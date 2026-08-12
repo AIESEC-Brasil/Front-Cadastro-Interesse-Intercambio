@@ -18,6 +18,7 @@ const VoluntarioGlobal = () => {
     return (
         <main>
             <div className="w-full max-w-4xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-xl">
+                <h2>Etapa 1 de 2</h2>
                 <FormularioPreCadastro />
             </div>
         </main>

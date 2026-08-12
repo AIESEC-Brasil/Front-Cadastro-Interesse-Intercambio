@@ -1,5 +1,7 @@
 /**
- * Importação principal do React para suporte a elementos JSX e tipagens.
+ * @file InputTexto.tsx
+ * @description Componente reutilizável de campo de texto com suporte a label flutuante, 
+ * tratamento de erros e acessibilidade integrada.
  */
 import React from 'react';
 
@@ -61,17 +63,19 @@ const InputTexto = ({
         {legenda} {obrigatorio && <span className="text-red-500">*</span>}
       </label>
 
-      {/* Exibição condicional da mensagem de erro acessível para leitores de tela */}
-      {error && (
-        <span
-          className="errorMsg"
-          id={`erro-${id}`}
-          role="alert"
-          aria-live="polite"
-        >
-          {error}
-        </span>
-      )}
+      {/* Exibição condicional da mensagem de erro com altura mínima reservada para manter o grid alinhado */}
+      <div className="min-h-4 mt-1">
+        {error && (
+          <span
+            className="errorMsg block text-xs text-red-500"
+            id={`erro-${id}`}
+            role="alert"
+            aria-live="polite"
+          >
+            {error}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
