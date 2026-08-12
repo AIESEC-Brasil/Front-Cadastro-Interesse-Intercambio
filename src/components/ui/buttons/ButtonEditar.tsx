@@ -9,15 +9,15 @@ import React from 'react';
 
 interface ButtonEditarProps {
     texto: string;
-    onClick: () => void;
-    type?: 'button' | 'submit';
+    aoClicar: () => void;
+    type?: 'button';
 }
 
-const ButtonEditar = ({ texto, onClick, type = 'button' }: ButtonEditarProps) => {
+const ButtonEditar = ({ texto, aoClicar, type = 'button' }: ButtonEditarProps) => {
     return (
         <button
             type={type}
-            onClick={onClick}
+            onClick={aoClicar}
             className="px-6 py-2.5 rounded-lg font-medium text-white bg-slate-500 hover:bg-slate-600 focus:ring-slate-300 transition shadow-sm cursor-pointer"
         >
             {texto}

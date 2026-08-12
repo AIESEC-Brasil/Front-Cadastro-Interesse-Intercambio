@@ -20,13 +20,18 @@
 .inputGroup label {
     position: absolute;
     left: 12px;
-    top: 50%;
+    top:  50%;
     transform: translateY(-50%);
     padding: 0 4px;
     transition: 0.2s all;
     pointer-events: none;
     color: #666;
     background-color: transparent;
+}
+
+/* Se houver erro, o label vai para 35% (em vez de ir para o topo / 0px) */
+.inputGroup.hasError label {
+    top: 35%;
 }
 
 /* Animação do label flutuante ao focar ou preencher */

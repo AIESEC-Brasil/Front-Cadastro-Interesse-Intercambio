@@ -42,7 +42,7 @@ const InputTexto = ({
   obrigatorio = true
 }: InputTextoProps) => {
   return (
-    <div className={styles.inputGroup}>
+    <div className={`${styles.inputGroup} ${error ? styles.hasError : ''}`}>
       {/* Campo de entrada de texto com atributos de controle, obrigatoriedade e acessibilidade */}
       <input
         type="text"
@@ -64,7 +64,7 @@ const InputTexto = ({
       {/* Exibição condicional da mensagem de erro acessível para leitores de tela */}
       {error && (
         <span
-          className={styles.errorMsg}
+          className="errorMsg"
           id={`erro-${id}`}
           role="alert"
           aria-live="polite"

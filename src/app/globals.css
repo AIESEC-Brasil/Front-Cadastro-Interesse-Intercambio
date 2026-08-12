@@ -23,3 +23,9 @@ body {
   color: var(--background);
   font-family: var(--font-sans), sans-serif;
 }
+
+.errorMsg {
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 4px;
+}
