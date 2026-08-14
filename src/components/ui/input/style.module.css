@@ -63,8 +63,7 @@
 
 /* Quando o input de senha está vazio e com erro, mantém o label centralizado */
 .inputGroup.hasError.senha label {
-    top: 50% !important;
-    transform: translateY(-200%) !important;
+    top: 27px !important;
 }
 
 /* Quando o usuário clica ou digita na senha, o label sobe para o topo perfeitamente */
@@ -75,6 +74,10 @@
     font-size: 13px;
     color: #0072ce;
     background-color: #fff;
+}
+
+.eye.hasError {
+    top: 26.5px;
 }
 
 .containerDinamico {

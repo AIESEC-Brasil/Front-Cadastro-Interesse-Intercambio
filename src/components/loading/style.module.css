@@ -1,0 +1,65 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.containerModal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinner {
+  width: 5rem;
+  height: 5rem;
+  animation: spin 1s linear infinite;
+  border-radius: 9999px;
+  border-width: 8px;
+  border-color: #2563eb;
+  border-top-color: transparent;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.textoOnda {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: 0.05em;
+  color: #2563eb;
+}
+
+.letra {
+  display: inline-block;
+  /* Duração ajustada para dar tempo de ver a onda correndo suavemente */
+  animation: waveBounce 2.2s ease-in-out infinite;
+}
+
+.espaco {
+  width: 0.5rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes waveBounce {
+  0%, 40%, 100% {
+    transform: translateY(0px);
+  }
+  20% {
+    transform: translateY(-10px); /* Sobe e desce em formato de onda */
+  }
+}

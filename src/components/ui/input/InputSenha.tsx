@@ -64,7 +64,7 @@ const InputSenha = ({
       {/* Botão para exibir/ocultar senha */}
       <button
         type="button"
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+        className={`${styles.eye} ${temErro ? styles.hasError : ''} absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none`}
         onClick={() => setMostrarSenha(!mostrarSenha)}
         aria-label={mostrarSenha ? "Ocultar senha" : "Exibir senha"}
       >

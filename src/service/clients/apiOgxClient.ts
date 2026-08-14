@@ -15,4 +15,17 @@ const apiOgxClient = axios.create({
   baseURL: "/api/ogx",
 });
 
+// ⚡ Interceptor de Resposta
+apiOgxClient.interceptors.response.use(
+  (response) => {
+    // Aqui você pega o que vem da API e já "filtra" para retornar direto o .data
+    // Se a sua API retorna { status: 200, data: [...] }, você pode retornar response.data
+    return response.data; 
+  },
+  (error) => {
+    // Tratamento de erro padrão do interceptor
+    return Promise.reject(error);
+  }
+);
+
 export default apiOgxClient;
