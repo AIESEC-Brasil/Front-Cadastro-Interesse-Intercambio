@@ -688,9 +688,6 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                 aoConfirmar={() => {
                     setModalSucessoAberta(false);
                     setModalSucessoCadastroAberta(true);
-                    if (typeof state === 'function') {
-                        state(2);
-                    }
                 }} 
                 aoEditar={() => setModalSucessoAberta(false)} 
             />
@@ -699,7 +696,12 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                 aberta={modalSucessoCadastroAberta}
                 senha={senha}
                 emailReferencia={emails[0]?.valor || ''}
-                aoConcluir={() => setModalSucessoCadastroAberta(false)}
+                aoConcluir={() => {
+                    setModalSucessoCadastroAberta(false);
+                    if (typeof state === 'function') {
+                        state(2);
+                    }
+                }}
             />
 
             <ModalErroConexao 
