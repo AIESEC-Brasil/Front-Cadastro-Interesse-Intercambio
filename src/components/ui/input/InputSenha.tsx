@@ -42,24 +42,28 @@ const InputSenha = ({
   const temErro = listaErros.length > 0 && listaErros[0] !== '';
 
   return (
-    <div className={`${styles.inputGroup} ${temErro ? styles.hasError : ''} ${styles.senha}`}>
-      {/* Campo de entrada de senha */}
-      <input
-        type={mostrarSenha ? "text" : "password"}
-        id={id}
-        name={id}
-        placeholder=" "
-        required={obrigatorio}
-        aria-required={obrigatorio}
-        aria-describedby={`erro-${id}`}
-        value={valor}
-        onChange={atualizar}
-      />
+    <div className={`${styles.inputGroup} ${temErro ? styles.hasError : ''} ${styles.senha} `}>
+      <div className={`relative flex items-center w-full rounded-xl border bg-white transition-all ${
+                temErro ? 'border-red-500 focus-within:ring-2 focus-within:ring-red-200' : 'border-zinc-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100'
+            }`}>
+          {/* Campo de entrada de senha */}
+          <input
+            type={mostrarSenha ? "text" : "password"}
+            id={id}
+            name={id}
+            placeholder=" "
+            required={obrigatorio}
+            aria-required={obrigatorio}
+            aria-describedby={`erro-${id}`}
+            value={valor}
+            onChange={atualizar}
+          />
 
-      {/* Rótulo (Label) flutuante */}
-      <label htmlFor={id}>
-        {legenda} {obrigatorio && <span className="text-red-500">*</span>}
-      </label>
+        {/* Rótulo (Label) flutuante */}
+        <label htmlFor={id}>
+          {legenda} {obrigatorio && <span className="text-red-500">*</span>}
+        </label>
+      </div>
 
       {/* Botão para exibir/ocultar senha */}
       <button

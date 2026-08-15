@@ -2,12 +2,17 @@
 
 /**
  * @file FormularioPreCadastro.tsx
- * @description Formulário com validação restrita. 
- * As propriedades `rota` e `state` definem e controlam respectivamente a rota e a função para mudar o step (ex: state(2)).
+ * @description Componente de formulário para pré-cadastro de leads AIESEC.
+ * Gerencia estados de dados pessoais, contatos, origem, vínculo acadêmico/escritório e LGPD.
+ * Integra-se com APIs externas para metadados e validação.
+ * 
+ * Propriedades:
+ * @property {string} rota - Define a rota de contexto para o formulário (ex: 'voluntario-global', 'talento-global').
+ * @property {(step: number | any) => void} state - Callback para transição de estados no componente pai.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-
+import { ChevronDown } from 'lucide-react';
 import InputTexto from '../ui/input/InputTexto';
 import InputSenha from '../ui/input/InputSenha';
 import InputData from '../ui/input/InputData';
@@ -38,6 +43,7 @@ import {
     removerMascaraData 
 } from '../../helpers/formatter';
 
+/** Interfaces para tipagem dos dados recuperados da API */
 interface OpcaoTipo {
     original: string;
     traduzido: string;
@@ -53,37 +59,43 @@ interface ProdutoOpcao {
     nome: string;
 }
 
-/**
- * Interface de propriedades do componente FormularioPreCadastro.
- * @property {string} rota - Identificador da rota atual (Obrigatório).
- * @property {(step: number | any) => void} state - Função callback para alterar o step/estado no componente pai após o sucesso.
- */
+interface OrigemOpcao {
+    id: number | string;
+    nome: string;
+}
+
 interface FormularioPreCadastroProps {
     rota: string;
     state: (step: number | any) => void;
 }
 
 /**
- * Componente principal do formulário de pré-cadastro.
- * 
- * @param {FormularioPreCadastroProps} props - Propriedades obrigatórias do componente.
- * @returns {JSX.Element} O elemento TSX renderizado do formulário.
+ * Componente principal `FormularioPreCadastro`.
+ * Orquestra a renderização dos inputs, validações em tempo real e persistência dos dados.
  */
 const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
-    // Estados principais de dados
+    // --- Estados de Dados do Formulário ---
     const [nome, setNome] = useState<string>('');
     const [sobrenome, setSobrenome] = useState<string>('');
     const [senha, setSenha] = useState<string>('');
     const [dataNascimento, setDataNascimento] = useState<string>('');
-    const [isOpen,setIsOpen] = useState<boolean>(false);
+    
+    // --- Estados de UI para Menus e Listas ---
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    // Estado do Produto (mapeado de metadados salvando { id, nome })
+    // --- Estado do Produto ---
     const [listaProdutos, setListaProdutos] = useState<ProdutoOpcao[]>([]);
     const [produtoSelecionado, setProdutoSelecionado] = useState<string>('');
     const [idProduto, setIdProduto] = useState<number | string>('');
     const [erroProduto, setErroProduto] = useState<string>('');
 
-    // Estados de Divisão de Mercado (com suporte a IDs exigidos pelo InputAutoComplete)
+    // --- Estado de Origem (InputAutoComplete) ---
+    const [listaOrigens, setListaOrigens] = useState<OrigemOpcao[]>([]);
+    const [origemSelecionada, setOrigemSelecionada] = useState<string>('');
+    const [idOrigem, setIdOrigem] = useState<number | string>('');
+    const [erroOrigem, setErroOrigem] = useState<string>('');
+
+    // --- Estados de Divisão de Mercado (Universidade/Escritório) ---
     const [marcarSemUniversidade, setMarcarSemUniversidade] = useState<boolean>(false);
     const [listaUniversidades, setListaUniversidades] = useState<any[]>([]);
     const [listaEscritorios, setListaEscritorios] = useState<any[]>([]);
@@ -94,17 +106,22 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
     const [escritorioSelecionado, setEscritorioSelecionado] = useState<string>('');
     const [idEscritorio, setIdEscritorio] = useState<number | string>('');
 
-    // Controle de Carregamento
+    // --- Estado do Termo LGPD ---
+    const [termoLGPD, setTermoLGPD] = useState<boolean>(false);
+    const [tituloTermoLGPD, setTituloTermoLGPD] = useState<string>('Eu concordo com a coleta e uso dos meus dados conforme a Política de Privacidade *');
+    const [descricaoTermoLGPD, setDescricaoTermoLGPD] = useState<string>('');
+    const [erroTermoLGPD, setErroTermoLGPD] = useState<string>('');
+
+    // --- Estados de Carregamento e API ---
     const [carregandoMetadados, setCarregandoMetadados] = useState<boolean>(true);
     const [carregandoEnvio, setCarregandoEnvio] = useState<boolean>(false);
 
-    // Dados dinâmicos da API
     const [opcoesEmail, setOpcoesEmail] = useState<OpcaoTipo[]>([]);
     const [opcoesTelefone, setOpcoesTelefone] = useState<OpcaoTipo[]>([]);
-    const [emails, setEmails] = useState<ItemDinamico[]>([{ tipo: '', valor: '' }]);
-    const [telefones, setTelefones] = useState<ItemDinamico[]>([{ tipo: '', valor: '' }]);
+    const [emails, setEmails] = useState<ItemDinamico[]>([{ tipo: 'other', valor: '' }]);
+    const [telefones, setTelefones] = useState<ItemDinamico[]>([{ tipo: 'other', valor: '' }]);
 
-    // Erros de campos persistentes
+    // --- Estados de Erros Persistentes ---
     const [erroNome, setErroNome] = useState<string>('');
     const [erroSobrenome, setErroSobrenome] = useState<string>('');
     const [erroSenha, setErroSenha] = useState<string[]>([]);
@@ -114,7 +131,7 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
     const [erroUniversidade, setErroUniversidade] = useState<string>('');
     const [erroEscritorio, setErroEscritorio] = useState<string>('');
 
-    // Modais
+    // --- Estados de Modais ---
     const [modalErroAberta, setModalErroAberta] = useState<boolean>(false);
     const [modalErroConexaoAberta, setModalErroConexaoAberta] = useState<boolean>(false);
     const [modalSucessoAberta, setModalSucessoAberta] = useState<boolean>(false);
@@ -126,6 +143,9 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
     const prevEmailsLen = useRef(emails.length);
     const prevTelefonesLen = useRef(telefones.length);
 
+    /**
+     * Efeito de inicialização: busca metadados e lista de universidades da API.
+     */
     useEffect(() => {
         let isMounted = true;
 
@@ -144,6 +164,8 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                 const campoTelefone = metadados.find((item: any) => item.external_id === 'telefone');
                 const campoEscritorio = metadados.find((item: any) => item.external_id === 'aiesec-mais-proxima');
                 const campoProduto = metadados.find((item: any) => item.external_id === 'produto');
+                const campoOrigem = metadados.find((item: any) => item.external_id === 'tag-origem-2');
+                const campoLGPD = metadados.find((item: any) => item.external_id === 'eu-concordo-com-a-coleta-e-uso-dos-meus-dados-conforme-');
 
                 const ordenar = (opts: string[]) => [...opts].sort((a, b) => a.toLowerCase() === 'other' ? -1 : b.toLowerCase() === 'other' ? 1 : 0);
 
@@ -157,11 +179,24 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                     nome: data.text
                 }));
 
-                // Mapeamento dinâmico das opções de produto baseando-se no external_id "produto" com estrutura { id, nome: text }
                 const produtoOpcoes = (campoProduto?.options || []).map((data: any) => ({
                     id: data.id,
                     nome: data.text
                 }));
+
+                const origemOpcoes = (campoOrigem?.options || []).map((data: any) => ({
+                    id: data.id,
+                    nome: data.text
+                }));
+
+                if (campoLGPD) {
+                    if (campoLGPD.name) {
+                        setTituloTermoLGPD(campoLGPD.name);
+                    }
+                    if (campoLGPD.description) {
+                        setDescricaoTermoLGPD(campoLGPD.description);
+                    }
+                }
 
                 if (isMounted) {
                     setOpcoesEmail(emailFormatado);
@@ -169,6 +204,7 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                     setListaUniversidades(resUni?.data.universidades || []);
                     setListaEscritorios(escritorioOpcoes);
                     setListaProdutos(produtoOpcoes);
+                    setListaOrigens(origemOpcoes);
                     setModalErroConexaoAberta(false);
                 }
             } catch (error) {
@@ -184,7 +220,9 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
         return () => { isMounted = false; };
     }, []);
 
-    // Lógica ajustada: Pré-define o produto com base na rota e opções mapeadas do metadado
+    /**
+     * Efeito para pré-seleção automática de produto baseado na rota.
+     */
     useEffect(() => {
         if (listaProdutos.length === 0) return;
 
@@ -203,7 +241,9 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
         }
     }, [rota, listaProdutos]);
 
-    // Validação contínua rigorosa aplicada a todos os campos (estáticos e dinâmicos)
+    /**
+     * Validação em tempo real dos campos.
+     */
     useEffect(() => {
         if (nome) {
             const eNome = validarTexto(nome, "nome");
@@ -253,6 +293,10 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
             setErroProduto('');
         }
 
+        if (origemSelecionada) {
+            setErroOrigem('');
+        }
+
         if (!marcarSemUniversidade) {
             if (universidadeSelecionada) {
                 setErroUniversidade('');
@@ -265,10 +309,17 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
             setErroUniversidade('');
         }
 
+        if (termoLGPD) {
+            setErroTermoLGPD('');
+        }
+
         prevEmailsLen.current = emails.length;
         prevTelefonesLen.current = telefones.length;
-    }, [nome, sobrenome, senha, dataNascimento, emails, telefones, produtoSelecionado, marcarSemUniversidade, universidadeSelecionada, escritorioSelecionado]);
+    }, [nome, sobrenome, senha, dataNascimento, emails, telefones, produtoSelecionado, origemSelecionada, marcarSemUniversidade, universidadeSelecionada, escritorioSelecionado, termoLGPD]);
 
+    /**
+     * Valida todos os campos antes de processar o envio e dispara modais de erro ou sucesso.
+     */
     const validarEProcessar = async () => {
         setCarregandoEnvio(true);
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -282,8 +333,10 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
         const errsT = validarTelefone(telefones.map(i => i.valor));
 
         const errProd = !produtoSelecionado ? 'Campo obrigatório.' : '';
+        const errOrigem = !origemSelecionada ? 'Campo obrigatório.' : '';
         const errUni = !marcarSemUniversidade && !universidadeSelecionada ? 'Campo obrigatório.' : '';
         const errEsc = marcarSemUniversidade && !escritorioSelecionado ? 'Campo obrigatório.' : '';
+        const errLGPD = !termoLGPD ? 'Campo obrigatório.' : '';
 
         const temErro = [
             eNome && eNome[0] !== '', 
@@ -293,8 +346,10 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
             errsE.some(e => e !== ''), 
             errsT.some(e => e !== ''),
             Boolean(errProd),
+            Boolean(errOrigem),
             Boolean(errUni),
-            Boolean(errEsc)
+            Boolean(errEsc),
+            Boolean(errLGPD)
         ].some(Boolean);
 
         if (temErro) {
@@ -332,6 +387,11 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                 erroJson.produto = [errProd];
             }
 
+            if (errOrigem) {
+                setErroOrigem(errOrigem);
+                erroJson.origem = [errOrigem];
+            }
+
             if (errUni) {
                 setErroUniversidade(errUni);
                 erroJson.universidade = [errUni];
@@ -340,6 +400,11 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
             if (errEsc) {
                 setErroEscritorio(errEsc);
                 erroJson.escritorio = [errEsc];
+            }
+
+            if (errLGPD) {
+                setErroTermoLGPD(errLGPD);
+                erroJson.lgpd = [errLGPD];
             }
 
             setErrosJson(erroJson);
@@ -351,11 +416,14 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                 sobrenome,
                 produto: produtoSelecionado,
                 idProduto: idProduto,
+                origem: origemSelecionada,
+                idOrigem: idOrigem,
                 "Data de Nascimento": aplicarMascaraData(dataFormatadaParaEnvio.split('-').reverse().join('/')), 
                 email: emails.map((e) => e.valor), 
                 telefone: telefones.map((t) => t.valor),
+                termoLGPD,
             };
-            console.log(telefones)
+            console.log(jsonResumo)
             if (!marcarSemUniversidade){
                 jsonResumo.universidade = universidadeSelecionada;
             } else {
@@ -370,10 +438,9 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
 
     return (
         <div className="relative">
-            {/* Esqueleto de carregamento */}
+            {/* Esqueleto de carregamento exibido enquanto metadados são buscados */}
             <LoadSkeletonDinamico aberta={carregandoMetadados} layoutLinhas={[2, 1, 1, 2, 2]} />
 
-            {/* Formulário visível apenas após sucesso na carga dos metadados */}
             {!carregandoMetadados && !modalErroConexaoAberta && (
                 <div id="meuForm" className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -447,13 +514,13 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                         obrigatorio 
                     />
 
+                    {/* Seleção de Produto (visível apenas para rotas específicas) */}
                     {rota === 'talento-global' && (
                         <div className="flex flex-col gap-1 relative">
                             <label className="text-sm font-medium text-gray-700">
                                 Produto <span className="text-red-500">*</span>
                             </label>
                             
-                            {/* Botão que simula o select */}
                             <div
                                 onClick={() => setIsOpen(!isOpen)}
                                 className={`w-full p-2.5 border rounded-lg bg-white text-gray-900 cursor-pointer flex justify-between items-center ${
@@ -461,14 +528,13 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                                 }`}
                             >
                                 <span>{produtoSelecionado || "Selecione"}</span>
-                                <svg className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <ChevronDown size={18} className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                             </div>
 
-                            {/* Menu customizado com opções em lista */}
                             {isOpen && (
-                                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden py-2 px-1 space-y-1">
+                                <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden py-2 px-1 space-y-1 max-h-60 overflow-y-auto">
                                     <div
-                                        className="px-3 py-2.5 hover:bg-gray-100 rounded-xl cursor-pointer text-gray-700"
+                                        className="px-3 py-2.5 hover:bg-gray-100 rounded-xl cursor-pointer text-gray-700 text-sm"
                                         onClick={() => {
                                             setProdutoSelecionado("");
                                             setIdProduto("");
@@ -480,7 +546,7 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                                     {listaProdutos.filter(p => p.nome.toLowerCase().includes("talento global")).map((prod) => (
                                         <div
                                             key={prod.id}
-                                            className="px-3 py-2.5 hover:bg-gray-100 rounded-xl cursor-pointer text-gray-900"
+                                            className="px-3 py-2.5 hover:bg-gray-100 rounded-xl cursor-pointer text-gray-900 text-sm"
                                             onClick={() => {
                                                 setProdutoSelecionado(prod.nome);
                                                 setIdProduto(prod.id);
@@ -493,12 +559,12 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                                 </div>
                             )}
 
-                            {erroProduto && <span className="text-xs text-red-500 mt-1">{erroProduto}</span>}
+                            {erroProduto && <span className="min-h-4 text-xs text-red-500 mt-0.5">{erroProduto}</span>}
                         </div>
                     )}
 
-                    {/* Divisão de Mercado adaptada ao contrato do InputAutoComplete */}
-                    <div className="flex flex-col gap-2">
+                    {/* Divisão de Mercado: Seleção de Universidade ou AIESEC mais próxima */}
+                    <div className="flex flex-col">
                         <InputAutoComplete 
                             id="universidade"
                             legenda="Universidade" 
@@ -514,7 +580,7 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                             obrigatorio={!marcarSemUniversidade}
                         />
 
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-2 mt-2">
                             <input 
                                 type="checkbox" 
                                 id="semUniversidade" 
@@ -532,26 +598,69 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                                     }
                                 }} 
                             />
-                            <label htmlFor="semUniversidade" className="text-sm cursor-pointer select-none text-blue-600">
+                            <label htmlFor="semUniversidade" className="text-base cursor-pointer select-none text-blue-900">
                                 Minha universidade não está listada ou não tenho vínculo com nenhum universidade
                             </label>
                         </div>
 
                         {marcarSemUniversidade && (
-                            <InputAutoComplete 
-                                id="escritorio"
-                                legenda="Qual AIESEC mais próxima" 
-                                opcoes={listaEscritorios} 
-                                valor={escritorioSelecionado} 
-                                atualizar={(nomeSel, idSel) => {
-                                    setEscritorioSelecionado(nomeSel);
-                                    setIdEscritorio(idSel);
-                                    if (nomeSel) setErroEscritorio('');
-                                }} 
-                                error={erroEscritorio}
-                                obrigatorio={marcarSemUniversidade}
-                            />
+                            <div className="flex flex-col gap-2 mt-7">
+                                <InputAutoComplete 
+                                    id="escritorio"
+                                    legenda="Qual AIESEC mais próxima" 
+                                    opcoes={listaEscritorios} 
+                                    valor={escritorioSelecionado} 
+                                    atualizar={(nomeSel, idSel) => {
+                                        setEscritorioSelecionado(nomeSel);
+                                        setIdEscritorio(idSel);
+                                        if (nomeSel) setErroEscritorio('');
+                                    }} 
+                                    error={erroEscritorio}
+                                    obrigatorio={marcarSemUniversidade}
+                                />
+                            </div>
                         )}
+                    </div>
+
+                    {/* Campo de Origem via Autocomplete */}
+                    <div className="flex flex-col">
+                        <InputAutoComplete 
+                            id="origem"
+                            legenda="Como conheceu a AIESEC?" 
+                            opcoes={listaOrigens} 
+                            valor={origemSelecionada} 
+                            atualizar={(nomeSel, idSel) => {
+                                setOrigemSelecionada(nomeSel);
+                                setIdOrigem(idSel);
+                                if (nomeSel) setErroOrigem('');
+                            }} 
+                            error={erroOrigem}
+                            obrigatorio
+                        />
+                    </div>
+
+                    {/* Checkbox de Termo de Privacidade / LGPD mapeado dinamicamente */}
+                    <div className="flex flex-col">
+                        <div className="flex items-start gap-2">
+                            <input 
+                                type="checkbox" 
+                                id="termoLGPD" 
+                                checked={termoLGPD} 
+                                onChange={(e) => setTermoLGPD(e.target.checked)} 
+                                className="mt-1"
+                            />
+                            <div className="flex flex-col">
+                                <label htmlFor="termoLGPD" className="text-base font-semibold text-blue-900 cursor-pointer select-none">
+                                    {tituloTermoLGPD}
+                                </label>
+                                {descricaoTermoLGPD && (
+                                    <span className="text-sm text-gray-600 mt-1">
+                                        {descricaoTermoLGPD}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                        {erroTermoLGPD && <span className="min-h-4 text-xs text-red-500 mt-0.5">{erroTermoLGPD}</span>}
                     </div>
 
                     <ButtonConfirmar 
@@ -562,7 +671,7 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                 </div>
             )}
 
-            {/* Modais */}
+            {/* Modais de controle e feedback */}
             <LoadSpinner aberta={carregandoEnvio} />
 
             <ModalErro 
@@ -593,7 +702,6 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                 aoConcluir={() => setModalSucessoCadastroAberta(false)}
             />
 
-            {/* Modal de Conexão com disparador de reload (suportando iframe via parent) */}
             <ModalErroConexao 
                 aberta={modalErroConexaoAberta} 
                 tipo={tipoErroConexao}

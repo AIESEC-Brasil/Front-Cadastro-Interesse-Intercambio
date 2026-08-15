@@ -1,7 +1,6 @@
 /* Agrupamento de inputs com label flutuante */
 .inputGroup {
     position: relative;
-    margin-bottom: 22px;
     width: 100%;
 }
 
@@ -38,37 +37,6 @@
 /* 3. ANIMAÇÃO DE FLUTUAR: Se focar ou preencher, o label vai para o topo (0px) */
 .inputGroup input:focus + label,
 .inputGroup input:not(:placeholder-shown) + label {
-    top: 0px !important;
-    transform: translateY(-50%) !important;
-    font-size: 13px;
-    color: #0072ce;
-    background-color: #fff;
-}
-
-/* ==========================================
-   AJUSTES ESPECÍFICOS PARA O INPUT DE SENHA
-   ========================================== */
-
-.inputGroup.senha label {
-    position: absolute;
-    left: 12px;
-    top: 50% !important;
-    transform: translateY(-50%);
-    padding: 0 4px;
-    transition: 0.2s all;
-    pointer-events: none;
-    color: #666;
-    background-color: transparent;
-}
-
-/* Quando o input de senha está vazio e com erro, mantém o label centralizado */
-.inputGroup.hasError.senha label {
-    top: 27px !important;
-}
-
-/* Quando o usuário clica ou digita na senha, o label sobe para o topo perfeitamente */
-.inputGroup.senha input:focus + label,
-.inputGroup.senha input:not(:placeholder-shown) + label {
     top: 0px !important;
     transform: translateY(-50%) !important;
     font-size: 13px;

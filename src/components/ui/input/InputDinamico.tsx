@@ -51,7 +51,7 @@ const InputDinamico = ({
 
   // Estado para controlar qual índice está com o select aberto (evita abrir todos ao mesmo tempo)
   const [dropdownAbertoIndex, setDropdownAbertoIndex] = useState<number | null>(null);
-
+  
   return (
     <div className={styles.containerDinamico}>
       <label className={styles.labelPrincipal}>
@@ -62,6 +62,7 @@ const InputDinamico = ({
         const erroAtual = erros[index];
         const isOpen = dropdownAbertoIndex === index;
         const opcaoSelecionada = opcoesTipo.find(o => o.original === item.tipo)
+        console.log(opcoesTipo,item)
 
         return (
           <React.Fragment key={index}>
@@ -98,14 +99,18 @@ const InputDinamico = ({
 
                 {/* Input de Valor */}
                 <div className={styles.inputWrapper}>
-                  <input
-                    type={tipoInput}
-                    placeholder={placeholderInput}
-                    aria-describedby={`erro-dinamico-${tituloLabel.toLowerCase()}-${index}`}
-                    value={item.valor}
-                    onChange={(e) => aoAtualizarValor(index, e.target.value)}
-                    className={styles.inputValor}
-                  />
+                  <div className={`relative flex items-center w-full rounded-xl border bg-white transition-all ${
+                  erroAtual ? 'border-red-500 focus-within:ring-2 focus-within:ring-red-200' : 'border-zinc-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100'
+                  }`}>
+                    <input
+                      type={tipoInput}
+                      placeholder={placeholderInput}
+                      aria-describedby={`erro-dinamico-${tituloLabel.toLowerCase()}-${index}`}
+                      value={item.valor}
+                      onChange={(e) => aoAtualizarValor(index, e.target.value)}
+                      className={styles.inputValor}
+                    />
+                  </div>
                 </div>
 
                 {/* Botão de Remover */}

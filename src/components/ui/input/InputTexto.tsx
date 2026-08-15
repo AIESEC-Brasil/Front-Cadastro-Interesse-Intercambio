@@ -45,24 +45,27 @@ const InputTexto = ({
 }: InputTextoProps) => {
   return (
     <div className={`${styles.inputGroup} ${error ? styles.hasError : ''}`}>
-      {/* Campo de entrada de texto com atributos de controle, obrigatoriedade e acessibilidade */}
-      <input
-        type="text"
-        id={id}
-        name={id}
-        placeholder=" "
-        required={obrigatorio}
-        aria-required={obrigatorio}
-        aria-describedby={`erro-${id}`}
-        value={valor}
-        onChange={atualizar}
-      />
+      <div className={`relative flex items-center w-full rounded-xl border bg-white transition-all ${
+                error ? 'border-red-500 focus-within:ring-2 focus-within:ring-red-200' : 'border-zinc-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100'
+            }`}>
+        {/* Campo de entrada de texto com atributos de controle, obrigatoriedade e acessibilidade */}
+        <input
+          type="text"
+          id={id}
+          name={id}
+          placeholder=" "
+          required={obrigatorio}
+          aria-required={obrigatorio}
+          aria-describedby={`erro-${id}`}
+          value={valor}
+          onChange={atualizar}
+        />
 
-      {/* Rótulo (Label) flutuante que se movimenta ao focar ou preencher o input */}
-      <label htmlFor={id}>
-        {legenda} {obrigatorio && <span className="text-red-500">*</span>}
-      </label>
-
+        {/* Rótulo (Label) flutuante que se movimenta ao focar ou preencher o input */}
+        <label htmlFor={id}>
+          {legenda} {obrigatorio && <span className="text-red-500">*</span>}
+        </label>
+      </div>
       {/* Exibição condicional da mensagem de erro com altura mínima reservada para manter o grid alinhado */}
       <div className="min-h-2 mt-1">
         {error && (

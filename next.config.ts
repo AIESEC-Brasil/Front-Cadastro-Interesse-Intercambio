@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
    * Evita avisos de 'Blocked cross-origin request' ao acessar o servidor dev
    * via WSL2, Docker ou IPs da rede local.
    */
-  allowedDevOrigins: ["172.19.135.162", "localhost:3000"],
+  allowedDevOrigins: ["172.19.135.162", "localhost:3000","amused-martin-sacred.ngrok-free.app"],
 
   /**
    * Configura o proxy reverso nativo do Next.js.
