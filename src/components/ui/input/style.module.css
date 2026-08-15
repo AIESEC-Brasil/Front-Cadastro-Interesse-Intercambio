@@ -20,7 +20,7 @@
 .inputGroup label {
     position: absolute;
     left: 12px;
-    top: 50%;
+    top: 38px;
     transform: translateY(-100%);
     padding: 0 4px;
     transition: 0.2s all;
@@ -31,7 +31,7 @@
 
 /* 1. Quando houver erro e o input estiver VAZIO: label fica centralizado */
 .inputGroup.hasError label {
-    top: 35%;
+    top: 27px !important;
     transform: translateY(-50%);
 }
 

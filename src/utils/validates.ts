@@ -73,6 +73,8 @@ const validarEmail = (emails: string[]): string[] => {
             erros.push(`O e-mail na posição ${index + 1} não pode estar vazio.`);
         } else if (!regexEmail.test(emailLimpo)) {
             erros.push(`O e-mail "${email}" é inválido.`);
+        } else {
+            erros.push('')
         }
     });
 
@@ -98,6 +100,8 @@ const validarTelefone = (telefones: string[]): string[] => {
             erros.push(`O telefone na posição ${index + 1} não pode estar vazio.`);
         } else if (!regexTelefone.test(telefoneLimpo)) {
             erros.push(`O telefone "${telefone}" é inválido. O formato deve ser (DD) 9XXXXXXXX.`);
+        } else {
+            erros.push('')
         }
     });
 
@@ -109,25 +113,55 @@ const validarTelefone = (telefones: string[]): string[] => {
 };
 
 /**
- * Aplica a máscara de telefone brasileiro no formato (DD) 9XXXXXXXX.
+ * Valida o formato e integridade de uma data no formato DD/MM/AAAA,
+ * garantindo também que não seja informada uma data maior que a atual.
  */
-const aplicarMascaraTelefone = (valor: string): string => {
-    const apenasNumeros = valor.replace(/\D/g, "").slice(0, 11);
-    
-    if (apenasNumeros.length <= 2) {
-        return apenasNumeros.length ? `(${apenasNumeros}` : "";
-    }
-    if (apenasNumeros.length <= 7) {
-        return `(${apenasNumeros.slice(0, 2)}) ${apenasNumeros.slice(2)}`;
-    }
-    return `(${apenasNumeros.slice(0, 2)}) ${apenasNumeros.slice(2, 7)}-${apenasNumeros.slice(7, 11)}`;
-};
+const validarData = (data: string): string[] => {
+    const erros: string[] = [];
+    const dataLimpa = data.trim();
+    const regexData = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 
-/**
- * Remove a máscara de telefone, retornando apenas os dígitos numéricos.
- */
-const removerMascaraTelefone = (valor: string): string => {
-    return valor.replace(/\D/g, "");
+    if (!dataLimpa) {
+        return ["O campo data de nascimento é obrigatório."];
+    }
+
+    if (!regexData.test(dataLimpa)) {
+        return ["A data deve estar no formato DD/MM/AAAA."];
+    }
+
+    const [, diaStr, mesStr, anoStr] = dataLimpa.match(regexData)!;
+    const dia = parseInt(diaStr, 10);
+    const mes = parseInt(mesStr, 10);
+    const ano = parseInt(anoStr, 10);
+
+    if (mes < 1 || mes > 12) {
+        erros.push("O mês informado é inválido.");
+    }
+
+    const diasNoMes = new Date(ano, mes, 0).getDate();
+    if (dia < 1 || dia > diasNoMes) {
+        erros.push("O dia informado é inválido para o mês correspondente.");
+    }
+
+    const anoAtual = new Date().getFullYear();
+    if (ano < 1900 || ano > anoAtual) {
+        erros.push("O ano informado é inválido.");
+    }
+
+    // Validação para não permitir data maior que a atual
+    const dataInformada = new Date(ano, mes - 1, dia);
+    const dataAtual = new Date();
+    dataAtual.setHours(0, 0, 0, 0);
+
+    if (dataInformada > dataAtual) {
+        erros.push("Não é permitido informar uma data maior que a atual.");
+    }
+
+    if (erros.length === 0) {
+        return [''];
+    }
+
+    return erros;
 };
 
 export { 
@@ -135,7 +169,6 @@ export {
     validarSenha, 
     contemApenasLetrasEspacos, 
     validarEmail, 
-    validarTelefone, 
-    aplicarMascaraTelefone, 
-    removerMascaraTelefone 
+    validarTelefone,
+    validarData
 };

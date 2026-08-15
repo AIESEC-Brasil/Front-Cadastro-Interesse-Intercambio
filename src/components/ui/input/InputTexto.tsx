@@ -64,7 +64,7 @@ const InputTexto = ({
       </label>
 
       {/* Exibição condicional da mensagem de erro com altura mínima reservada para manter o grid alinhado */}
-      <div className="min-h-4 mt-1">
+      <div className="min-h-2 mt-1">
         {error && (
           <span
             className="errorMsg block text-xs text-red-500"

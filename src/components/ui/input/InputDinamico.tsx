@@ -5,7 +5,7 @@
  * @description Componente reutilizável para múltiplos inputs com suporte a erros individuais por linha e correção de fragmentação de tags (React.Fragment).
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 import ButtonConfirmar from '../buttons/ButtonConfirmar';
 import styles from "./style.module.css";
@@ -26,7 +26,7 @@ interface InputDinamicoProps {
   tipoInput?: string;
   itens: ItemDinamico[];
   opcoesTipo: OpcaoTipo[];
-  erros?: string[]; // Recebe um array de erros correspondente a cada linha
+  erros?: string[];
   aoAdicionar: () => void;
   aoRemover: (index: number) => void;
   aoAtualizarTipo: (index: number, novoTipo: string) => void;
@@ -49,6 +49,9 @@ const InputDinamico = ({
 }: InputDinamicoProps) => {
   const apenasUmItem = itens.length === 1;
 
+  // Estado para controlar qual índice está com o select aberto (evita abrir todos ao mesmo tempo)
+  const [dropdownAbertoIndex, setDropdownAbertoIndex] = useState<number | null>(null);
+
   return (
     <div className={styles.containerDinamico}>
       <label className={styles.labelPrincipal}>
@@ -57,27 +60,40 @@ const InputDinamico = ({
 
       {itens.map((item, index) => {
         const erroAtual = erros[index];
+        const isOpen = dropdownAbertoIndex === index;
+        const opcaoSelecionada = opcoesTipo.find(o => o.original === item.tipo)
 
         return (
           <React.Fragment key={index}>
             <div className="flex flex-col mb-3">
               <div className={`${styles.linhaItem} ${erroAtual ? styles.hasError : ''}`}>
-                {/* Select de Tipo */}
-                <div className={styles.selectWrapper}>
-                  <select
-                    value={item.tipo}
-                    onChange={(e) => aoAtualizarTipo(index, e.target.value)}
-                    className={styles.selectTipo}
+                
+                {/* Select Customizado de Tipo com bordas arredondadas */}
+                <div className="relative w-1/3">
+                  <div
+                    onClick={() => setDropdownAbertoIndex(isOpen ? null : index)}
+                    className="w-full p-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 cursor-pointer flex justify-between items-center select-none"
                   >
-                    {opcoesTipo.map((opcao) => (
-                      <option key={opcao.original} value={opcao.original}>
-                        {opcao.traduzido}
-                      </option>
-                    ))}
-                  </select>
-                  <div className={styles.setaIcone}>
-                    <ChevronDown size={18} />
+                    <span className="truncate" >{opcaoSelecionada ? opcaoSelecionada.traduzido : "Selecione"}</span>
+                    <ChevronDown size={18} className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                   </div>
+
+                  {isOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-xl shadow-lg overflow-hidden">
+                      {opcoesTipo.map((opcao) => (
+                        <div
+                          key={opcao.original}
+                          className="p-2.5 hover:bg-gray-100 cursor-pointer text-gray-900 text-sm"
+                          onClick={() => {
+                            aoAtualizarTipo(index, opcao.original);
+                            setDropdownAbertoIndex(null);
+                          }}
+                        >
+                          {opcao.traduzido}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Input de Valor */}

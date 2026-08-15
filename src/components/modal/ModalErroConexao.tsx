@@ -4,10 +4,10 @@ import React from 'react';
 interface ModalProps {
   aberta: boolean;
   aoTentarNovamente: () => void;
-  tipo?: 'conexao' | 'bug'; // 'bug' para representar o erro inesperado
+  tipo: 'conexao' | 'bug'; // 'bug' para representar o erro inesperado
 }
 
-export default function ModalErroConexao({ aberta, aoTentarNovamente, tipo = 'conexao' }: ModalProps) {
+export default function ModalErroConexao({ aberta, aoTentarNovamente, tipo}: ModalProps) {
   if (!aberta) return null;
 
   const mensagens = {
