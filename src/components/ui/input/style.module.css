@@ -1,0 +1,155 @@
+/* Agrupamento de inputs com label flutuante */
+.inputGroup {
+    position: relative;
+    width: 100%;
+}
+
+.inputGroup input {
+    width: 100%;
+    padding: 14px 12px;
+    font-size: 16px;
+    border: 1px solid #ccd6eb;
+    border-radius: 10px;
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #171717;
+    outline: none;
+}
+
+.inputGroup label {
+    position: absolute;
+    left: 12px;
+    top: 38px;
+    transform: translateY(-100%);
+    padding: 0 4px;
+    transition: 0.2s all;
+    pointer-events: none;
+    color: #666;
+    background-color: transparent;
+}
+
+/* 1. Quando houver erro e o input estiver VAZIO: label fica centralizado */
+.inputGroup.hasError label {
+    top: 27px !important;
+    transform: translateY(-50%);
+}
+
+/* 3. ANIMAÇÃO DE FLUTUAR: Se focar ou preencher, o label vai para o topo (0px) */
+.inputGroup input:focus + label,
+.inputGroup input:not(:placeholder-shown) + label {
+    top: 0px !important;
+    transform: translateY(-50%) !important;
+    font-size: 13px;
+    color: #0072ce;
+    background-color: #fff;
+}
+
+.eye.hasError {
+    top: 26.5px;
+}
+
+.containerDinamico {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.labelPrincipal {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.linhaItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.selectWrapper {
+    width: 35%;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.inputWrapper {
+    flex: 1;
+    position: relative;
+}
+
+.selectTipo,
+.inputValor {
+    width: 100%;
+    padding: 14px 12px;
+    font-size: 16px;
+    border: 1px solid #ccd6eb;
+    border-radius: 10px;
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #171717;
+    outline: none;
+}
+
+.selectTipo {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    padding-right: 35px; /* Espaço para a setinha não sobrepor o texto */
+}
+
+.setaIcone {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+    color: #666;
+    display: flex;
+    align-items: center;
+}
+
+.selectTipo:focus,
+.inputValor:focus {
+    border-color: #0072ce;
+}
+
+.botaoRemover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    transition: background-color 0.2s;
+    height: 50px;
+}
+
+.botaoRemover.ativo {
+    background-color: #e88a8a;
+    color: #fff;
+    cursor: pointer;
+}
+
+.botaoRemover.ativo:hover {
+    background-color: #d97777;
+}
+
+.botaoRemover.bloqueado {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.botaoAdicionarWrapper {
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .botaoAdicionarWrapper {
+        width: auto;
+    }
+}
