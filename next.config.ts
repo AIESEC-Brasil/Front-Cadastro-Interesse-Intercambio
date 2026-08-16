@@ -14,7 +14,7 @@ import type { NextConfig } from "next";
  * e em qualquer domínio ou subdomínio pertencente a aiesec.org.br.
  */
 const AIESEC_FRAME_ANCESTORS =
-  "frame-ancestors 'self' https://aiesec.org.br https://*.aiesec.org.br;";
+  "frame-ancestors 'self' https://aiesec.org.br https://*.aiesec.org.br http://localhost:8000 https://amused-martin-sacred.ngrok-free.app/;";
 
 const nextConfig: NextConfig = {
   /**
