@@ -17,9 +17,6 @@ const AIESEC_FRAME_ANCESTORS =
   "frame-ancestors 'self' https://aiesec.org.br https://*.aiesec.org.br;";
 
 const nextConfig: NextConfig = {
-  // Habilita a exportação estática pura para gerar arquivos HTML/JS/CSS prontos para hospedagem estática
-  output: 'export',
-
   /**
    * Origens permitidas no modo de desenvolvimento.
    * Evita avisos de 'Blocked cross-origin request' ao acessar o servidor dev
@@ -33,8 +30,10 @@ const nextConfig: NextConfig = {
    * direto para a API externa configurada (ex: http://localhost:5000/api/*).
    */
 
-  /*
-  // Configuração de headers comentada temporariamente para permitir a exportação estática (output: 'export')
+  /**
+   * Configura cabeçalhos de resposta HTTP personalizados por rota.
+   * Libera CORS wildcard (*) para todas as rotas e define diretivas de CSP.
+   */
   async headers() {
     return [
       // -------------------------------------------------------------------
@@ -107,7 +106,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  */
 };
 
 export default nextConfig;
