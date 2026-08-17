@@ -62,7 +62,6 @@ const InputDinamico = ({
         const erroAtual = erros[index];
         const isOpen = dropdownAbertoIndex === index;
         const opcaoSelecionada = opcoesTipo.find(o => o.original === item.tipo)
-        console.log(opcoesTipo,item)
 
         return (
           <React.Fragment key={index}>

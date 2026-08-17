@@ -15,7 +15,7 @@ const apiExterna = axios.create({
   // Reutiliza conexões TCP abertas, eliminando o tempo de nova conexão
   httpAgent,
   httpsAgent,
-  timeout: 10000, // Timeout de segurança de 10 segundos
+  timeout: 60000, // Timeout de segurança de 60 segundos
   headers: {
     "Content-Type": "application/json",
     "Cache-Control": "no-cache",

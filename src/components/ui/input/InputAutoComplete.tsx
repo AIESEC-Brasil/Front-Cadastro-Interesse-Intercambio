@@ -87,6 +87,7 @@ const InputAutoComplete: React.FC<InputAutoCompleteProps> = ({
                 onFocus={() => setAtivo(true)}
                 placeholder={placeholder}
                 className={desabilitado ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'w-full bg-white px-4 py-3 text-sm text-black placeholder:text-zinc-400 placeholder:uppercase focus:outline-none rounded-xl pr-10'}
+                autoComplete="off"
             />
 
             {/* Rótulo (Label) flutuante */}

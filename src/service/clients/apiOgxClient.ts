@@ -13,6 +13,9 @@ import axios from "axios";
  */
 const apiOgxClient = axios.create({
   baseURL: "/api/ogx",
+  headers: {
+    "Content-Type": "application/json"
+  }
 });
 
 // ⚡ Interceptor de Resposta
