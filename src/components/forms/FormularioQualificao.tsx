@@ -22,20 +22,19 @@ interface FormularioQualificacaoProps {
 
 const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) => {
     const {
-        idiomasSelecionados,
-        idIdiomas,
         listaIdiomas,
         carregandoEnvio,
+        carregandoMetadados,
         handleAtualizarIdiomas,
         idiomasFormatados,
         processarEnvio
     } = useFormularioQualificacao(rota, state);
     
-
     return (
         <div className="relative">
             {/* Esqueleto de carregamento exibido enquanto metadados são buscados */}
-            
+            <LoadSkeletonDinamico aberta={carregandoMetadados} layoutLinhas={[1, 1]} />
+            {!carregandoMetadados && (
                 <div id="meuFormQuali" className="flex flex-col gap-4">
                     
                     {/* Input MultiSelect de Idiomas */}
@@ -56,7 +55,7 @@ const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) =>
                         type="button" 
                     />
                 </div>
-            
+            )}
 
             {/* Loaders */}
             <LoadSpinner aberta={carregandoEnvio} />

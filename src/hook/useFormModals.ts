@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 export function useFormModals() {
-    const [carregandoMetadados, setCarregandoMetadados] = useState<boolean>(true);
     const [carregandoEnvio, setCarregandoEnvio] = useState<boolean>(false);
     
     const [modalErroAberta, setModalErroAberta] = useState<boolean>(false);
@@ -16,7 +15,6 @@ export function useFormModals() {
     const [dadosResumo, setDadosResumo] = useState<Record<string, any>>({});
 
     return {
-        carregandoMetadados, setCarregandoMetadados,
         carregandoEnvio, setCarregandoEnvio,
         modalErroAberta, setModalErroAberta,
         modalErroConexaoAberta, setModalErroConexaoAberta,

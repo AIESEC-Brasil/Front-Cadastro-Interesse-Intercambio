@@ -1,92 +1,30 @@
 import { useState, useEffect } from 'react';
 import apiOgxClient from '../service/clients/apiOgxClient';
-import { traduzirPalavras, removerMascaraData, aplicarMascaraTelefone,removerMascaraTelefone } from '../helpers/formatter';
+import { removerMascaraData, aplicarMascaraTelefone,removerMascaraTelefone } from '../helpers/formatter';
 import { useFormFields } from './useFormFields';
 import { useFormValidation } from './useFormValidation';
 import { useFormModals } from './useFormModals';
+import { useDadosFormulario } from './useDadosFormulario';
 
-export function useFormularioPreCadastro(rota: string, state: (step: number | any) => void) {
+export function useFormularioPreCadastro(rota: string, state: (step: number | any) => void,dados:any) {
     const fields = useFormFields();
     const { erros, validarTudo } = useFormValidation(fields);
     const modals = useFormModals();
+    const dadosFormulario = useDadosFormulario();
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [listaProdutos, setListaProdutos] = useState<any[]>([]);
-    const [listaOrigens, setListaOrigens] = useState<any[]>([]);
-    const [listaUniversidades, setListaUniversidades] = useState<any[]>([]);
-    const [listaEscritorios, setListaEscritorios] = useState<any[]>([]);
-    const [listaIdiomas, setListaIdiomas] = useState<any[]>([]);
-    const [opcoesEmail, setOpcoesEmail] = useState<any[]>([]);
-    const [opcoesTelefone, setOpcoesTelefone] = useState<any[]>([]);
-    const [tituloTermoLGPD, setTituloTermoLGPD] = useState<string>('Eu concordo com a coleta e uso dos meus dados conforme a Política de Privacidade *');
-    const [descricaoTermoLGPD, setDescricaoTermoLGPD] = useState<string>('');
-
-    // Busca de Metadados Iniciais
-    useEffect(() => {
-        let isMounted = true;
-        const carregarDadosIniciais = async () => {
-            modals.setCarregandoMetadados(true);
-            try {
-                const [resMeta, resUni] = await Promise.all([
-                    apiOgxClient.get('/new-lead-ogx/metadados'),
-                    apiOgxClient.get('/divisao-mercado/universidades'),
-                ]);
-
-                const metadados = resMeta?.data;
-                if (!isMounted || !Array.isArray(metadados)) return;
-
-                const campoEmail = metadados.find((item: any) => item.external_id === 'email');
-                const campoTelefone = metadados.find((item: any) => item.external_id === 'telefone');
-                const campoEscritorio = metadados.find((item: any) => item.external_id === 'aiesec-mais-proxima');
-                const campoProduto = metadados.find((item: any) => item.external_id === 'produto');
-                const campoOrigem = metadados.find((item: any) => item.external_id === 'tag-origem-2');
-                const campoLGPD = metadados.find((item: any) => item.external_id === 'eu-concordo-com-a-coleta-e-uso-dos-meus-dados-conforme-');
-                const camposIdiomas = metadados.find((item: any) => item.external_id === 'possui-outro-idioma');
-
-                const ordenar = (opts: string[]) => [...opts].sort((a, b) => a.toLowerCase() === 'other' ? -1 : b.toLowerCase() === 'other' ? 1 : 0);
-
-                const [emailFormatado, telefoneFormatado] = await Promise.all([
-                    traduzirPalavras(campoEmail?.options ? ordenar(campoEmail.options) : []),
-                    traduzirPalavras(campoTelefone?.options ? ordenar(campoTelefone.options) : [])
-                ]);
-
-                if (campoLGPD) {
-                    if (campoLGPD.name) setTituloTermoLGPD(campoLGPD.name);
-                    if (campoLGPD.description) setDescricaoTermoLGPD(campoLGPD.description);
-                }
-
-                if (isMounted) {
-                    setOpcoesEmail(emailFormatado);
-                    setOpcoesTelefone(telefoneFormatado);
-                    setListaUniversidades(resUni?.data.universidades || []);
-                    setListaEscritorios((campoEscritorio?.options || []).map((d: any) => ({ id: d.id, nome: d.text })));
-                    setListaProdutos((campoProduto?.options || []).map((d: any) => ({ id: d.id, nome: d.text })));
-                    setListaOrigens((campoOrigem?.options || []).map((d: any) => ({ id: d.id, nome: d.text })));
-                    setListaIdiomas((camposIdiomas?.options || []).map((d: any) => ({ id: d.id, nome: d.text })));
-                    modals.setModalErroConexaoAberta(false);
-                }
-            } catch (error) {
-                if (isMounted) modals.setModalErroConexaoAberta(true);
-                modals.setTipoErroConexao('conexao');
-            } finally {
-                if (isMounted) modals.setCarregandoMetadados(false);
-            }
-        };
-        carregarDadosIniciais();
-        return () => { isMounted = false; };
-    }, []);
 
     // Pré-seleção por Rota
     useEffect(() => {
-        if (listaProdutos.length === 0) return;
+        if (dadosFormulario.listaProdutos.length === 0) return;
         if (rota === 'voluntario-global') {
-            const encontrado = listaProdutos.find(p => p.nome.toLowerCase().includes('voluntário global') || p.nome.toLowerCase().includes('voluntario global'));
+            const encontrado = dadosFormulario.listaProdutos.find(p => p.nome.toLowerCase().includes('voluntário global') || p.nome.toLowerCase().includes('voluntario global'));
             if (encontrado) { fields.setProdutoSelecionado(encontrado.nome); fields.setIdProduto(encontrado.id); }
         } else if (rota === 'professor-global') {
-            const encontrado = listaProdutos.find(p => p.nome.toLowerCase().includes('professor global'));
+            const encontrado = dadosFormulario.listaProdutos.find(p => p.nome.toLowerCase().includes('professor global'));
             if (encontrado) { fields.setProdutoSelecionado(encontrado.nome); fields.setIdProduto(encontrado.id); }
         }
-    }, [rota, listaProdutos]);
+    }, [rota, dadosFormulario.listaProdutos]);
 
     const validarEProcessar = async () => {
         modals.setCarregandoEnvio(true);
@@ -208,8 +146,7 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
         ...erros,
         ...modals,
         isOpen, setIsOpen,
-        listaProdutos, listaOrigens, listaUniversidades, listaEscritorios,listaIdiomas,
-        opcoesEmail, opcoesTelefone, tituloTermoLGPD, descricaoTermoLGPD,
+        ...dadosFormulario,
         validarEProcessar,
         aplicarMascaraTelefone,
         enviarDados
