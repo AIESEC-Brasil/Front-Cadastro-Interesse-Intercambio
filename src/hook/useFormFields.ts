@@ -15,7 +15,7 @@ export function useFormFields() {
     const [itemId, setItemId] = useState<number>(0);
     const [emails, setEmails] = useState<ItemDinamico[]>([{ tipo: 'other', valor: '' }]);
     const [telefones, setTelefones] = useState<ItemDinamico[]>([{ tipo: 'other', valor: '' }]);
-
+    const [curso,setCurso] = useState<string>('');
     const [produtoSelecionado, setProdutoSelecionado] = useState<string>('');
     const [idProduto, setIdProduto] = useState<number | string>('');
 
@@ -39,6 +39,7 @@ export function useFormFields() {
         nome, setNome: (v: string) => {if (contemApenasLetrasEspacos(v)){setNome(formatarNome(v))}},
         sobrenome, setSobrenome: (v: string) => {if (contemApenasLetrasEspacos(v)){setSobrenome(formatarNome(v))}},
         senha, setSenha,
+        curso,setCurso: (v: string) => {if (contemApenasLetrasEspacos(v)){setCurso(formatarNome(v))}},
         dataNascimento, setDataNascimento: (v: string) => setDataNascimento(aplicarMascaraData(v)),
         emails, setEmails,
         itemId, setItemId,

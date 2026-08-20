@@ -13,6 +13,7 @@ export function useFormValidation(fields: any) {
     const [erroUniversidade, setErroUniversidade] = useState<string>('');
     const [erroEscritorio, setErroEscritorio] = useState<string>('');
     const [erroTermoLGPD, setErroTermoLGPD] = useState<string>('');
+    const [erroCurso, setErroCurso] = useState<string>('');
 
     const prevEmailsLen = useRef(fields.emails.length);
     const prevTelefonesLen = useRef(fields.telefones.length);
@@ -20,6 +21,7 @@ export function useFormValidation(fields: any) {
     // Extração segura de valores primitivos para o array de dependências
     const nome = fields.nome;
     const sobrenome = fields.sobrenome;
+    const curso = fields.curso;
     const senha = fields.senha;
     const dataNascimento = fields.dataNascimento;
     const emails = fields.emails;
@@ -48,6 +50,17 @@ export function useFormValidation(fields: any) {
             } else if (eSobrenome && eSobrenome[0]) {
                 setErroSobrenome(eSobrenome[0]);
             }
+        }
+
+        if (curso) {
+            const eCurso = validarTexto(curso, "curso");
+            if (!eCurso || (eCurso.length > 0 && eCurso[0] === '')) {
+                setErroCurso('');
+            } else if (eCurso && eCurso[0]) {
+                setErroCurso(eCurso[0]);
+            }
+        } else {
+            setErroCurso('');
         }
 
         if (senha) {
@@ -106,6 +119,7 @@ export function useFormValidation(fields: any) {
     }, [
         nome,
         sobrenome,
+        curso,
         senha,
         dataNascimento,
         emails.length,
@@ -123,6 +137,7 @@ export function useFormValidation(fields: any) {
     const validarTudo = () => {
         const eNome = validarTexto(fields.nome, "nome");
         const eSobrenome = validarTexto(fields.sobrenome, "sobrenome");
+        const eCurso = validarTexto(fields.curso, "curso");
         const eSenha = validarSenha(fields.senha);
         const eData = validarData(fields.dataNascimento);
         const errsE = validarEmail(fields.emails.map((i: any) => i.valor));
@@ -154,7 +169,7 @@ export function useFormValidation(fields: any) {
 
     return {
         erros: {
-            erroNome, erroSobrenome, erroSenha, erroDataNascimento,
+            erroNome, erroSobrenome, erroSenha, erroDataNascimento,erroCurso,
             erroEmail, erroTelefone, erroProduto, erroOrigem,
             erroUniversidade, erroEscritorio, erroTermoLGPD
         },

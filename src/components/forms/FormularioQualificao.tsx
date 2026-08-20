@@ -8,6 +8,7 @@
 
 import React from 'react';
 import InputMultiSelectIdiomas from '../ui/input/InputMultiSelectIdiomas';
+import InputTexto from '../ui/input/InputTexto';
 import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
 
 import LoadSpinner from '../loading/LoadSpinner';
@@ -22,6 +23,7 @@ interface FormularioQualificacaoProps {
 
 const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) => {
     const {
+        curso,setCurso,erroCurso,
         listaIdiomas,
         carregandoEnvio,
         carregandoMetadados,
@@ -48,6 +50,15 @@ const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) =>
                             obrigatorio={false}
                         />
                     </div>
+
+                    <InputTexto 
+                            id="curso" 
+                            legenda="Qual seu Curso?" 
+                            valor={curso} 
+                            atualizar={(e: any) => setCurso(e.target.value)} 
+                            error={erroCurso} 
+                            obrigatorio={false}
+                        />
 
                     <ButtonConfirmar 
                         texto="Avançar" 

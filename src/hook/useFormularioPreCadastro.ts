@@ -6,7 +6,7 @@ import { useFormValidation } from './useFormValidation';
 import { useFormModals } from './useFormModals';
 import { useDadosFormulario } from './useDadosFormulario';
 
-export function useFormularioPreCadastro(rota: string, state: (step: number | any) => void,dados:any) {
+export function useFormularioPreCadastro(rota: string, state: (step: number | any) => void) {
     const fields = useFormFields();
     const { erros, validarTudo } = useFormValidation(fields);
     const modals = useFormModals();

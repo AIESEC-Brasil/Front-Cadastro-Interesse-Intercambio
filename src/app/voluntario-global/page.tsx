@@ -15,7 +15,7 @@ import FormularioQualificao from "@components/forms/FormularioQualificao";
  * @param {Object} props.req - Objeto da requisição.
  */
 const VoluntarioGlobal = ({ req }: { req: { path: string } }) => {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(2);
     const pathname = usePathname();
     const totalSteps = 2;
 
