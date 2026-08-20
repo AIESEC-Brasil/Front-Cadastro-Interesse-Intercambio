@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { aplicarMascaraData } from '../helpers/formatter';
-import {contemApenasLetrasEspacos} from '../utils/validates'
+import { contemApenasLetrasEspacos } from '../utils/validates';
 
 export interface ItemDinamico {
     tipo: string;
@@ -30,6 +30,9 @@ export function useFormFields() {
 
     const [termoLGPD, setTermoLGPD] = useState<boolean>(false);
 
+    const [idiomasSelecionados, setIdiomasSelecionados] = useState<string[]>([]);
+    const [idIdiomas, setIdIdiomas] = useState<(string | number)[]>([]);
+
     const formatarNome = (val: string) => val.split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
 
     return {
@@ -50,5 +53,7 @@ export function useFormFields() {
         escritorioSelecionado, setEscritorioSelecionado,
         idEscritorio, setIdEscritorio,
         termoLGPD, setTermoLGPD,
+        idiomasSelecionados, setIdiomasSelecionados,
+        idIdiomas, setIdIdiomas,
     };
 }

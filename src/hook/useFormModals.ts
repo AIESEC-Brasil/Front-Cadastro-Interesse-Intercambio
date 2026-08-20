@@ -6,9 +6,11 @@ export function useFormModals() {
     
     const [modalErroAberta, setModalErroAberta] = useState<boolean>(false);
     const [modalErroConexaoAberta, setModalErroConexaoAberta] = useState<boolean>(false);
+    const [modalConflitoAberta,setModalConflitoAberta] = useState<boolean>(false);
     const [modalSucessoAberta, setModalSucessoAberta] = useState<boolean>(false);
     const [modalSucessoCadastroAberta, setModalSucessoCadastroAberta] = useState<boolean>(false);
     
+    const [dataConflito,setDataConflito] = useState<Record<string, string[]> | string>('');
     const [tipoErroConexao, setTipoErroConexao] = useState<'conexao' | 'bug'>('conexao');
     const [errosJson, setErrosJson] = useState<Record<string, string[]>>({});
     const [dadosResumo, setDadosResumo] = useState<Record<string, any>>({});
@@ -18,10 +20,12 @@ export function useFormModals() {
         carregandoEnvio, setCarregandoEnvio,
         modalErroAberta, setModalErroAberta,
         modalErroConexaoAberta, setModalErroConexaoAberta,
+        modalConflitoAberta,setModalConflitoAberta,
         modalSucessoAberta, setModalSucessoAberta,
         modalSucessoCadastroAberta, setModalSucessoCadastroAberta,
         tipoErroConexao, setTipoErroConexao,
         errosJson, setErrosJson,
-        dadosResumo, setDadosResumo
+        dadosResumo, setDadosResumo,
+        dataConflito,setDataConflito
     };
 }

@@ -19,6 +19,7 @@ import ModalErro from '../modal/ModalErro';
 import ModalSucesso from '../modal/ModalSucesso';
 import ModalErroConexao from '../modal/ModalErroConexao';
 import ModalSucessoCadastro from '../modal/ModalSucessoCadastro';
+import ModalConflito from '../modal/ModalConflito';
 import LoadSpinner from '../loading/LoadSpinner';
 import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
 
@@ -50,10 +51,10 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
         
         carregandoMetadados, carregandoEnvio,
         modalErroAberta, setModalErroAberta,
-        modalErroConexaoAberta,
+        modalErroConexaoAberta,modalConflitoAberta,setModalConflitoAberta,
         modalSucessoAberta, setModalSucessoAberta,
         modalSucessoCadastroAberta, setModalSucessoCadastroAberta,
-        tipoErroConexao, errosJson, dadosResumo,
+        tipoErroConexao, errosJson, dadosResumo,dataConflito,
 
         erroNome, erroSobrenome, erroSenha, erroDataNascimento,
         erroEmail, erroTelefone, erroProduto, erroOrigem,
@@ -324,6 +325,8 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                 tipo={tipoErroConexao}
                 aoTentarNovamente={() => window.parent.location.reload()} 
             />
+
+            <ModalConflito aberta={modalConflitoAberta} dadosErro={dataConflito} aoFechar={() => {setModalConflitoAberta(false)}}/>
         </div>
     );
 };

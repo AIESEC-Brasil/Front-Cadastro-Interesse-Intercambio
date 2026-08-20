@@ -15,6 +15,7 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
     const [listaOrigens, setListaOrigens] = useState<any[]>([]);
     const [listaUniversidades, setListaUniversidades] = useState<any[]>([]);
     const [listaEscritorios, setListaEscritorios] = useState<any[]>([]);
+    const [listaIdiomas, setListaIdiomas] = useState<any[]>([]);
     const [opcoesEmail, setOpcoesEmail] = useState<any[]>([]);
     const [opcoesTelefone, setOpcoesTelefone] = useState<any[]>([]);
     const [tituloTermoLGPD, setTituloTermoLGPD] = useState<string>('Eu concordo com a coleta e uso dos meus dados conforme a Política de Privacidade *');
@@ -40,6 +41,7 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
                 const campoProduto = metadados.find((item: any) => item.external_id === 'produto');
                 const campoOrigem = metadados.find((item: any) => item.external_id === 'tag-origem-2');
                 const campoLGPD = metadados.find((item: any) => item.external_id === 'eu-concordo-com-a-coleta-e-uso-dos-meus-dados-conforme-');
+                const camposIdiomas = metadados.find((item: any) => item.external_id === 'possui-outro-idioma');
 
                 const ordenar = (opts: string[]) => [...opts].sort((a, b) => a.toLowerCase() === 'other' ? -1 : b.toLowerCase() === 'other' ? 1 : 0);
 
@@ -60,6 +62,7 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
                     setListaEscritorios((campoEscritorio?.options || []).map((d: any) => ({ id: d.id, nome: d.text })));
                     setListaProdutos((campoProduto?.options || []).map((d: any) => ({ id: d.id, nome: d.text })));
                     setListaOrigens((campoOrigem?.options || []).map((d: any) => ({ id: d.id, nome: d.text })));
+                    setListaIdiomas((camposIdiomas?.options || []).map((d: any) => ({ id: d.id, nome: d.text })));
                     modals.setModalErroConexaoAberta(false);
                 }
             } catch (error) {
@@ -181,10 +184,20 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
             }
 
             modals.setModalSucessoCadastroAberta(true);
-        } catch (error) {
-            modals.setTipoErroConexao('bug');
-            modals.setModalErroConexaoAberta(true);
-            console.error('Erro ao enviar dados:', error);
+        } catch (error:any) {
+            const dadosErro = error.response?.data?.data;
+            console.log(dadosErro)
+            if (error.response.status === 409){
+                const conteudoModal = dadosErro.erro 
+                ? dadosErro.erro.replace("EXPA", "").trim() 
+                : dadosErro;
+                modals.setDataConflito(conteudoModal)
+                modals.setModalConflitoAberta(true)
+            } else {
+                modals.setTipoErroConexao('bug');
+                modals.setModalErroConexaoAberta(true);
+            }
+            console.log('Erro ao enviar dados:', error);
         } finally {
             modals.setCarregandoEnvio(false);
         }
@@ -195,7 +208,7 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
         ...erros,
         ...modals,
         isOpen, setIsOpen,
-        listaProdutos, listaOrigens, listaUniversidades, listaEscritorios,
+        listaProdutos, listaOrigens, listaUniversidades, listaEscritorios,listaIdiomas,
         opcoesEmail, opcoesTelefone, tituloTermoLGPD, descricaoTermoLGPD,
         validarEProcessar,
         aplicarMascaraTelefone,

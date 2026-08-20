@@ -7,6 +7,7 @@
 import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
 import FormularioPreCadastro from "@components/forms/FormularioPreCadastro";
+import FormularioQualificao from "@components/forms/FormularioQualificao";
 
 /**
  * Componente da página de Voluntário Global.
@@ -14,7 +15,7 @@ import FormularioPreCadastro from "@components/forms/FormularioPreCadastro";
  * @param {Object} props.req - Objeto da requisição.
  */
 const VoluntarioGlobal = ({ req }: { req: { path: string } }) => {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(2);
     const pathname = usePathname();
     const totalSteps = 2;
 
@@ -64,9 +65,12 @@ const VoluntarioGlobal = ({ req }: { req: { path: string } }) => {
                 )}
                 
                 {step === 2 && (
-                    <>
-                        {/* Conteúdo da segunda etapa */}
-                    </>
+                    
+                <FormularioQualificao
+                    rota={pathname?.replace(/^\//, '')} 
+                    state={setStep} 
+                />
+                    
                 )}
             </div>
         </main>
