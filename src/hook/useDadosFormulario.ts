@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import apiOgxClient from '../service/clients/apiOgxClient';
 import { traduzirPalavras } from '../helpers/formatter';
 
-interface OpcaoFormulario {
+interface Metacards {
     id: number | string;
     nome: string;
 }
@@ -13,11 +13,11 @@ const tituloTermoPadrao = 'Eu concordo com a coleta e uso dos meus dados conform
 // CACHE GLOBAL EM MEMÓRIA (SINGLETON DO MÓDULO)
 // ==========================================
 let cacheGlobal: {
-    listaProdutos: OpcaoFormulario[];
-    listaOrigens: OpcaoFormulario[];
+    listaProdutos: Metacards[];
+    listaOrigens: Metacards[];
     listaUniversidades: any[];
-    listaEscritorios: OpcaoFormulario[];
-    listaIdiomas: OpcaoFormulario[];
+    listaEscritorios: Metacards[];
+    listaIdiomas: Metacards[];
     opcoesEmail: any[];
     opcoesTelefone: any[];
     tituloTermoLGPD: string;
@@ -41,11 +41,11 @@ export function useDadosFormulario() {
     const [carregandoMetadados, setCarregandoMetadados] = useState(!cacheGlobal.jaCarregou);
     const [erroMetadados, setErroMetadados] = useState(false);
 
-    const [listaProdutos, setListaProdutos] = useState<OpcaoFormulario[]>(cacheGlobal.listaProdutos);
-    const [listaOrigens, setListaOrigens] = useState<OpcaoFormulario[]>(cacheGlobal.listaOrigens);
+    const [listaProdutos, setListaProdutos] = useState<Metacards[]>(cacheGlobal.listaProdutos);
+    const [listaOrigens, setListaOrigens] = useState<Metacards[]>(cacheGlobal.listaOrigens);
     const [listaUniversidades, setListaUniversidades] = useState<any[]>(cacheGlobal.listaUniversidades);
-    const [listaEscritorios, setListaEscritorios] = useState<OpcaoFormulario[]>(cacheGlobal.listaEscritorios);
-    const [listaIdiomas, setListaIdiomas] = useState<OpcaoFormulario[]>(cacheGlobal.listaIdiomas);
+    const [listaEscritorios, setListaEscritorios] = useState<Metacards[]>(cacheGlobal.listaEscritorios);
+    const [listaIdiomas, setListaIdiomas] = useState<Metacards[]>(cacheGlobal.listaIdiomas);
     const [opcoesEmail, setOpcoesEmail] = useState<any[]>(cacheGlobal.opcoesEmail);
     const [opcoesTelefone, setOpcoesTelefone] = useState<any[]>(cacheGlobal.opcoesTelefone);
     const [tituloTermoLGPD, setTituloTermoLGPD] = useState(cacheGlobal.tituloTermoLGPD);
