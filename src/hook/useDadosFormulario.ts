@@ -9,20 +9,55 @@ interface OpcaoFormulario {
 
 const tituloTermoPadrao = 'Eu concordo com a coleta e uso dos meus dados conforme a Política de Privacidade *';
 
+// ==========================================
+// CACHE GLOBAL EM MEMÓRIA (SINGLETON DO MÓDULO)
+// ==========================================
+let cacheGlobal: {
+    listaProdutos: OpcaoFormulario[];
+    listaOrigens: OpcaoFormulario[];
+    listaUniversidades: any[];
+    listaEscritorios: OpcaoFormulario[];
+    listaIdiomas: OpcaoFormulario[];
+    opcoesEmail: any[];
+    opcoesTelefone: any[];
+    tituloTermoLGPD: string;
+    descricaoTermoLGPD: string;
+    jaCarregou: boolean;
+} = {
+    listaProdutos: [],
+    listaOrigens: [],
+    listaUniversidades: [],
+    listaEscritorios: [],
+    listaIdiomas: [],
+    opcoesEmail: [],
+    opcoesTelefone: [],
+    tituloTermoLGPD: tituloTermoPadrao,
+    descricaoTermoLGPD: '',
+    jaCarregou: false,
+};
+
 export function useDadosFormulario() {
-    const [carregandoMetadados, setCarregandoMetadados] = useState(true);
+    // Inicializa com o cache caso já tenha sido carregado antes
+    const [carregandoMetadados, setCarregandoMetadados] = useState(!cacheGlobal.jaCarregou);
     const [erroMetadados, setErroMetadados] = useState(false);
-    const [listaProdutos, setListaProdutos] = useState<OpcaoFormulario[]>([]);
-    const [listaOrigens, setListaOrigens] = useState<OpcaoFormulario[]>([]);
-    const [listaUniversidades, setListaUniversidades] = useState<any[]>([]);
-    const [listaEscritorios, setListaEscritorios] = useState<OpcaoFormulario[]>([]);
-    const [listaIdiomas, setListaIdiomas] = useState<OpcaoFormulario[]>([]);
-    const [opcoesEmail, setOpcoesEmail] = useState<any[]>([]);
-    const [opcoesTelefone, setOpcoesTelefone] = useState<any[]>([]);
-    const [tituloTermoLGPD, setTituloTermoLGPD] = useState(tituloTermoPadrao);
-    const [descricaoTermoLGPD, setDescricaoTermoLGPD] = useState('');
+
+    const [listaProdutos, setListaProdutos] = useState<OpcaoFormulario[]>(cacheGlobal.listaProdutos);
+    const [listaOrigens, setListaOrigens] = useState<OpcaoFormulario[]>(cacheGlobal.listaOrigens);
+    const [listaUniversidades, setListaUniversidades] = useState<any[]>(cacheGlobal.listaUniversidades);
+    const [listaEscritorios, setListaEscritorios] = useState<OpcaoFormulario[]>(cacheGlobal.listaEscritorios);
+    const [listaIdiomas, setListaIdiomas] = useState<OpcaoFormulario[]>(cacheGlobal.listaIdiomas);
+    const [opcoesEmail, setOpcoesEmail] = useState<any[]>(cacheGlobal.opcoesEmail);
+    const [opcoesTelefone, setOpcoesTelefone] = useState<any[]>(cacheGlobal.opcoesTelefone);
+    const [tituloTermoLGPD, setTituloTermoLGPD] = useState(cacheGlobal.tituloTermoLGPD);
+    const [descricaoTermoLGPD, setDescricaoTermoLGPD] = useState(cacheGlobal.descricaoTermoLGPD);
 
     useEffect(() => {
+        // Se já carregou anteriormente, não faz a requisição de novo
+        if (cacheGlobal.jaCarregou) {
+            setCarregandoMetadados(false);
+            return;
+        }
+
         let componenteMontado = true;
 
         const carregarDados = async () => {
@@ -43,9 +78,11 @@ export function useDadosFormulario() {
 
                 const encontrarCampo = (identificador: string) =>
                     metadados.find((item: any) => item.external_id === identificador);
+
                 const ordenarOpcoes = (opcoes: any[]) => [...opcoes].sort((a, b) =>
                     a.toLowerCase() === 'other' ? -1 : b.toLowerCase() === 'other' ? 1 : 0
                 );
+
                 const campoEmail = encontrarCampo('email');
                 const campoTelefone = encontrarCampo('telefone');
                 const campoEscritorio = encontrarCampo('aiesec-mais-proxima');
@@ -59,16 +96,39 @@ export function useDadosFormulario() {
                     traduzirPalavras(campoTelefone?.options ? ordenarOpcoes(campoTelefone.options) : []),
                 ]);
 
-                if (campoLGPD.name) setTituloTermoLGPD(campoLGPD.name);
-                if (campoLGPD.description) setDescricaoTermoLGPD(campoLGPD.description);
+                const novoTitulo = campoLGPD?.name || tituloTermoPadrao;
+                const novaDescricao = campoLGPD?.description || '';
+                const novasUniversidades = respostaUniversidades?.data?.universidades || [];
+                const novosEscritorios = (campoEscritorio?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosProdutos = (campoProduto?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novasOrigens = (campoOrigem?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosIdiomas = (campoIdiomas?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
 
-                setOpcoesEmail(emailFormatado);
-                setOpcoesTelefone(telefoneFormatado);
-                setListaUniversidades(respostaUniversidades?.data?.universidades || []);
-                setListaEscritorios((campoEscritorio?.options || []).map((item: any) => ({ id: item.id, nome: item.text })));
-                setListaProdutos((campoProduto?.options || []).map((item: any) => ({ id: item.id, nome: item.text })));
-                setListaOrigens((campoOrigem?.options || []).map((item: any) => ({ id: item.id, nome: item.text })));
-                setListaIdiomas((campoIdiomas?.options || []).map((item: any) => ({ id: item.id, nome: item.text })));
+                // Atualiza o cache global
+                cacheGlobal = {
+                    listaProdutos: novosProdutos,
+                    listaOrigens: novasOrigens,
+                    listaUniversidades: novasUniversidades,
+                    listaEscritorios: novosEscritorios,
+                    listaIdiomas: novosIdiomas,
+                    opcoesEmail: emailFormatado,
+                    opcoesTelefone: telefoneFormatado,
+                    tituloTermoLGPD: novoTitulo,
+                    descricaoTermoLGPD: novaDescricao,
+                    jaCarregou: true,
+                };
+
+                if (componenteMontado) {
+                    setTituloTermoLGPD(novoTitulo);
+                    setDescricaoTermoLGPD(novaDescricao);
+                    setOpcoesEmail(emailFormatado);
+                    setOpcoesTelefone(telefoneFormatado);
+                    setListaUniversidades(novasUniversidades);
+                    setListaEscritorios(novosEscritorios);
+                    setListaProdutos(novosProdutos);
+                    setListaOrigens(novasOrigens);
+                    setListaIdiomas(novosIdiomas);
+                }
             } catch {
                 if (componenteMontado) setErroMetadados(true);
             } finally {
@@ -77,6 +137,7 @@ export function useDadosFormulario() {
         };
 
         carregarDados();
+
         return () => {
             componenteMontado = false;
         };
