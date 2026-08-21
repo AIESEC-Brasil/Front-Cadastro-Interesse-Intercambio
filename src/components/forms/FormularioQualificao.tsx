@@ -9,7 +9,10 @@
 import React from 'react';
 import InputMultiSelectIdiomas from '../ui/input/InputMultiSelectIdiomas';
 import InputTexto from '../ui/input/InputTexto';
+import InputAutoComplete from '../ui/input/InputAutoComplete';
 import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
+
+import ModalErroConexao from '../modal/ModalErroConexao';
 
 import LoadSpinner from '../loading/LoadSpinner';
 import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
@@ -23,12 +26,14 @@ interface FormularioQualificacaoProps {
 
 const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) => {
     const {
-        curso,setCurso,erroCurso,
-        listaIdiomas,
+        curso,setCurso,erroCurso,semestreSelecionados,idiomasSelecionados,
+        listaIdiomas,listaSemestres,
+        modalErroConexaoAberta,tipoErroConexao,
         carregandoEnvio,
         carregandoMetadados,
+        idiomaFomartado,
         handleAtualizarIdiomas,
-        idiomasFormatados,
+        handleAtualizarSemestre,
         processarEnvio
     } = useFormularioQualificacao(rota, state);
     
@@ -43,20 +48,29 @@ const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) =>
                     <div className="flex flex-col">
                         <InputMultiSelectIdiomas 
                             id="idiomas"
-                            legenda="Idiomas e Proficiência"
-                            selecionados={idiomasFormatados}
+                            legenda="Idiomas e Proficiência(caso possua proficência em algum idioma)"
+                            selecionados={idiomaFomartado}
                             atualizar={handleAtualizarIdiomas}
-                            opcoes={listaIdiomas || []}
+                            opcoes={listaIdiomas}
                             obrigatorio={false}
                         />
                     </div>
 
-                    <InputTexto 
+                    { rota === 'voluntario-global' && <InputTexto 
                             id="curso" 
-                            legenda="Qual seu Curso?" 
+                            legenda="Qual seu curso?(caso esteja cursando algo)" 
                             valor={curso} 
                             atualizar={(e: any) => setCurso(e.target.value)} 
                             error={erroCurso} 
+                            obrigatorio={false}
+                        />}
+
+                    <InputAutoComplete 
+                            id="semestre-curso"
+                            legenda="Em que semestre se encontra?(caso esteja cursando algo)" 
+                            opcoes={listaSemestres} 
+                            valor={semestreSelecionados} 
+                            atualizar={handleAtualizarSemestre} 
                             obrigatorio={false}
                         />
 
@@ -70,6 +84,12 @@ const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) =>
 
             {/* Loaders */}
             <LoadSpinner aberta={carregandoEnvio} />
+
+            <ModalErroConexao 
+                aberta={modalErroConexaoAberta} 
+                tipo={tipoErroConexao}
+                aoTentarNovamente={() => window.parent.location.reload()} 
+            />
         </div>
     );
 };

@@ -7,13 +7,13 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
     const fields = useFormFields();
     const { erros, validarTudo } = useFormValidation(fields);
     const modals = useFormModals();
-    const { listaIdiomas, carregandoMetadados } = useDadosFormulario();
+    const dadosFormulario = useDadosFormulario(modals);
 
-    // Converte os arrays separados (nomes e ids) no formato de objetos que o InputMultiSelectIdiomas espera ({ id, nome })
-    const idiomasFormatados = fields.idiomasSelecionados.map((nome, index) => ({
+    const idiomaFomartado = fields.idiomasSelecionados.map((nome,index) => ({
         id: fields.idIdiomas[index],
-        nome: nome
+        nome
     }));
+
     // Função que recebe a nova lista do input e atualiza os dois arrays separadamente no hook
     const handleAtualizarIdiomas = (novosSelecionados: Array<{ id: number | string; nome: string }>) => {
         const nomes = novosSelecionados.map(item => item.nome);
@@ -23,6 +23,13 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
         fields.setIdIdiomas(ids);
         console.log(nomes,ids);
     };
+
+    const handleAtualizarSemestre = (nomeSelecionado: string, idSelecionado: number | string) => {
+        fields.setSemestreSelecionado(nomeSelecionado);
+        fields.setIdSemestre(idSelecionado);
+        console.log(nomeSelecionado,idSelecionado);
+    };
+
     const processarEnvio = () => {
         console.log("Idiomas Nomes:", fields.idiomasSelecionados);
         console.log("Idiomas IDs:", fields.idIdiomas);
@@ -37,10 +44,10 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
         ...fields,
         ...erros,
         ...modals,
-        listaIdiomas,
-        carregandoMetadados,
-        idiomasFormatados,
+        ...dadosFormulario,
+        idiomaFomartado,
         handleAtualizarIdiomas,
+        handleAtualizarSemestre,
         processarEnvio
     }
 }

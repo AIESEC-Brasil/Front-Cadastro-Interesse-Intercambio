@@ -64,18 +64,18 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
         aplicarMascaraTelefone,
         enviarDados
     } = useFormularioPreCadastro(rota, state);
-
+    
     return (
         <div className="relative">
             {/* Esqueleto de carregamento exibido enquanto metadados são buscados */}
             <LoadSkeletonDinamico aberta={carregandoMetadados} layoutLinhas={[2, 1, 1, 2, 2]} />
 
-            {!carregandoMetadados && !modalErroConexaoAberta && (
+            {!carregandoMetadados && (
                 <div id="meuForm" className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <InputTexto 
                             id="nome" 
-                            legenda="Nome" 
+                            legenda="N ome" 
                             valor={nome} 
                             atualizar={(e: any) => setNome(e.target.value)} 
                             error={erroNome} 
@@ -190,7 +190,7 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                     <div className="flex flex-col">
                         <InputAutoComplete 
                             id="universidade"
-                            legenda="Universidade" 
+                            legenda="Qual sua Universidade?" 
                             opcoes={listaUniversidades} 
                             valor={universidadeSelecionada} 
                             atualizar={(nomeSel, idSel) => {
@@ -225,7 +225,7 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
                             <div className="flex flex-col gap-2 mt-7">
                                 <InputAutoComplete 
                                     id="escritorio"
-                                    legenda="Qual AIESEC mais próxima" 
+                                    legenda="Qual AIESEC mais próxima?" 
                                     opcoes={listaEscritorios} 
                                     valor={escritorioSelecionado} 
                                     atualizar={(nomeSel, idSel) => {

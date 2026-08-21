@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import apiOgxClient from '../service/clients/apiOgxClient';
 import { traduzirPalavras } from '../helpers/formatter';
+import { useFormModals } from './useFormModals';
 
 interface Metacards {
     id: number | string;
@@ -18,6 +19,7 @@ let cacheGlobal: {
     listaUniversidades: any[];
     listaEscritorios: Metacards[];
     listaIdiomas: Metacards[];
+    listaSemestres: Metacards[];
     opcoesEmail: any[];
     opcoesTelefone: any[];
     tituloTermoLGPD: string;
@@ -29,6 +31,7 @@ let cacheGlobal: {
     listaUniversidades: [],
     listaEscritorios: [],
     listaIdiomas: [],
+    listaSemestres: [],
     opcoesEmail: [],
     opcoesTelefone: [],
     tituloTermoLGPD: tituloTermoPadrao,
@@ -36,16 +39,17 @@ let cacheGlobal: {
     jaCarregou: false,
 };
 
-export function useDadosFormulario() {
+export function useDadosFormulario(modals:any) {
     // Inicializa com o cache caso já tenha sido carregado antes
     const [carregandoMetadados, setCarregandoMetadados] = useState(!cacheGlobal.jaCarregou);
     const [erroMetadados, setErroMetadados] = useState(false);
 
-    const [listaProdutos, setListaProdutos] = useState<Metacards[]>(cacheGlobal.listaProdutos);
-    const [listaOrigens, setListaOrigens] = useState<Metacards[]>(cacheGlobal.listaOrigens);
+    const [listaProdutos, setListaProdutos] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaProdutos);
+    const [listaOrigens, setListaOrigens] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaOrigens);
     const [listaUniversidades, setListaUniversidades] = useState<any[]>(cacheGlobal.listaUniversidades);
-    const [listaEscritorios, setListaEscritorios] = useState<Metacards[]>(cacheGlobal.listaEscritorios);
-    const [listaIdiomas, setListaIdiomas] = useState<Metacards[]>(cacheGlobal.listaIdiomas);
+    const [listaEscritorios, setListaEscritorios] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaEscritorios);
+    const [listaIdiomas, setListaIdiomas] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaIdiomas);
+    const [listaSemestres,setListaSemestres] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaSemestres);
     const [opcoesEmail, setOpcoesEmail] = useState<any[]>(cacheGlobal.opcoesEmail);
     const [opcoesTelefone, setOpcoesTelefone] = useState<any[]>(cacheGlobal.opcoesTelefone);
     const [tituloTermoLGPD, setTituloTermoLGPD] = useState(cacheGlobal.tituloTermoLGPD);
@@ -90,11 +94,12 @@ export function useDadosFormulario() {
                 const campoOrigem = encontrarCampo('tag-origem-2');
                 const campoLGPD = encontrarCampo('eu-concordo-com-a-coleta-e-uso-dos-meus-dados-conforme-');
                 const campoIdiomas = encontrarCampo('possui-outro-idioma');
-
+                const campoSemestres = encontrarCampo('qual-semestre-do-curso');
+                
                 const [emailFormatado, telefoneFormatado] = await Promise.all([
                     traduzirPalavras(campoEmail?.options ? ordenarOpcoes(campoEmail.options) : []),
                     traduzirPalavras(campoTelefone?.options ? ordenarOpcoes(campoTelefone.options) : []),
-                ]);
+                ]) ;
 
                 const novoTitulo = campoLGPD?.name || tituloTermoPadrao;
                 const novaDescricao = campoLGPD?.description || '';
@@ -103,7 +108,8 @@ export function useDadosFormulario() {
                 const novosProdutos = (campoProduto?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
                 const novasOrigens = (campoOrigem?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
                 const novosIdiomas = (campoIdiomas?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-
+                const novosSemestres = (campoSemestres?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
+                
                 // Atualiza o cache global
                 cacheGlobal = {
                     listaProdutos: novosProdutos,
@@ -111,13 +117,14 @@ export function useDadosFormulario() {
                     listaUniversidades: novasUniversidades,
                     listaEscritorios: novosEscritorios,
                     listaIdiomas: novosIdiomas,
+                    listaSemestres: novosSemestres,
                     opcoesEmail: emailFormatado,
                     opcoesTelefone: telefoneFormatado,
                     tituloTermoLGPD: novoTitulo,
                     descricaoTermoLGPD: novaDescricao,
                     jaCarregou: true,
                 };
-
+                
                 if (componenteMontado) {
                     setTituloTermoLGPD(novoTitulo);
                     setDescricaoTermoLGPD(novaDescricao);
@@ -128,14 +135,18 @@ export function useDadosFormulario() {
                     setListaProdutos(novosProdutos);
                     setListaOrigens(novasOrigens);
                     setListaIdiomas(novosIdiomas);
+                    setListaSemestres(novosSemestres);
                 }
             } catch {
-                if (componenteMontado) setErroMetadados(true);
+                if (componenteMontado) {
+                    modals.setTipoErroConexao('conexao');
+                    modals.setModalErroConexaoAberta(true);
+                }
             } finally {
                 if (componenteMontado) setCarregandoMetadados(false);
             }
         };
-
+        
         carregarDados();
 
         return () => {
@@ -151,6 +162,7 @@ export function useDadosFormulario() {
         listaUniversidades,
         listaEscritorios,
         listaIdiomas,
+        listaSemestres,
         opcoesEmail,
         opcoesTelefone,
         tituloTermoLGPD,

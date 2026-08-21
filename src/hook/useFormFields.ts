@@ -33,6 +33,9 @@ export function useFormFields() {
     const [idiomasSelecionados, setIdiomasSelecionados] = useState<string[]>([]);
     const [idIdiomas, setIdIdiomas] = useState<(string | number)[]>([]);
 
+    const [semestreSelecionados, setSemestreSelecionado] = useState<string>('');
+    const [idSemestre, setIdSemestre] = useState<string | number>('');
+
     const formatarNome = (val: string) => val.split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
 
     return {
@@ -56,5 +59,7 @@ export function useFormFields() {
         termoLGPD, setTermoLGPD,
         idiomasSelecionados, setIdiomasSelecionados,
         idIdiomas, setIdIdiomas,
+        semestreSelecionados, setSemestreSelecionado,
+        idSemestre, setIdSemestre
     };
 }

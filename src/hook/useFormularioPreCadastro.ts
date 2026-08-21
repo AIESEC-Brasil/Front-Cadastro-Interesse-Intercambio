@@ -10,8 +10,7 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
     const fields = useFormFields();
     const { erros, validarTudo } = useFormValidation(fields);
     const modals = useFormModals();
-    const dadosFormulario = useDadosFormulario();
-
+    const dadosFormulario = useDadosFormulario(modals);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     // Pré-seleção por Rota
