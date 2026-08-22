@@ -194,21 +194,21 @@ export function useFormValidation(fields: any, step: number) {
 
         const errosJson: any = {};
         if (step === 1) {
-            if (eNome?.[0]) { setErroNome(eNome[0]); errosJson.nome = eNome; }
-            if (eSobrenome?.[0]) { setErroSobrenome(eSobrenome[0]); errosJson.sobrenome = eSobrenome; }
-            if (eSenha?.[0]) { setErroSenha(eSenha); errosJson.senha = eSenha; }
+            if (eNome?.[0]) { setErroNome(eNome[0]); errosJson["Nome"] = eNome; }
+            if (eSobrenome?.[0]) { setErroSobrenome(eSobrenome[0]); errosJson["Sobrenome"] = eSobrenome; }
+            if (eSenha?.[0]) { setErroSenha(eSenha); errosJson["Senha"] = eSenha; }
             if (eData?.[0]) { setErroDataNascimento(eData[0]); errosJson["Data de Nascimento"] = eData; }
-            if (errsE.some((e: string) => e !== '')) { setErroEmail(errsE); errosJson.email = errsE.filter((e: string) => e !== ''); }
-            if (errsT.some((e: string) => e !== '')) { setErroTelefone(errsT); errosJson.telefone = errsT.filter((e: string) => e !== ''); }
-            if (errProd) { setErroProduto(errProd); errosJson.produto = [errProd]; }
-            if (errOrigem) { setErroOrigem(errOrigem); errosJson.origem = [errOrigem]; }
-            if (errUni) { setErroUniversidade(errUni); errosJson.universidade = [errUni]; }
-            if (errEsc) { setErroEscritorio(errEsc); errosJson.escritorio = [errEsc]; }
-            if (errLGPD) { setErroTermoLGPD(errLGPD); errosJson.lgpd = [errLGPD]; }
+            if (errsE.some((e: string) => e !== '')) { setErroEmail(errsE); errosJson["E-mail"] = errsE.filter((e: string) => e !== ''); }
+            if (errsT.some((e: string) => e !== '')) { setErroTelefone(errsT); errosJson["Telefone"] = errsT.filter((e: string) => e !== ''); }
+            if (errProd) { setErroProduto(errProd); errosJson["Programa"] = [errProd]; }
+            if (errOrigem) { setErroOrigem(errOrigem); errosJson["Como conheceu a AIESEC"] = [errOrigem]; }
+            if (errUni) { setErroUniversidade(errUni); errosJson["Universidade"] = [errUni]; }
+            if (errEsc) { setErroEscritorio(errEsc); errosJson["AIESEC mais Próxima"] = [errEsc]; }
+            if (errLGPD) { setErroTermoLGPD(errLGPD); errosJson["Politica de Privacidade"] = [errLGPD]; }
         } else if (step === 2) {
-            if (eCurso?.[0] !== '') { setErroCurso(eCurso[0]); errosJson.curso = eCurso; }
-            if (errSemestre) { setErroSemestre(errSemestre); errosJson.semestre = [errSemestre]; }
-            if (errIdiomas) { setErroIdiomas(errIdiomas); errosJson.idiomas = [errIdiomas]; }
+            if (eCurso?.[0] !== '') { setErroCurso(eCurso[0]); errosJson["Curso"] = eCurso; }
+            if (errSemestre) { setErroSemestre(errSemestre); errosJson["Semestre"] = [errSemestre]; }
+            if (errIdiomas) { setErroIdiomas(errIdiomas); errosJson["Idiomas"] = [errIdiomas]; }
         }
 
         return {
