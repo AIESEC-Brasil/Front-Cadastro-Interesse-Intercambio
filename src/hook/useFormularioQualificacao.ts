@@ -3,9 +3,9 @@ import { useFormValidation } from './useFormValidation';
 import { useFormModals } from './useFormModals';
 import { useDadosFormulario } from './useDadosFormulario';
 
-export function useFormularioQualificacao(rota: string, state: (step: number | any) => void) {
+export function useFormularioQualificacao(rota: string, state: (step: number | any) => void,step:number) {
     const fields = useFormFields();
-    const { erros, validarTudo } = useFormValidation(fields);
+    const { erros, validarTudo } = useFormValidation(fields,step);
     const modals = useFormModals();
     const dadosFormulario = useDadosFormulario(modals);
 
@@ -31,13 +31,21 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
     };
 
     const processarEnvio = () => {
-        console.log("Idiomas Nomes:", fields.idiomasSelecionados);
+        const { temErros, errosJson } = validarTudo();
+        console.log(errosJson)
+        if (temErros) {
+            modals.setErrosJson(errosJson);
+            modals.setModalErroAberta(true);
+        } else {
+            console.log("Idiomas Nomes:", fields.idiomasSelecionados);
         console.log("Idiomas IDs:", fields.idIdiomas);
         
         // Exemplo avançando o step (ex: ir para o próximo passo)
         if (typeof state === 'function') {
             state(3);
         }
+        }
+        
     };
 
     return {

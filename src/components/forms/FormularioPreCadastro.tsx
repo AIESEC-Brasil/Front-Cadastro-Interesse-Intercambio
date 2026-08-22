@@ -28,9 +28,10 @@ import { useFormularioPreCadastro } from '../../hook/useFormularioPreCadastro';
 interface FormularioPreCadastroProps {
     rota: string;
     state: (step: number | any) => void;
+    step: number
 }
 
-const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
+const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps) => {
     const {
         nome, setNome,
         sobrenome, setSobrenome,
@@ -63,7 +64,7 @@ const FormularioPreCadastro = ({ rota, state }: FormularioPreCadastroProps) => {
         validarEProcessar,
         aplicarMascaraTelefone,
         enviarDados
-    } = useFormularioPreCadastro(rota, state);
+    } = useFormularioPreCadastro(rota, state,step);
     
     return (
         <div className="relative">

@@ -61,6 +61,7 @@ const VoluntarioGlobal = ({ req }: { req: { path: string } }) => {
                     <FormularioPreCadastro 
                         rota={pathname?.replace(/^\//, '')} 
                         state={setStep} 
+                        step={step}
                     />
                 )}
                 
@@ -69,6 +70,7 @@ const VoluntarioGlobal = ({ req }: { req: { path: string } }) => {
                 <FormularioQualificao
                     rota={pathname?.replace(/^\//, '')} 
                     state={setStep} 
+                    step={step}
                 />
                     
                 )}

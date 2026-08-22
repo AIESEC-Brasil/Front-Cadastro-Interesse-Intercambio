@@ -6,9 +6,9 @@ import { useFormValidation } from './useFormValidation';
 import { useFormModals } from './useFormModals';
 import { useDadosFormulario } from './useDadosFormulario';
 
-export function useFormularioPreCadastro(rota: string, state: (step: number | any) => void) {
+export function useFormularioPreCadastro(rota: string, state: (step: number | any) => void,step:number) {
     const fields = useFormFields();
-    const { erros, validarTudo } = useFormValidation(fields);
+    const { erros, validarTudo } = useFormValidation(fields,step);
     const modals = useFormModals();
     const dadosFormulario = useDadosFormulario(modals);
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -36,19 +36,17 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
             modals.setModalErroAberta(true);
         } else {
             const jsonResumo: any = { 
-                nome: fields.nome, 
-                sobrenome: fields.sobrenome, 
-                produto: fields.produtoSelecionado, 
-                idProduto: fields.idProduto, 
-                origem: fields.origemSelecionada, 
-                idOrigem: fields.idOrigem,
-                "Data de Nascimento": fields.dataNascimento, 
-                email: fields.emails.map((e: any) => e.valor), 
-                telefone: fields.telefones.map((t: any) => t.valor), 
-                termoLGPD: fields.termoLGPD ? "Concordo" : "Não Concordo",
+                ["Nome"]: fields.nome, 
+                ["Sobrenome"]: fields.sobrenome, 
+                ["Programa"]: fields.produtoSelecionado, 
+                ["Como conheceu a AIESEC"]: fields.origemSelecionada, 
+                ["Data de Nascimento"]: fields.dataNascimento, 
+                ["E-mail"]: fields.emails.map((e: any) => e.valor), 
+                ["Telefone"]: fields.telefones.map((t: any) => t.valor), 
+                ["Politica de Privacidade"]: fields.termoLGPD ? "Concordo" : "Não Concordo",
             };
-            if (!fields.marcarSemUniversidade) jsonResumo.universidade = fields.universidadeSelecionada;
-            else jsonResumo.escritorio = fields.escritorioSelecionado;
+            if (!fields.marcarSemUniversidade) jsonResumo["Universidade"] = fields.universidadeSelecionada;
+            else jsonResumo["AIESEC mais Próxima"] = fields.escritorioSelecionado;
 
             modals.setDadosResumo(jsonResumo);
             modals.setModalSucessoAberta(true);
@@ -85,11 +83,11 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
 
     if (rota === 'voluntario-global') {
         produto.id_expa = 7;
-    } else if (rota === 'professor-global') {
-        produto.id_expa = 9;
     } else if (rota === 'talento-global') {
         produto.id_expa = 8;
-    }
+    } else if (rota === 'professor-global') {
+        produto.id_expa = 9;
+    } 
 
     const enviarDados = async () => {
         modals.setCarregandoEnvio(true);
@@ -123,7 +121,6 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
             modals.setModalSucessoCadastroAberta(true);
         } catch (error:any) {
             const dadosErro = error.response?.data?.data;
-            console.log(dadosErro)
             if (error.response.status === 409){
                 const conteudoModal = dadosErro.erro 
                 ? dadosErro.erro.replace("EXPA", "").trim() 

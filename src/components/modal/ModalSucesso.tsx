@@ -49,7 +49,7 @@ const ModalSucesso = ({
                         <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 space-y-3">
                             {Object.entries(resumoDados).map(([chave, valor], index) => (
                                 <div key={index} className="text-sm border-b border-gray-200/60 pb-2 last:border-0 last:pb-0">
-                                    <strong className="text-gray-700 capitalize block mb-0.5">{chave}:</strong>
+                                    <strong className="text-gray-700 block mb-0.5">{chave}:</strong>
                                     
                                     {/* Se o valor for um array (ex: vários e-mails ou telefones), renderiza uma lista */}
                                     {Array.isArray(valor) ? (

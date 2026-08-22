@@ -22,9 +22,10 @@ import { useFormularioQualificacao } from '../../hook/useFormularioQualificacao'
 interface FormularioQualificacaoProps {
     rota: string;
     state: (step: number | any) => void;
+    step: number
 }
 
-const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) => {
+const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProps) => {
     const {
         curso,setCurso,erroCurso,semestreSelecionados,idiomasSelecionados,
         listaIdiomas,listaSemestres,
@@ -35,7 +36,7 @@ const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) =>
         handleAtualizarIdiomas,
         handleAtualizarSemestre,
         processarEnvio
-    } = useFormularioQualificacao(rota, state);
+    } = useFormularioQualificacao(rota, state,step);
     
     return (
         <div className="relative">
@@ -48,7 +49,7 @@ const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) =>
                     <div className="flex flex-col">
                         <InputMultiSelectIdiomas 
                             id="idiomas"
-                            legenda="Idiomas e Proficiência(caso possua proficência em algum idioma)"
+                            legenda="Idiomas e Proficiência(Opcional)"
                             selecionados={idiomaFomartado}
                             atualizar={handleAtualizarIdiomas}
                             opcoes={listaIdiomas}
@@ -58,7 +59,7 @@ const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) =>
 
                     { rota === 'voluntario-global' && <InputTexto 
                             id="curso" 
-                            legenda="Qual seu curso?(caso esteja cursando algo)" 
+                            legenda="Qual seu curso?(Opcional)" 
                             valor={curso} 
                             atualizar={(e: any) => setCurso(e.target.value)} 
                             error={erroCurso} 
@@ -67,7 +68,7 @@ const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) =>
 
                     <InputAutoComplete 
                             id="semestre-curso"
-                            legenda="Em que semestre se encontra?(caso esteja cursando algo)" 
+                            legenda="Em que semestre se encontra?(Opicional)" 
                             opcoes={listaSemestres} 
                             valor={semestreSelecionados} 
                             atualizar={handleAtualizarSemestre} 
@@ -75,12 +76,12 @@ const FormularioQualificacao = ({ rota, state }: FormularioQualificacaoProps) =>
                         />
 
                     <ButtonConfirmar 
-                        texto="Avançar" 
+                        texto="Cadastrar" 
                         aoClicar={processarEnvio} 
                         type="button" 
                     />
                 </div>
-            )}
+            )} 
 
             {/* Loaders */}
             <LoadSpinner aberta={carregandoEnvio} />
