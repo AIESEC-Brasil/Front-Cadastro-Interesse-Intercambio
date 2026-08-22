@@ -189,7 +189,7 @@ export function useFormValidation(fields: any, step: number) {
         const temAlgoSemestre = fields.semestreSelecionados !== undefined && fields.semestreSelecionados !== null && fields.semestreSelecionados !== '' && fields.semestreSelecionados.length > 0;
         const errSemestre = step === 2 && temAlgoSemestre && !fields.idSemestre ? 'Selecione uma opção válida da lista.' : '';
         
-        const temAlgoIdiomas = fields.idiomasSelecionados !== undefined && fields.idiomasSelecionados !== null && fields.idiomasSelecionados !== '' && fields.idiomasSelecionados.length === 0;
+        const temAlgoIdiomas = fields.idiomasSelecionados !== undefined && fields.idiomasSelecionados !== null && fields.idiomasSelecionados !== '' && fields.idiomasSelecionados.length > 0;
         const errIdiomas = step === 2 && temAlgoIdiomas && (!fields.idIdiomas || fields.idIdiomas.length === 0) ? 'Selecione uma opção válida da lista.' : '';
 
         const errosJson: any = {};
