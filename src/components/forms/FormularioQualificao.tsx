@@ -10,8 +10,10 @@ import React from 'react';
 import InputMultiSelectIdiomas from '../ui/input/InputMultiSelectIdiomas';
 import InputTexto from '../ui/input/InputTexto';
 import InputAutoComplete from '../ui/input/InputAutoComplete';
+import InputAnexoPdf from '../ui/input/InputAnexoPdf';
 import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
 
+import ModalErro from '../modal/ModalErro';
 import ModalErroConexao from '../modal/ModalErroConexao';
 
 import LoadSpinner from '../loading/LoadSpinner';
@@ -28,6 +30,7 @@ interface FormularioQualificacaoProps {
 const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProps) => {
     const {
         curso,setCurso,erroCurso,semestreSelecionados,idiomasSelecionados,
+        anexoPdf,
         listaIdiomas,listaSemestres,
         modalErroConexaoAberta,tipoErroConexao,
         carregandoEnvio,
@@ -35,7 +38,11 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
         idiomaFomartado,
         handleAtualizarIdiomas,
         handleAtualizarSemestre,
-        processarEnvio
+        handleAtualizarCurriculo,
+        processarEnvio,
+        setModalErroAberta,
+        modalErroAberta,
+        errosJson,
     } = useFormularioQualificacao(rota, state,step);
     
     return (
@@ -75,6 +82,15 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
                             obrigatorio={false}
                         />
 
+                    <InputAnexoPdf
+                        id="anexoPdf"
+                        legenda="Anexe seu Curriculo em PDF"
+                        arquivo={anexoPdf}
+                        atualizar={handleAtualizarCurriculo}
+                        tamanhoMaximoMb={5}
+                        obrigatorio
+                    />
+
                     <ButtonConfirmar 
                         texto="Cadastrar" 
                         aoClicar={processarEnvio} 
@@ -90,6 +106,13 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
                 aberta={modalErroConexaoAberta} 
                 tipo={tipoErroConexao}
                 aoTentarNovamente={() => window.parent.location.reload()} 
+            />
+
+             <ModalErro 
+                aberta={modalErroAberta} 
+                titulo="Dados incorretos." 
+                erros={errosJson} 
+                aoFechar={() => setModalErroAberta(false)} 
             />
         </div>
     );

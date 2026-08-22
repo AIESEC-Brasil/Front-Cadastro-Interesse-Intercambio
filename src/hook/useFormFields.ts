@@ -35,6 +35,8 @@ export function useFormFields() {
 
     const [semestreSelecionados, setSemestreSelecionado] = useState<string>('');
     const [idSemestre, setIdSemestre] = useState<string | number>('');
+    const [anexoPdf, setAnexoPdf] = useState<File | null>(null);
+    const [anexoBase64, setAnexoBase64] = useState<string | null>(null);
 
     const formatarNome = (val: string) => val.split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
 
@@ -60,6 +62,7 @@ export function useFormFields() {
         idiomasSelecionados, setIdiomasSelecionados,
         idIdiomas, setIdIdiomas,
         semestreSelecionados, setSemestreSelecionado,
-        idSemestre, setIdSemestre
+        idSemestre, setIdSemestre,
+        anexoPdf, setAnexoPdf,anexoBase64, setAnexoBase64
     };
 }

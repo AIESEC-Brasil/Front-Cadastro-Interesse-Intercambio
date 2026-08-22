@@ -30,9 +30,16 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
         console.log(nomeSelecionado,idSelecionado);
     };
 
+    const handleAtualizarCurriculo = (arquivo: File | null, base64: string | null) => {
+        fields.setAnexoBase64(base64)
+        fields.setAnexoPdf(arquivo)
+        console.log(base64,arquivo)
+    }
+
     const processarEnvio = () => {
         const { temErros, errosJson } = validarTudo();
         console.log(errosJson)
+        console.log(fields.anexoPdf)
         if (temErros) {
             modals.setErrosJson(errosJson);
             modals.setModalErroAberta(true);
@@ -56,6 +63,7 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
         idiomaFomartado,
         handleAtualizarIdiomas,
         handleAtualizarSemestre,
+        handleAtualizarCurriculo,
         processarEnvio
     }
 }
