@@ -184,12 +184,12 @@ export function useFormValidation(fields: any, step: number) {
         const errUni = step === 1 && !fields.marcarSemUniversidade && !fields.idUniversidade ? 'Campo obrigatório.' : '';
         const errEsc = step === 1 && fields.marcarSemUniversidade && !fields.idEscritorio ? 'Campo obrigatório.' : '';
         const errLGPD = step === 1 && !fields.termoLGPD ? 'Campo obrigatório.' : '';
-
+       
         // Step 2 Opcional: Só valida se tem algo preenchido/selecionado mas falta o ID correspondente
         const temAlgoSemestre = fields.semestreSelecionados !== undefined && fields.semestreSelecionados !== null && fields.semestreSelecionados !== '' && fields.semestreSelecionados.length > 0;
         const errSemestre = step === 2 && temAlgoSemestre && !fields.idSemestre ? 'Selecione uma opção válida da lista.' : '';
-
-        const temAlgoIdiomas = fields.idiomasSelecionados !== undefined && fields.idiomasSelecionados !== null && fields.idiomasSelecionados !== '' && fields.idiomasSelecionados.length > 0;
+        
+        const temAlgoIdiomas = fields.idiomasSelecionados !== undefined && fields.idiomasSelecionados !== null && fields.idiomasSelecionados !== '' && fields.idiomasSelecionados.length === 0;
         const errIdiomas = step === 2 && temAlgoIdiomas && (!fields.idIdiomas || fields.idIdiomas.length === 0) ? 'Selecione uma opção válida da lista.' : '';
 
         const errosJson: any = {};
