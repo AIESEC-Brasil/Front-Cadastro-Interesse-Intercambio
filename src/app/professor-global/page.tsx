@@ -7,13 +7,14 @@
 import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
 import FormularioPreCadastro from "@components/forms/FormularioPreCadastro";
+import FormularioQualificao from "@components/forms/FormularioQualificao";
 
 /**
  * Componente da página de Voluntário Global.
  * @param {Object} props 
  * @param {Object} props.req - Objeto da requisição.
  */
-const ProfessorGlobal = ({ req }: { req: { path: string } }) => {
+const VoluntarioGlobal = ({ req }: { req: { path: string } }) => {
     const [step, setStep] = useState(1);
     const pathname = usePathname();
     const totalSteps = 2;
@@ -60,17 +61,22 @@ const ProfessorGlobal = ({ req }: { req: { path: string } }) => {
                     <FormularioPreCadastro 
                         rota={pathname?.replace(/^\//, '')} 
                         state={setStep} 
+                        step={step}
                     />
                 )}
                 
                 {step === 2 && (
-                    <>
-                        {/* Conteúdo da segunda etapa */}
-                    </>
+                    
+                <FormularioQualificao
+                    rota={pathname?.replace(/^\//, '')} 
+                    state={setStep} 
+                    step={step}
+                />
+                    
                 )}
             </div>
         </main>
     );
 };
 
-export default ProfessorGlobal;
+export default VoluntarioGlobal;
