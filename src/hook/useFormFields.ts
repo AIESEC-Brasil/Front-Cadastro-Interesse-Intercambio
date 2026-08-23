@@ -7,62 +7,194 @@ export interface ItemDinamico {
     valor: string;
 }
 
+// ==========================================
+// CACHE / ESTADO GLOBAL EM MEMÓRIA (SINGLETON)
+// ==========================================
+let estadoGlobalFormulario = {
+    nome: '',
+    sobrenome: '',
+    senha: '',
+    dataNascimento: '',
+    itemId: 0,
+    emails: [{ tipo: 'other', valor: '' }] as ItemDinamico[],
+    telefones: [{ tipo: 'other', valor: '' }] as ItemDinamico[],
+    curso: '',
+    produtoSelecionado: '',
+    idProduto: '' as number | string,
+    origemSelecionada: '',
+    idOrigem: '' as number | string,
+    marcarSemUniversidade: false,
+    universidadeSelecionada: '',
+    idUniversidade: '' as number | string,
+    escritorioSelecionado: '',
+    idEscritorio: '' as string | number,
+    termoLGPD: false,
+    idiomasSelecionados: [] as string[],
+    idIdiomas: [] as (string | number)[],
+    semestreSelecionado: '',
+    idSemestre: '' as string | number,
+    anexoPdf: null as File | null,
+    anexoBase64: null as string | null,
+};
+
+let listenersGlobal: Array<() => void> = [];
+
+const notificarListeners = () => {
+    listenersGlobal.forEach((listener) => listener());
+};
+
 export function useFormFields() {
-    const [nome, setNome] = useState<string>('');
-    const [sobrenome, setSobrenome] = useState<string>('');
-    const [senha, setSenha] = useState<string>('');
-    const [dataNascimento, setDataNascimento] = useState<string>('');
-    const [itemId, setItemId] = useState<number>(0);
-    const [emails, setEmails] = useState<ItemDinamico[]>([{ tipo: 'other', valor: '' }]);
-    const [telefones, setTelefones] = useState<ItemDinamico[]>([{ tipo: 'other', valor: '' }]);
-    const [curso,setCurso] = useState<string>('');
-    const [produtoSelecionado, setProdutoSelecionado] = useState<string>('');
-    const [idProduto, setIdProduto] = useState<number | string>('');
+    const [, setForcarRender] = useState({});
 
-    const [origemSelecionada, setOrigemSelecionada] = useState<string>('');
-    const [idOrigem, setIdOrigem] = useState<number | string>('');
+    useState(() => {
+        const atualizar = () => setForcarRender({});
+        listenersGlobal.push(atualizar);
 
-    const [marcarSemUniversidade, setMarcarSemUniversidade] = useState<boolean>(false);
-    const [universidadeSelecionada, setUniversidadeSelecionada] = useState<string>('');
-    const [idUniversidade, setIdUniversidade] = useState<number | string>('');
-    const [escritorioSelecionado, setEscritorioSelecionado] = useState<string>('');
-    const [idEscritorio, setIdEscritorio] = useState<string | number>('');
+        return () => {
+            listenersGlobal = listenersGlobal.filter((l) => l !== atualizar);
+        };
+    });
 
-    const [termoLGPD, setTermoLGPD] = useState<boolean>(false);
-
-    const [idiomasSelecionados, setIdiomasSelecionados] = useState<string[]>([]);
-    const [idIdiomas, setIdIdiomas] = useState<(string | number)[]>([]);
-
-    const [semestreSelecionados, setSemestreSelecionado] = useState<string>('');
-    const [idSemestre, setIdSemestre] = useState<string | number>('');
-    const [anexoPdf, setAnexoPdf] = useState<File | null>(null);
-    const [anexoBase64, setAnexoBase64] = useState<string | null>(null);
-
-    const formatarNome = (val: string) => val.split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
+    const formatarNome = (val: string) => {
+        const conectivos = ['da', 'de', 'di', 'do', 'du', 'a', 'e', 'i', 'o', 'u'];
+        return val
+            .split(' ')
+            .map((p, index) => {
+                const palavraLower = p.toLowerCase();
+                if (index > 0 && conectivos.includes(palavraLower)) {
+                    return palavraLower;
+                }
+                return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();
+            })
+            .join(' ');
+    };
 
     return {
-        nome, setNome: (v: string) => {if (contemApenasLetrasEspacos(v)){setNome(formatarNome(v))}},
-        sobrenome, setSobrenome: (v: string) => {if (contemApenasLetrasEspacos(v)){setSobrenome(formatarNome(v))}},
-        senha, setSenha,
-        curso,setCurso: (v: string) => {if (contemApenasLetrasEspacos(v)){setCurso(formatarNome(v))}},
-        dataNascimento, setDataNascimento: (v: string) => setDataNascimento(aplicarMascaraData(v)),
-        emails, setEmails,
-        itemId, setItemId,
-        telefones, setTelefones,
-        produtoSelecionado, setProdutoSelecionado,
-        idProduto, setIdProduto,
-        origemSelecionada, setOrigemSelecionada,
-        idOrigem, setIdOrigem,
-        marcarSemUniversidade, setMarcarSemUniversidade,
-        universidadeSelecionada, setUniversidadeSelecionada,
-        idUniversidade, setIdUniversidade,
-        escritorioSelecionado, setEscritorioSelecionado,
-        idEscritorio, setIdEscritorio,
-        termoLGPD, setTermoLGPD,
-        idiomasSelecionados, setIdiomasSelecionados,
-        idIdiomas, setIdIdiomas,
-        semestreSelecionados, setSemestreSelecionado,
-        idSemestre, setIdSemestre,
-        anexoPdf, setAnexoPdf,anexoBase64, setAnexoBase64
+        nome: estadoGlobalFormulario.nome, 
+        setNome: (v: string) => {
+            if (contemApenasLetrasEspacos(v)) {
+                estadoGlobalFormulario.nome = formatarNome(v);
+                notificarListeners();
+            }
+        },
+        sobrenome: estadoGlobalFormulario.sobrenome, 
+        setSobrenome: (v: string) => {
+            if (contemApenasLetrasEspacos(v)) {
+                estadoGlobalFormulario.sobrenome = formatarNome(v);
+                notificarListeners();
+            }
+        },
+        senha: estadoGlobalFormulario.senha, 
+        setSenha: (v: string) => {
+            estadoGlobalFormulario.senha = v;
+            notificarListeners();
+        },
+        curso: estadoGlobalFormulario.curso,
+        setCurso: (v: string) => {
+            if (contemApenasLetrasEspacos(v)) {
+                estadoGlobalFormulario.curso = formatarNome(v);
+                notificarListeners();
+            }
+        },
+        dataNascimento: estadoGlobalFormulario.dataNascimento, 
+        setDataNascimento: (v: string) => {
+            estadoGlobalFormulario.dataNascimento = aplicarMascaraData(v);
+            notificarListeners();
+        },
+        emails: estadoGlobalFormulario.emails, 
+        setEmails: (v: ItemDinamico[] | ((prev: ItemDinamico[]) => ItemDinamico[])) => {
+            estadoGlobalFormulario.emails = typeof v === 'function' ? v(estadoGlobalFormulario.emails) : v;
+            notificarListeners();
+        },
+        itemId: estadoGlobalFormulario.itemId, 
+        setItemId: (v: number | ((prev: number) => number)) => {
+            estadoGlobalFormulario.itemId = typeof v === 'function' ? v(estadoGlobalFormulario.itemId) : v;
+            notificarListeners();
+        },
+        telefones: estadoGlobalFormulario.telefones, 
+        setTelefones: (v: ItemDinamico[] | ((prev: ItemDinamico[]) => ItemDinamico[])) => {
+            estadoGlobalFormulario.telefones = typeof v === 'function' ? v(estadoGlobalFormulario.telefones) : v;
+            notificarListeners();
+        },
+        produtoSelecionado: estadoGlobalFormulario.produtoSelecionado, 
+        setProdutoSelecionado: (v: string) => {
+            estadoGlobalFormulario.produtoSelecionado = v;
+            notificarListeners();
+        },
+        idProduto: estadoGlobalFormulario.idProduto, 
+        setIdProduto: (v: number | string) => {
+            estadoGlobalFormulario.idProduto = v;
+            notificarListeners();
+        },
+        origemSelecionada: estadoGlobalFormulario.origemSelecionada, 
+        setOrigemSelecionada: (v: string) => {
+            estadoGlobalFormulario.origemSelecionada = v;
+            notificarListeners();
+        },
+        idOrigem: estadoGlobalFormulario.idOrigem, 
+        setIdOrigem: (v: number | string) => {
+            estadoGlobalFormulario.idOrigem = v;
+            notificarListeners();
+        },
+        marcarSemUniversidade: estadoGlobalFormulario.marcarSemUniversidade, 
+        setMarcarSemUniversidade: (v: boolean | ((prev: boolean) => boolean)) => {
+            estadoGlobalFormulario.marcarSemUniversidade = typeof v === 'function' ? v(estadoGlobalFormulario.marcarSemUniversidade) : v;
+            notificarListeners();
+        },
+        universidadeSelecionada: estadoGlobalFormulario.universidadeSelecionada, 
+        setUniversidadeSelecionada: (v: string) => {
+            estadoGlobalFormulario.universidadeSelecionada = v;
+            notificarListeners();
+        },
+        idUniversidade: estadoGlobalFormulario.idUniversidade, 
+        setIdUniversidade: (v: number | string) => {
+            estadoGlobalFormulario.idUniversidade = v;
+            notificarListeners();
+        },
+        escritorioSelecionado: estadoGlobalFormulario.escritorioSelecionado, 
+        setEscritorioSelecionado: (v: string) => {
+            estadoGlobalFormulario.escritorioSelecionado = v;
+            notificarListeners();
+        },
+        idEscritorio: estadoGlobalFormulario.idEscritorio, 
+        setIdEscritorio: (v: string | number) => {
+            estadoGlobalFormulario.idEscritorio = v;
+            notificarListeners();
+        },
+        termoLGPD: estadoGlobalFormulario.termoLGPD, 
+        setTermoLGPD: (v: boolean | ((prev: boolean) => boolean)) => {
+            estadoGlobalFormulario.termoLGPD = typeof v === 'function' ? v(estadoGlobalFormulario.termoLGPD) : v;
+            notificarListeners();
+        },
+        idiomasSelecionados: estadoGlobalFormulario.idiomasSelecionados, 
+        setIdiomasSelecionados: (v: string[] | ((prev: string[]) => string[])) => {
+            estadoGlobalFormulario.idiomasSelecionados = typeof v === 'function' ? v(estadoGlobalFormulario.idiomasSelecionados) : v;
+            notificarListeners();
+        },
+        idIdiomas: estadoGlobalFormulario.idIdiomas, 
+        setIdIdiomas: (v: (string | number)[] | ((prev: (string | number)[]) => (string | number)[])) => {
+            estadoGlobalFormulario.idIdiomas = typeof v === 'function' ? v(estadoGlobalFormulario.idIdiomas) : v;
+            notificarListeners();
+        },
+        semestreSelecionado: estadoGlobalFormulario.semestreSelecionado, 
+        setSemestreSelecionado: (v: string) => {
+            estadoGlobalFormulario.semestreSelecionado = v;
+            notificarListeners();
+        },
+        idSemestre: estadoGlobalFormulario.idSemestre, 
+        setIdSemestre: (v: string | number) => {
+            estadoGlobalFormulario.idSemestre = v;
+            notificarListeners();
+        },
+        anexoPdf: estadoGlobalFormulario.anexoPdf, 
+        setAnexoPdf: (v: File | null) => {
+            estadoGlobalFormulario.anexoPdf = v;
+            notificarListeners();
+        },
+        anexoBase64: estadoGlobalFormulario.anexoBase64, 
+        setAnexoBase64: (v: string | null) => {
+            estadoGlobalFormulario.anexoBase64 = v;
+            notificarListeners();
+        }
     };
 }

@@ -76,7 +76,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <InputTexto 
                             id="nome" 
-                            legenda="N ome" 
+                            legenda="Nome" 
                             valor={nome} 
                             atualizar={(e: any) => setNome(e.target.value)} 
                             error={erroNome} 

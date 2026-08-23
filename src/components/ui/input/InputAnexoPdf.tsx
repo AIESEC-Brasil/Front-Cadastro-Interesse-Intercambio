@@ -169,7 +169,7 @@ const InputAnexoPdf = ({
                             onClick={removerArquivo}
                             disabled={desabilitado}
                             aria-label={`Remover ${arquivo.name}`}
-                            className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 shrink-0"
+                            className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 shrink-0 cursor-pointer"
                         >
                             <X size={18} aria-hidden="true" />
                         </button>

@@ -37,7 +37,7 @@ export function useFormValidation(fields: any, step: number) {
     const idUniversidade = fields.idUniversidade;
     const escritorioSelecionado = fields.escritorioSelecionado;
     const idEscritorio = fields.idEscritorio;
-    const semestreSelecionados = fields.semestreSelecionados;
+    const semestreSelecionado = fields.semestreSelecionado;
     const idSemestre = fields.idSemestre;
     const idiomaSelecionados = fields.idiomasSelecionados;
     const idIdiomas = fields.idIdiomas;
@@ -132,8 +132,8 @@ export function useFormValidation(fields: any, step: number) {
                 setErroIdiomas('');
             }
 
-            if (semestreSelecionados) {
-                if (semestreSelecionados === '' || idSemestre) {
+            if (semestreSelecionado) {
+                if (semestreSelecionado === '' || idSemestre) {
                     setErroSemestre('');
                 }
             } else {
@@ -164,7 +164,7 @@ export function useFormValidation(fields: any, step: number) {
         idUniversidade,
         escritorioSelecionado,
         idEscritorio,
-        semestreSelecionados,
+        semestreSelecionado,
         idSemestre,
         JSON.stringify(idiomaSelecionados),
         JSON.stringify(idIdiomas),
@@ -186,7 +186,7 @@ export function useFormValidation(fields: any, step: number) {
         const errLGPD = step === 1 && !fields.termoLGPD ? 'Campo obrigatório.' : '';
        
         // Step 2 Opcional: Só valida se tem algo preenchido/selecionado mas falta o ID correspondente
-        const temAlgoSemestre = fields.semestreSelecionados !== undefined && fields.semestreSelecionados !== null && fields.semestreSelecionados !== '' && fields.semestreSelecionados.length > 0;
+        const temAlgoSemestre = fields.semestreSelecionado !== undefined && fields.semestreSelecionado !== null && fields.semestreSelecionado !== '' && fields.semestreSelecionado.length > 0;
         const errSemestre = step === 2 && temAlgoSemestre && !fields.idSemestre ? 'Selecione uma opção válida da lista.' : '';
         
         const temAlgoIdiomas = fields.idiomasSelecionados !== undefined && fields.idiomasSelecionados !== null && fields.idiomasSelecionados !== '' && fields.idiomasSelecionados.length > 0;

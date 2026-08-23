@@ -32,7 +32,7 @@ export default function ModalSucessoCadastro({
 
         <button 
           onClick={aoConcluir}
-          className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
+          className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium cursor-pointer"
         >
           Entendido
         </button>

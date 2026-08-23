@@ -7,8 +7,8 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
     const fields = useFormFields();
     const { erros, validarTudo } = useFormValidation(fields,step);
     const modals = useFormModals();
-    const dadosFormulario = useDadosFormulario(modals);
-
+    const dadosFormulario = useDadosFormulario(modals,fields,step,rota);
+    console.log(fields.itemId)
     const idiomaFomartado = fields.idiomasSelecionados.map((nome,index) => ({
         id: fields.idIdiomas[index],
         nome
@@ -33,7 +33,10 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
     const handleAtualizarCurriculo = (arquivo: File | null, base64: string | null) => {
         fields.setAnexoBase64(base64)
         fields.setAnexoPdf(arquivo)
-        console.log(base64,arquivo)
+        console.log(base64)
+        if (arquivo){
+            console.log(arquivo.name)
+        }
     }
 
     const processarEnvio = () => {
@@ -44,15 +47,31 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
             modals.setErrosJson(errosJson);
             modals.setModalErroAberta(true);
         } else {
-            console.log("Idiomas Nomes:", fields.idiomasSelecionados);
-        console.log("Idiomas IDs:", fields.idIdiomas);
-        
-        // Exemplo avançando o step (ex: ir para o próximo passo)
-        if (typeof state === 'function') {
-            state(3);
+            const jsonResumo: any = {};
+            if (fields.idiomasSelecionados.length > 0 || fields.curso || fields.semestreSelecionado || fields.anexoPdf ){
+                if (fields.idiomasSelecionados.length > 0) {
+                    jsonResumo["Idiomas"] = fields.idiomasSelecionados
+                }
+
+                if (fields.curso){
+                    jsonResumo["Curso"] = fields.curso
+                }
+
+                if (fields.semestreSelecionado){
+                    jsonResumo["Semestre"] = fields.semestreSelecionado
+                }
+
+                if (fields.anexoPdf) {
+                    jsonResumo["Curriculo"] = fields.anexoPdf.name;
+                }
+
+                modals.setDadosResumo(jsonResumo);
+                modals.setModalSucessoAberta(true);
+            } else {
+                modals.setModalSucessoQualificaco(true);
+            }
         }
-        }
-        
+        modals.setCarregandoEnvio(false);
     };
 
     return {

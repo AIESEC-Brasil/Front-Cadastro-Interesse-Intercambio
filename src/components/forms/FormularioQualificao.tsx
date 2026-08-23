@@ -13,6 +13,8 @@ import InputAutoComplete from '../ui/input/InputAutoComplete';
 import InputAnexoPdf from '../ui/input/InputAnexoPdf';
 import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
 
+import ModalSucesso from '../modal/ModalSucesso';
+import ModalSucessoQualificacao from '../modal/ModalSucessoQualificacao';
 import ModalErro from '../modal/ModalErro';
 import ModalErroConexao from '../modal/ModalErroConexao';
 
@@ -29,7 +31,7 @@ interface FormularioQualificacaoProps {
 
 const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProps) => {
     const {
-        curso,setCurso,erroCurso,semestreSelecionados,idiomasSelecionados,
+        curso,setCurso,erroCurso,semestreSelecionado,idiomasSelecionados,
         anexoPdf,
         listaIdiomas,listaSemestres,
         modalErroConexaoAberta,tipoErroConexao,
@@ -41,8 +43,13 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
         handleAtualizarCurriculo,
         processarEnvio,
         setModalErroAberta,
+        setModalSucessoAberta,
+        modalSucessoQualificaco,
         modalErroAberta,
+        modalSucessoAberta,
         errosJson,
+        enviarDados,
+        dadosResumo,
     } = useFormularioQualificacao(rota, state,step);
     
     return (
@@ -77,7 +84,7 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
                             id="semestre-curso"
                             legenda="Em que semestre se encontra?(Opicional)" 
                             opcoes={listaSemestres} 
-                            valor={semestreSelecionados} 
+                            valor={semestreSelecionado} 
                             atualizar={handleAtualizarSemestre} 
                             obrigatorio={false}
                         />
@@ -102,6 +109,17 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
             {/* Loaders */}
             <LoadSpinner aberta={carregandoEnvio} />
 
+            <ModalSucesso 
+                aberta={modalSucessoAberta} 
+                titulo="Confirme" 
+                resumoDados={dadosResumo} 
+                aoConfirmar={() => {
+                    setModalSucessoAberta(false);
+                    enviarDados();
+                }} 
+                aoEditar={() => setModalSucessoAberta(false)} 
+            />
+
             <ModalErroConexao 
                 aberta={modalErroConexaoAberta} 
                 tipo={tipoErroConexao}
@@ -114,6 +132,8 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
                 erros={errosJson} 
                 aoFechar={() => setModalErroAberta(false)} 
             />
+
+            <ModalSucessoQualificacao isOpen={modalSucessoQualificaco} onClose ={() => window.parent.location.reload() } />
         </div>
     );
 };

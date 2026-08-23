@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import apiOgxClient from '../service/clients/apiOgxClient';
-import { removerMascaraData, aplicarMascaraTelefone,removerMascaraTelefone } from '../helpers/formatter';
 import { useFormFields } from './useFormFields';
 import { useFormValidation } from './useFormValidation';
 import { useFormModals } from './useFormModals';
 import { useDadosFormulario } from './useDadosFormulario';
+import {aplicarMascaraTelefone } from '../helpers/formatter';
 
 export function useFormularioPreCadastro(rota: string, state: (step: number | any) => void,step:number) {
     const fields = useFormFields();
     const { erros, validarTudo } = useFormValidation(fields,step);
     const modals = useFormModals();
-    const dadosFormulario = useDadosFormulario(modals);
+    const dadosFormulario = useDadosFormulario(modals,fields,step,rota);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     // Pré-seleção por Rota
@@ -54,97 +54,13 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
         modals.setCarregandoEnvio(false);
     };
 
-    const nome = fields.nome;
-    const sobrenome = fields.sobrenome;
-    const senha = fields.senha;
-    const dataNascimento = removerMascaraData(fields.dataNascimento);
-    const email = fields.emails.map(e => ({ tipo: e.tipo, email: e.valor }));
-    const telefone = fields.telefones.map(e => ({ tipo: e.tipo, numero: removerMascaraTelefone(e.valor) }));
-    
-    const comite = {
-        id: fields.idEscritorio,
-        nome: fields.escritorioSelecionado,
-    };
-    
-    const universidade = {
-        id: fields.idUniversidade,
-        nome: fields.universidadeSelecionada,
-    };
-    
-    const origem = {
-        id: fields.idOrigem,
-        nome: fields.origemSelecionada,
-    };
-    
-    const produto: any = {
-        id_podio: fields.idProduto,
-        titulo: fields.produtoSelecionado
-    };
-
-    if (rota === 'voluntario-global') {
-        produto.id_expa = 7;
-    } else if (rota === 'talento-global') {
-        produto.id_expa = 8;
-    } else if (rota === 'professor-global') {
-        produto.id_expa = 9;
-    } 
-
-    const enviarDados = async () => {
-        modals.setCarregandoEnvio(true);
-        
-        const json: any = {
-            nome,
-            sobrenome,
-            senha,
-            dataNascimento,
-            email,
-            telefone,
-            produto,
-            origem,
-            autorizacao: 1
-        };
-        
-        if (fields.marcarSemUniversidade) {
-            json.comite = comite;
-        } else {
-            json.universidade = universidade;
-        }
-        console.log(json)
-        try {
-            const response = await apiOgxClient.post('/new-lead-ogx/cadastro', json);
-            
-            // 💡 Ajuste para capturar o item_id retornado pelo backend (ex: response.data.item_id ou ajuste conforme sua API)
-            if (response?.data?.item_id) {
-                fields.setItemId(response.data.item_id);
-            }
-
-            modals.setModalSucessoCadastroAberta(true);
-        } catch (error:any) {
-            const dadosErro = error.response?.data?.data;
-            if (error.response.status === 409){
-                const conteudoModal = dadosErro.erro 
-                ? dadosErro.erro.replace("EXPA", "").trim() 
-                : dadosErro;
-                modals.setDataConflito(conteudoModal)
-                modals.setModalConflitoAberta(true)
-            } else {
-                modals.setTipoErroConexao('bug');
-                modals.setModalErroConexaoAberta(true);
-            }
-            console.log('Erro ao enviar dados:', error);
-        } finally {
-            modals.setCarregandoEnvio(false);
-        }
-    };
-
     return {
         ...fields,
         ...erros,
         ...modals,
-        isOpen, setIsOpen,
         ...dadosFormulario,
+        isOpen, setIsOpen,
         validarEProcessar,
-        aplicarMascaraTelefone,
-        enviarDados
+        aplicarMascaraTelefone
     };
 }
