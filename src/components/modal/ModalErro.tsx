@@ -43,7 +43,7 @@ const ModalErro = ({ aberta, titulo = "Dados incorretos.", erros, aoFechar }: Mo
                     <ul className="space-y-3">
                         {entradasErros.map(([campo, mensagens], index) => (
                             <li key={index} className="bg-red-50 p-3 rounded-lg border border-red-100">
-                                <strong className="text-red-800 capitalize block mb-1">{campo}:</strong>
+                                <strong className="text-red-800 block mb-1">{campo}:</strong>
                                 <ul className="list-disc list-inside space-y-1 pl-2">
                                     {mensagens.map((msg, idx) => (
                                         <li key={idx} className="text-sm text-red-700">{msg}</li>

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * @file VoluntarioGlobal.tsx
+ * @file ProgramasIntercambio.tsx
  * @description Página de fluxo de cadastro para Voluntário Global.
  */
 import { usePathname } from 'next/navigation';
@@ -14,7 +14,7 @@ import FormularioQualificao from "@components/forms/FormularioQualificao";
  * @param {Object} props 
  * @param {Object} props.req - Objeto da requisição.
  */
-const VoluntarioGlobal = ({ req }: { req: { path: string } }) => {
+const ProgramasIntercambio = ({ req }: { req: { path: string } }) => {
     const [step, setStep] = useState(1);
     const pathname = usePathname();
     const totalSteps = 2;
@@ -79,4 +79,4 @@ const VoluntarioGlobal = ({ req }: { req: { path: string } }) => {
     );
 };
 
-export default VoluntarioGlobal;
+export default ProgramasIntercambio;

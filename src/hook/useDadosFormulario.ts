@@ -24,10 +24,12 @@ const tituloTermoPadrao = 'Eu concordo com a coleta e uso dos meus dados conform
 let cacheGlobal: {
     listaProdutos: Metacards[];
     listaOrigens: Metacards[];
-    listaUniversidades: any[];
+    listaUniversidades: Metacards[];
     listaEscritorios: Metacards[];
     listaIdiomas: Metacards[];
     listaSemestres: Metacards[];
+    listaAreaAtuacao:Metacards[];
+    listaNivelMercado:Metacards[];
     opcoesEmail: any[];
     opcoesTelefone: any[];
     tituloTermoLGPD: string;
@@ -40,6 +42,8 @@ let cacheGlobal: {
     listaEscritorios: [],
     listaIdiomas: [],
     listaSemestres: [],
+    listaAreaAtuacao:[],
+    listaNivelMercado:[],
     opcoesEmail: [],
     opcoesTelefone: [],
     tituloTermoLGPD: tituloTermoPadrao,
@@ -68,6 +72,8 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
     const [listaEscritorios, setListaEscritorios] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaEscritorios);
     const [listaIdiomas, setListaIdiomas] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaIdiomas);
     const [listaSemestres,setListaSemestres] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaSemestres);
+    const [listaAreaAtuacao,setListaAreaAtuacao] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaAreaAtuacao);
+    const [listaNivelMercado,setListaNivelMercado] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaNivelMercado);
     const [opcoesEmail, setOpcoesEmail] = useState<any[]>(cacheGlobal.opcoesEmail);
     const [opcoesTelefone, setOpcoesTelefone] = useState<any[]>(cacheGlobal.opcoesTelefone);
     const [tituloTermoLGPD, setTituloTermoLGPD] = useState(cacheGlobal.tituloTermoLGPD);
@@ -126,6 +132,8 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 const campoLGPD = encontrarCampo('eu-concordo-com-a-coleta-e-uso-dos-meus-dados-conforme-');
                 const campoIdiomas = encontrarCampo('possui-outro-idioma');
                 const campoSemestres = encontrarCampo('qual-semestre-do-curso');
+                const campoAreaAtuacao = encontrarCampo('qual-sua-area-de-atuacao');
+                const campoNivelAtuacao = encontrarCampo('qual-seu-nivel-de-atuacao');
                 
                 const [emailFormatado, telefoneFormatado] = await Promise.all([
                     traduzirPalavras(campoEmail?.options ? ordenarOpcoes(campoEmail.options) : []),
@@ -140,7 +148,9 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 const novasOrigens = (campoOrigem?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
                 const novosIdiomas = (campoIdiomas?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
                 const novosSemestres = (campoSemestres?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-                
+                const novasAreaAtuacao = (campoAreaAtuacao?.options || []).map((item:any) => ({ id:item.id,nome:item.text }));
+                const novosNivelAtuacao = (campoNivelAtuacao?.options || []).map((item:any) => ({ id:item.id,nome:item.text }));
+
                 // Atualiza o cache global
                 cacheGlobal = {
                     listaProdutos: novosProdutos,
@@ -149,6 +159,8 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                     listaEscritorios: novosEscritorios,
                     listaIdiomas: novosIdiomas,
                     listaSemestres: novosSemestres,
+                    listaAreaAtuacao: novasAreaAtuacao,
+                    listaNivelMercado:novosNivelAtuacao,
                     opcoesEmail: emailFormatado,
                     opcoesTelefone: telefoneFormatado,
                     tituloTermoLGPD: novoTitulo,
@@ -167,6 +179,8 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                     setListaOrigens(novasOrigens);
                     setListaIdiomas(novosIdiomas);
                     setListaSemestres(novosSemestres);
+                    setListaAreaAtuacao(novasAreaAtuacao);
+                    setListaNivelMercado(novosNivelAtuacao);
                 }
             } catch {
                 if (componenteMontado) {
@@ -226,6 +240,7 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
      */
     const enviarDados = async () => {
         modals.setCarregandoEnvio(true);
+        let resultado = null;
         if (step === 1) {
             const jsonPreCadastro: any = {
                 nome,
@@ -244,16 +259,16 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
             } else {
                 jsonPreCadastro.universidade = universidade;
             }
-            console.log(jsonPreCadastro)
+           
             try {
-                const response = await apiOgxClient.post('/new-lead-ogx/cadastro', jsonPreCadastro);
-                console.log(response.data.item_id)
+                const response:any = await apiOgxClient.post('/new-lead-ogx/cadastro', jsonPreCadastro);
                 // 💡 Ajuste para capturar o item_id retornado pelo backend (ex: response.data.item_id ou ajuste conforme sua API)
                 if (response?.data?.item_id) {
                     fields.setItemId(response.data.item_id);
                 }
 
                 modals.setModalSucessoCadastroAberta(true);
+                resultado = response?.sucesso;
             } catch (error:any) {
                 const dadosErro = error.response?.data?.data;
                 if (error.response.status === 409){
@@ -270,6 +285,7 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
             } finally {
                 modals.setCarregandoEnvio(false);
             }
+            return resultado
             
         } else if (step === 2) {
             const jsonQualificacao: any = {
@@ -294,17 +310,32 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 }));
             }
             
-            if (fields.semestreSelecionado){
+            if (fields.semestreSelecionado) {
                 jsonQualificacao.semestreCurso = {
                     id: fields.idSemestre,
                     nome: fields.semestreSelecionado
                 };
             }
 
-    
+            if (fields.areaAtuacaoSelecionada){
+                jsonQualificacao.areaAtuacao = {
+                    id: fields.idAreaAtuacao,
+                    nome: fields.areaAtuacaoSelecionada
+                }
+            }
+
+            if (fields.nivelAtuacaoSelecionado){
+                jsonQualificacao.nivelAtuacao = {
+                    id: fields.idNivelAtuacao,
+                    nome: fields.nivelAtuacaoSelecionado
+                }
+            }
+
+            
             try {
-                await apiOgxClient.put('/new-lead-ogx/cadastro', jsonQualificacao);
+                const response:any = await apiOgxClient.put('/new-lead-ogx/cadastro', jsonQualificacao);
                 modals.setModalSucessoCadastroAberta(true);
+                resultado = response?.sucesso;
             } catch (error:any) {
                 const dadosErro = error.response?.data?.data;
                 if (error.response.status === 409){
@@ -321,6 +352,7 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
             } finally {
                 modals.setCarregandoEnvio(false);
             }
+            return resultado;
         }
     };
 
@@ -333,6 +365,8 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
         listaEscritorios,
         listaIdiomas,
         listaSemestres,
+        listaAreaAtuacao,
+        listaNivelMercado,
         opcoesEmail,
         opcoesTelefone,
         tituloTermoLGPD,

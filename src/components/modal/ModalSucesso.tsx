@@ -30,36 +30,43 @@ const ModalSucesso = ({
                 
                 {/* Cabeçalho com o botão X para fechar */}
                 <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
-                    <h3 className="text-xl font-bold text-blue-900">{titulo}</h3>
+                    <h3 className="text-xl font-bold text-blue-900 truncate pr-2">{titulo}</h3>
                     <button 
                         onClick={aoEditar}
-                        className="text-gray-400 hover:text-gray-600 transition text-2xl font-bold leading-none cursor-pointer"
+                        className="text-gray-400 hover:text-gray-600 transition text-2xl font-bold leading-none cursor-pointer shrink-0"
                         aria-label="Fechar"
                     >
                         &times;
                     </button>
                 </div>
 
-                {/* Corpo da Modal */}
-                <div className="p-6 max-h-80 overflow-y-auto">
+                {/* Corpo da Modal com limitação de altura responsiva */}
+                <div className="p-6 max-h-[60vh] overflow-y-auto">
                     {mensagem && <p className="text-gray-700 mb-4 whitespace-pre-line">{mensagem}</p>}
 
-                    {/* Exibe o resumo estruturado lidando com valores únicos ou listas (múltiplos emails/telefones) */}
+                    {/* Exibe o resumo estruturado */}
                     {resumoDados && (
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 space-y-3">
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 space-y-3 max-w-full">
                             {Object.entries(resumoDados).map(([chave, valor], index) => (
-                                <div key={index} className="text-sm border-b border-gray-200/60 pb-2 last:border-0 last:pb-0">
+                                <div key={index} className="text-sm border-b border-gray-200/60 pb-2 last:border-0 last:pb-0 min-w-0">
                                     <strong className="text-gray-700 block mb-0.5">{chave}:</strong>
                                     
-                                    {/* Se o valor for um array (ex: vários e-mails ou telefones), renderiza uma lista */}
+                                    {/* Se o valor for um array */}
                                     {Array.isArray(valor) ? (
                                         <ul className="list-disc list-inside pl-2 space-y-0.5 text-gray-600">
                                             {valor.map((item, idx) => (
-                                                <li key={idx}>{String(item)}</li>
+                                                <li key={idx} className="truncate" title={String(item)}>
+                                                    {String(item)}
+                                                </li>
                                             ))}
                                         </ul>
                                     ) : (
-                                        <span className="text-gray-600 block pl-2">{String(valor)}</span>
+                                        <span 
+                                            className="text-gray-600 block pl-2 truncate" 
+                                            title={String(valor)}
+                                        >
+                                            {String(valor)}
+                                        </span>
                                     )}
                                 </div>
                             ))}
@@ -67,7 +74,7 @@ const ModalSucesso = ({
                     )}
                 </div>
 
-                {/* Rodapé com os dois botões: Editar dados (Cinza) e Confirmar (Azul) */}
+                {/* Rodapé */}
                 <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-gray-100">
                     <ButtonEditar 
                         texto="Editar dados" 

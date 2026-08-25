@@ -31,9 +31,9 @@ interface FormularioQualificacaoProps {
 
 const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProps) => {
     const {
-        curso,setCurso,erroCurso,semestreSelecionado,idiomasSelecionados,
+        curso,setCurso,erroCurso,semestreSelecionado,areaAtuacaoSelecionada,nivelAtuacaoSelecionado,
         anexoPdf,
-        listaIdiomas,listaSemestres,
+        listaIdiomas,listaSemestres,listaAreaAtuacao,listaNivelMercado,
         modalErroConexaoAberta,tipoErroConexao,
         carregandoEnvio,
         carregandoMetadados,
@@ -41,15 +41,18 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
         handleAtualizarIdiomas,
         handleAtualizarSemestre,
         handleAtualizarCurriculo,
-        processarEnvio,
+        handleAtualizarAreaAtuacao,
+        handleAtualizarNivelAtuacao,
+        validarEProcessar,
         setModalErroAberta,
         setModalSucessoAberta,
         modalSucessoQualificaco,
         modalErroAberta,
         modalSucessoAberta,
         errosJson,
-        enviarDados,
+        atualizarDadosQualificacao,
         dadosResumo,
+        fecharModalSucessoQualificacao,
     } = useFormularioQualificacao(rota, state,step);
     
     return (
@@ -80,6 +83,30 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
                             obrigatorio={false}
                         />}
 
+                    {['talento-global','professor-global'].includes(rota) && (
+                        <>
+
+                            <InputAutoComplete 
+                                id="area-atuacao"
+                                legenda="Qual sua Área de Atuação?(Opicional)" 
+                                opcoes={listaAreaAtuacao} 
+                                valor={areaAtuacaoSelecionada} 
+                                atualizar={handleAtualizarAreaAtuacao} 
+                                obrigatorio={false}
+                            />
+
+                            <InputAutoComplete 
+                                id="nivel-atuacao"
+                                legenda="Qual seu Nivel de Atuação no mercado?(Opicional)" 
+                                opcoes={listaNivelMercado} 
+                                valor={nivelAtuacaoSelecionado} 
+                                atualizar={handleAtualizarNivelAtuacao} 
+                                obrigatorio={false}
+                            />
+
+                        </>
+                    )}
+
                     <InputAutoComplete 
                             id="semestre-curso"
                             legenda="Em que semestre se encontra?(Opicional)" 
@@ -95,12 +122,12 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
                         arquivo={anexoPdf}
                         atualizar={handleAtualizarCurriculo}
                         tamanhoMaximoMb={5}
-                        obrigatorio
+                        obrigatorio={false}
                     />
 
                     <ButtonConfirmar 
                         texto="Cadastrar" 
-                        aoClicar={processarEnvio} 
+                        aoClicar={validarEProcessar} 
                         type="button" 
                     />
                 </div>
@@ -113,10 +140,7 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
                 aberta={modalSucessoAberta} 
                 titulo="Confirme" 
                 resumoDados={dadosResumo} 
-                aoConfirmar={() => {
-                    setModalSucessoAberta(false);
-                    enviarDados();
-                }} 
+                aoConfirmar={atualizarDadosQualificacao} 
                 aoEditar={() => setModalSucessoAberta(false)} 
             />
 
@@ -133,7 +157,7 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
                 aoFechar={() => setModalErroAberta(false)} 
             />
 
-            <ModalSucessoQualificacao isOpen={modalSucessoQualificaco} onClose ={() => window.parent.location.reload() } />
+            <ModalSucessoQualificacao isOpen={modalSucessoQualificaco} onClose ={fecharModalSucessoQualificacao} />
         </div>
     );
 };

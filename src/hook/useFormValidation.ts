@@ -16,6 +16,9 @@ export function useFormValidation(fields: any, step: number) {
     const [erroCurso, setErroCurso] = useState<string>('');
     const [erroSemestre, setErroSemestre] = useState<string>('');
     const [erroIdiomas, setErroIdiomas] = useState<string>('');
+    // Novos estados de erro para Área e Nível de Atuação:
+    const [erroAreaAtuacao, setErroAreaAtuacao] = useState<string>('');
+    const [erroNivelAtuacao, setErroNivelAtuacao] = useState<string>('');
 
     const prevEmailsLen = useRef(fields.emails.length);
     const prevTelefonesLen = useRef(fields.telefones.length);
@@ -42,6 +45,10 @@ export function useFormValidation(fields: any, step: number) {
     const idiomaSelecionados = fields.idiomasSelecionados;
     const idIdiomas = fields.idIdiomas;
     const termoLGPD = fields.termoLGPD;
+    const areaAtuacao = fields.areaAtuacao;
+    const idAreaAtuacao = fields.idAreaAtuacao;
+    const nivelAtuacao = fields.nivelAtuacao;
+    const idNivelAtuacao = fields.idNivelAtuacao;
 
     useEffect(() => {
         if (step === 1) {
@@ -139,6 +146,24 @@ export function useFormValidation(fields: any, step: number) {
             } else {
                 setErroSemestre('');
             }
+
+            // Validação em tempo real para Área de Atuação
+            if (areaAtuacao) {
+                if (areaAtuacao === '' || idAreaAtuacao) {
+                    setErroAreaAtuacao('');
+                }
+            } else {
+                setErroAreaAtuacao('');
+            }
+
+            // Validação em tempo real para Nível de Atuação
+            if (nivelAtuacao) {
+                if (nivelAtuacao === '' || idNivelAtuacao) {
+                    setErroNivelAtuacao('');
+                }
+            } else {
+                setErroNivelAtuacao('');
+            }
         }
 
         prevEmailsLen.current = emails.length;
@@ -168,7 +193,11 @@ export function useFormValidation(fields: any, step: number) {
         idSemestre,
         JSON.stringify(idiomaSelecionados),
         JSON.stringify(idIdiomas),
-        termoLGPD
+        termoLGPD,
+        areaAtuacao,
+        idAreaAtuacao,
+        nivelAtuacao,
+        idNivelAtuacao
     ]);
     
     const validarTudo = () => {
@@ -192,6 +221,13 @@ export function useFormValidation(fields: any, step: number) {
         const temAlgoIdiomas = fields.idiomasSelecionados !== undefined && fields.idiomasSelecionados !== null && fields.idiomasSelecionados !== '' && fields.idiomasSelecionados.length > 0;
         const errIdiomas = step === 2 && temAlgoIdiomas && (!fields.idIdiomas || fields.idIdiomas.length === 0) ? 'Selecione uma opção válida da lista.' : '';
 
+        // Validações opcionais para Área e Nível de Atuação (caso preencha o texto, o ID precisa existir)
+        const temAlgoArea = fields.areaAtuacaoSelecionada !== undefined && fields.areaAtuacaoSelecionada !== null && fields.areaAtuacaoSelecionada !== '' && fields.areaAtuacaoSelecionada.length > 0;
+        const errAreaAtuacao = step === 2 && temAlgoArea && !fields.idAreaAtuacao ? 'Selecione uma opção válida da lista.' : '';
+
+        const temAlgoNivel = fields.nivelAtuacaoSelecionado !== undefined && fields.nivelAtuacaoSelecionado !== null && fields.nivelAtuacaoSelecionado !== '' && fields.nivelAtuacaoSelecionado.length > 0;
+        const errNivelAtuacao = step === 2 && temAlgoNivel && !fields.idNivelAtuacao ? 'Selecione uma opção válida da lista.' : '';
+
         const errosJson: any = {};
         if (step === 1) {
             if (eNome?.[0]) { setErroNome(eNome[0]); errosJson["Nome"] = eNome; }
@@ -209,6 +245,8 @@ export function useFormValidation(fields: any, step: number) {
             if (eCurso?.[0] !== '') { setErroCurso(eCurso[0]); errosJson["Curso"] = eCurso; }
             if (errSemestre) { setErroSemestre(errSemestre); errosJson["Semestre"] = [errSemestre]; }
             if (errIdiomas) { setErroIdiomas(errIdiomas); errosJson["Idiomas"] = [errIdiomas]; }
+            if (errAreaAtuacao) { setErroAreaAtuacao(errAreaAtuacao); errosJson["Área de Atuação"] = [errAreaAtuacao]; }
+            if (errNivelAtuacao) { setErroNivelAtuacao(errNivelAtuacao); errosJson["Nível de Atuação"] = [errNivelAtuacao]; }
         }
 
         return {
@@ -221,7 +259,8 @@ export function useFormValidation(fields: any, step: number) {
         erros: {
             erroNome, erroSobrenome, erroSenha, erroDataNascimento, erroCurso,
             erroEmail, erroTelefone, erroProduto, erroOrigem,
-            erroUniversidade, erroEscritorio, erroTermoLGPD, erroSemestre, erroIdiomas
+            erroUniversidade, erroEscritorio, erroTermoLGPD, erroSemestre, erroIdiomas,
+            erroAreaAtuacao, erroNivelAtuacao
         },
         validarTudo
     };

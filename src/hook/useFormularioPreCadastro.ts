@@ -27,7 +27,7 @@ export function useFormularioPreCadastro(rota: string, state: (step: number | an
 
     const validarEProcessar = async () => {
         modals.setCarregandoEnvio(true);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         const { temErros, errosJson } = validarTudo();
 

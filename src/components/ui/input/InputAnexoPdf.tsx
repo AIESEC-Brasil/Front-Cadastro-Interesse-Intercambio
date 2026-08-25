@@ -128,7 +128,7 @@ const InputAnexoPdf = ({
                             className="h-full bg-blue-600 transition-all duration-75 ease-out relative"
                             style={{ width: `${progresso}%` }}
                         >
-                            <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.25)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.25)_50%,rgba(255,255,255,0.25)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] animate-[move-bg_1s_linear_infinite]" />
+                            <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.25)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.25)_50%,rgba(255,255,255,0.25)_75%,transparent_75%,transparent)] bg-size-[1rem_1rem] animate-[move-bg_1s_linear_infinite]" />
                         </div>
                     </div>
                 )}

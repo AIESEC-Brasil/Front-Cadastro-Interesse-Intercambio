@@ -35,6 +35,10 @@ let estadoGlobalFormulario = {
     idSemestre: '' as string | number,
     anexoPdf: null as File | null,
     anexoBase64: null as string | null,
+    areaAtuacao: '',
+    idAreaAtuacao: '' as string | number,
+    nivelAtuacao: '',
+    idNivelAtuacao: '' as string | number,
 };
 
 let listenersGlobal: Array<() => void> = [];
@@ -68,6 +72,39 @@ export function useFormFields() {
             })
             .join(' ');
     };
+
+    const limpar = () => {
+            estadoGlobalFormulario = {
+                nome: '',
+                sobrenome: '',
+                senha: '',
+                dataNascimento: '',
+                itemId: 0,
+                emails: [{ tipo: 'other', valor: '' }] as ItemDinamico[],
+                telefones: [{ tipo: 'other', valor: '' }] as ItemDinamico[],
+                curso: '',
+                produtoSelecionado: '',
+                idProduto: '' as number | string,
+                origemSelecionada: '',
+                idOrigem: '' as number | string,
+                marcarSemUniversidade: false,
+                universidadeSelecionada: '',
+                idUniversidade: '' as number | string,
+                escritorioSelecionado: '',
+                idEscritorio: '' as string | number,
+                termoLGPD: false,
+                idiomasSelecionados: [] as string[],
+                idIdiomas: [] as (string | number)[],
+                semestreSelecionado: '',
+                idSemestre: '' as string | number,
+                anexoPdf: null as File | null,
+                anexoBase64: null as string | null,
+                areaAtuacao: '',
+                idAreaAtuacao: '' as string | number,
+                nivelAtuacao: '',
+                idNivelAtuacao: '' as string | number,
+            }
+    }
 
     return {
         nome: estadoGlobalFormulario.nome, 
@@ -195,6 +232,27 @@ export function useFormFields() {
         setAnexoBase64: (v: string | null) => {
             estadoGlobalFormulario.anexoBase64 = v;
             notificarListeners();
-        }
+        },
+        areaAtuacaoSelecionada: estadoGlobalFormulario.areaAtuacao,
+        setAreaAtuacao: (v: string) => {
+            estadoGlobalFormulario.areaAtuacao = v;
+            notificarListeners();
+        },
+        idAreaAtuacao: estadoGlobalFormulario.idAreaAtuacao,
+        setIdAreaAtuacao: (v: string | number) => {
+            estadoGlobalFormulario.idAreaAtuacao = v;
+            notificarListeners();
+        },
+        nivelAtuacaoSelecionado: estadoGlobalFormulario.nivelAtuacao,
+        setNivelAtuacao: (v: string) => {
+            estadoGlobalFormulario.nivelAtuacao = v;
+            notificarListeners();
+        },
+        idNivelAtuacao: estadoGlobalFormulario.idNivelAtuacao,
+        setIdNivelAtuacao: (v: string | number) => {
+            estadoGlobalFormulario.idNivelAtuacao = v;
+            notificarListeners();
+        },
+        limpar
     };
 }
