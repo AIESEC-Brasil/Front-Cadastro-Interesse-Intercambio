@@ -1,5 +1,15 @@
 import { useState } from 'react';
 
+/**
+ * Reúne o estado de todas as mensagens de feedback do cadastro.
+ *
+ * `modalErroAberta` representa dados inválidos, enquanto `modalConflitoAberta`
+ * representa uma resposta de conflito da API. `modalSucessoAberta` é uma etapa
+ * intermediária: mostra o resumo antes do envio. Os dois estados de sucesso
+ * restantes pertencem, respectivamente, ao cadastro inicial e à qualificação.
+ * Manter esses estados juntos evita que cada formulário precise conhecer os
+ * detalhes de todos os modais.
+ */
 export function useFormModals() {
     const [carregandoEnvio, setCarregandoEnvio] = useState<boolean>(false);
     

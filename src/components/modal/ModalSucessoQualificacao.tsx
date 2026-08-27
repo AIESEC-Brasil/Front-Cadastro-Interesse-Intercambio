@@ -1,11 +1,8 @@
 import React from 'react';
+import type { QualificationSuccessModalProps } from '../../type/components';
 
-interface ModalQualificacaoProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
-
-export default function ModalSucessoQualificacao({ isOpen, onClose }: ModalQualificacaoProps) {
+/** Informa a conclusão da qualificação; o pai decide quando limpar e voltar. */
+export default function ModalSucessoQualificacao({ isOpen, onClose }: QualificationSuccessModalProps) {
     if (!isOpen) return null;
 
     return (

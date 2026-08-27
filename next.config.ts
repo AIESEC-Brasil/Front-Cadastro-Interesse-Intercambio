@@ -16,6 +16,8 @@ const AIESEC_FRAME_ANCESTORS =
   "frame-ancestors 'self' https://aiesec.org.br https://*.aiesec.org.br http://localhost:8000 https://encapsula-frame.pages.dev;";
 
 const nextConfig: NextConfig = {
+  // Esta configuração é lida pelo servidor Next.js durante build e execução;
+  // os componentes React não precisam conhecer regras de proxy ou headers.
   /**
    * Gera uma build otimizada e autocontida, essencial para otimizar 
    * o tamanho da imagem final em ambientes Docker.

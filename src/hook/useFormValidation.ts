@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { validarTexto, validarSenha, validarEmail, validarTelefone, validarData } from '../utils/validates';
 
+/**
+ * Centraliza as mensagens de validação das duas etapas.
+ *
+ * Há dois momentos diferentes: os efeitos abaixo limpam/atualizam mensagens
+ * enquanto o usuário digita; `validarTudo` faz uma conferência completa quando
+ * o botão de avanço é acionado. Na etapa 2, os campos são opcionais: só há erro
+ * quando alguém começou a preenchê-los, mas ainda não escolheu uma opção válida
+ * com ID correspondente.
+ */
 export function useFormValidation(fields: any, step: number) {
     const [erroNome, setErroNome] = useState<string>('');
     const [erroSobrenome, setErroSobrenome] = useState<string>('');

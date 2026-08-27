@@ -7,15 +7,10 @@
 
 import React from 'react';
 import ButtonEditar from '../ui/buttons/ButtonEditar';
+import type { ErrorModalProps } from '../../type/components';
 
-interface ModalErroProps {
-    aberta: boolean;
-    titulo?: string;
-    erros: Record<string, string[]>;
-    aoFechar: () => void;
-}
-
-const ModalErro = ({ aberta, titulo = "Dados incorretos.", erros, aoFechar }: ModalErroProps) => {
+/** Apresenta erros agrupados por campo, no formato `{ campo: [mensagens] }`. */
+const ModalErro = ({ aberta, titulo = "Dados incorretos.", erros, aoFechar }: ErrorModalProps) => {
     if (!aberta) return null;
 
     const entradasErros = Object.entries(erros);

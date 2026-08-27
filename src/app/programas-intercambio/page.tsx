@@ -14,6 +14,10 @@ import FormularioQualificao from "@components/forms/FormularioQualificao";
  * @param {Object} props 
  * @param {Object} props.req - Objeto da requisição.
  */
+/**
+ * Controla o fluxo de duas etapas. As rewrites preservam o programa na URL;
+ * `pathname` é repassado aos formulários para que cada hook aplique suas regras.
+ */
 const ProgramasIntercambio = ({ req }: { req: { path: string } }) => {
     const [step, setStep] = useState(1);
     const pathname = usePathname();

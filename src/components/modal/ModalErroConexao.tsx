@@ -1,13 +1,10 @@
 // src/components/modal/ModalErroConexao.tsx
 import React from 'react';
 
-interface ModalProps {
-  aberta: boolean;
-  aoTentarNovamente: () => void;
-  tipo: 'conexao' | 'bug'; // 'bug' para representar o erro inesperado
-}
+import type { ConnectionErrorModalProps } from '../../type/components';
 
-export default function ModalErroConexao({ aberta, aoTentarNovamente, tipo}: ModalProps) {
+/** Diferencia falha ao buscar metadados de erro inesperado durante o envio. */
+export default function ModalErroConexao({ aberta, aoTentarNovamente, tipo}: ConnectionErrorModalProps) {
   if (!aberta) return null;
 
   const mensagens = {

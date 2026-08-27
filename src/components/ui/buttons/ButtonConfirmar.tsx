@@ -7,13 +7,10 @@
 
 import React from 'react';
 
-interface ButtonConfirmarProps {
-    texto: string;
-    aoClicar: () => void;
-    type?: 'button';
-}
+import type { ButtonProps } from '../../../type/components';
 
-const ButtonConfirmar = ({ texto, aoClicar, type = 'button' }: ButtonConfirmarProps) => {
+/** Botão visualmente primário para confirmar, avançar ou concluir uma ação. */
+const ButtonConfirmar = ({ texto, aoClicar, type = 'button' }: ButtonProps) => {
     return (
         <button
             type={type}

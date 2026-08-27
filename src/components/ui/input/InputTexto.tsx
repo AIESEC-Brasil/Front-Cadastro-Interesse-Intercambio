@@ -9,30 +9,16 @@ import React from 'react';
  * Importação dos estilos modulares específicos para o comportamento e layout do campo de texto.
  */
 import styles from "./style.module.css";
+import type { TextInputProps } from '../../../type/components';
 
 /**
  * Propriedades aceitas pelo componente InputTexto.
  */
-interface InputTextoProps {
-  /** Identificador único do input (usado para vincular o label e os atributos de acessibilidade). */
-  id: string;
-  /** Texto descritivo (rótulo) exibido junto ao input. */
-  legenda: string;
-  /** Valor atual armazenado no campo (para inputs controlados). */
-  valor: string;
-  /** Função de callback disparada sempre que o valor do input é alterado. */
-  atualizar: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  /** Mensagem de erro de validação opcional exibida abaixo do campo. */
-  error?: string;
-  /** Define se o campo é obrigatório (padrão: true). Adiciona um asterisco vermelho e regras de validação. */
-  obrigatorio?: boolean;
-}
-
 /**
  * Componente reutilizável de campo de texto com suporte a label flutuante,
  * tratamento de erros e acessibilidade integrada.
  * 
- * @param {InputTextoProps} props - Propriedades do componente.
+ * @param {TextInputProps} props - Propriedades do componente.
  * @returns {JSX.Element} O elemento estrutural do input com label flutuante e validação.
  */
 const InputTexto = ({
@@ -42,7 +28,7 @@ const InputTexto = ({
   atualizar,
   error,
   obrigatorio = true
-}: InputTextoProps) => {
+}: TextInputProps) => {
   return (
     <div className={`${styles.inputGroup} ${error ? styles.hasError : ''}`}>
       <div className={`relative flex items-center w-full rounded-xl border bg-white transition-all ${

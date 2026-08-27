@@ -11,6 +11,8 @@ async function handleProxy(
   req: NextRequest,
   context: { params: Promise<{ path?: string[] }> }
 ) {
+  // Este proxy adiciona `/api/` ao caminho externo; o cliente browser já usa
+  // `/api/ogx`, mantendo a URL da API externa escondida do front-end.
   const { path } = await context.params;
 
   if (!path || path.length === 0) {

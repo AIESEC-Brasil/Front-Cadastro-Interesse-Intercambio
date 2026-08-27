@@ -7,25 +7,16 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import styles from "./style.module.css";
+import type { LanguageMultiSelectProps } from '../../../type/components';
 
-interface OpcaoIdioma {
-    id: number | string;
-    nome: string;
-}
-
-interface InputMultiSelectIdiomasProps {
-    id: string;
-    legenda: string;
-    selecionados: OpcaoIdioma[];
-    atualizar: (novosSelecionados: OpcaoIdioma[]) => void;
-    opcoes: OpcaoIdioma[];
-    error?: string;
-    obrigatorio?: boolean;
-    placeholder?: string;
-    desabilitado?: boolean;
-}
-
-const InputMultiSelectIdiomas: React.FC<InputMultiSelectIdiomasProps> = ({
+/**
+ * Permite selecionar níveis de idioma sem repetir o mesmo idioma-base.
+ *
+ * Por exemplo, depois de escolher “Inglês - Básico”, as demais opções de
+ * inglês são ocultadas, embora outros idiomas continuem disponíveis. O estado
+ * externo recebe a lista completa de objetos selecionados.
+ */
+const InputMultiSelectIdiomas: React.FC<LanguageMultiSelectProps> = ({
     id,
     legenda,
     selecionados,
@@ -69,7 +60,7 @@ const InputMultiSelectIdiomas: React.FC<InputMultiSelectIdiomasProps> = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const selecionarOpcao = (opcao: OpcaoIdioma) => {
+    const selecionarOpcao = (opcao: LanguageMultiSelectProps['opcoes'][number]) => {
         atualizar([...selecionados, opcao]);
         setValorInput("");
         setAtivo(false);

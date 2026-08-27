@@ -7,7 +7,9 @@ interface LoadSpinnerProps {
   aberta: boolean;
   message?: string;
 }
+  import type { LoadSpinnerProps } from '../../type/components';
 
+/** Bloqueia a interação durante operações assíncronas de envio. */
 export default function LoadSpinner({ aberta, message = 'Carregando...' }: LoadSpinnerProps) {
   if (!aberta) return null;
 

@@ -3,15 +3,11 @@ import apiOgxClient from '../service/clients/apiOgxClient';
 import { traduzirPalavras } from '../helpers/formatter';
 import { useFormModals } from './useFormModals';
 import { removerMascaraData,removerMascaraTelefone } from '../helpers/formatter';
+import type { MetadataOption } from '../type/common';
 
 /**
  * Interface que define a estrutura padrão para os itens de metadados (listas suspensas, opções, etc.).
  */
-interface Metacards {
-    id: number | string;
-    nome: string;
-}
-
 const tituloTermoPadrao = 'Eu concordo com a coleta e uso dos meus dados conforme a Política de Privacidade *';
 
 // ==========================================
@@ -22,14 +18,14 @@ const tituloTermoPadrao = 'Eu concordo com a coleta e uso dos meus dados conform
  * evitando requisições HTTP repetidas ao carregar o componente múltiplas vezes.
  */
 let cacheGlobal: {
-    listaProdutos: Metacards[];
-    listaOrigens: Metacards[];
-    listaUniversidades: Metacards[];
-    listaEscritorios: Metacards[];
-    listaIdiomas: Metacards[];
-    listaSemestres: Metacards[];
-    listaAreaAtuacao:Metacards[];
-    listaNivelMercado:Metacards[];
+    listaProdutos: MetadataOption[];
+    listaOrigens: MetadataOption[];
+    listaUniversidades: MetadataOption[];
+    listaEscritorios: MetadataOption[];
+    listaIdiomas: MetadataOption[];
+    listaSemestres: MetadataOption[];
+    listaAreaAtuacao: MetadataOption[];
+    listaNivelMercado: MetadataOption[];
     opcoesEmail: any[];
     opcoesTelefone: any[];
     tituloTermoLGPD: string;

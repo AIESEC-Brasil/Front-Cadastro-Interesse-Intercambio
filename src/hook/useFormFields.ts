@@ -2,22 +2,20 @@ import { useState } from 'react';
 import { aplicarMascaraData } from '../helpers/formatter';
 import { contemApenasLetrasEspacos } from '../utils/validates';
 
-export interface ItemDinamico {
-    tipo: string;
-    valor: string;
-}
+import type { ContactItem } from '../type/common';
+import { FormFieldsState } from '../type/form';
 
 // ==========================================
 // CACHE / ESTADO GLOBAL EM MEMÓRIA (SINGLETON)
 // ==========================================
-let estadoGlobalFormulario = {
+let estadoGlobalFormulario: FormFieldsState = {
     nome: '',
     sobrenome: '',
     senha: '',
     dataNascimento: '',
     itemId: 0,
-    emails: [{ tipo: 'other', valor: '' }] as ItemDinamico[],
-    telefones: [{ tipo: 'other', valor: '' }] as ItemDinamico[],
+    emails: [{ tipo: 'other', valor: '' }] as ContactItem[],
+    telefones: [{ tipo: 'other', valor: '' }] as ContactItem[],
     curso: '',
     produtoSelecionado: '',
     idProduto: '' as number | string,
@@ -47,6 +45,19 @@ const notificarListeners = () => {
     listenersGlobal.forEach((listener) => listener());
 };
 
+/**
+ * Mantém os dados preenchidos pelo usuário durante as duas etapas do cadastro.
+ *
+ * O objeto real fica fora do componente, no escopo deste módulo. Isso faz dele
+ * um singleton em memória: quando a primeira etapa é desmontada para abrir a
+ * segunda, os valores continuam disponíveis para o próximo hook. Essa memória
+ * não é um banco de dados, não vai para o navegador e é perdida ao recarregar
+ * a página.
+ *
+ * Cada setter altera o campo correspondente e chama `notificarListeners`. A
+ * notificação força os componentes que usam este hook a renderizarem de novo,
+ * simulando um pequeno store compartilhado sem adicionar uma biblioteca.
+ */
 export function useFormFields() {
     const [, setForcarRender] = useState({});
 
@@ -80,8 +91,8 @@ export function useFormFields() {
                 senha: '',
                 dataNascimento: '',
                 itemId: 0,
-                emails: [{ tipo: 'other', valor: '' }] as ItemDinamico[],
-                telefones: [{ tipo: 'other', valor: '' }] as ItemDinamico[],
+                emails: [{ tipo: 'other', valor: '' }] as ContactItem[],
+                telefones: [{ tipo: 'other', valor: '' }] as ContactItem[],
                 curso: '',
                 produtoSelecionado: '',
                 idProduto: '' as number | string,
@@ -139,7 +150,7 @@ export function useFormFields() {
             notificarListeners();
         },
         emails: estadoGlobalFormulario.emails, 
-        setEmails: (v: ItemDinamico[] | ((prev: ItemDinamico[]) => ItemDinamico[])) => {
+        setEmails: (v: ContactItem[] | ((prev: ContactItem[]) => ContactItem[])) => {
             estadoGlobalFormulario.emails = typeof v === 'function' ? v(estadoGlobalFormulario.emails) : v;
             notificarListeners();
         },
@@ -149,7 +160,7 @@ export function useFormFields() {
             notificarListeners();
         },
         telefones: estadoGlobalFormulario.telefones, 
-        setTelefones: (v: ItemDinamico[] | ((prev: ItemDinamico[]) => ItemDinamico[])) => {
+        setTelefones: (v: ContactItem[] | ((prev: ContactItem[]) => ContactItem[])) => {
             estadoGlobalFormulario.telefones = typeof v === 'function' ? v(estadoGlobalFormulario.telefones) : v;
             notificarListeners();
         },

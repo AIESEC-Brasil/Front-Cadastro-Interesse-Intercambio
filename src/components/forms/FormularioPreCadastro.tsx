@@ -25,13 +25,17 @@ import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
 
 import { useFormularioPreCadastro } from '../../hook/useFormularioPreCadastro';
 
-interface FormularioPreCadastroProps {
-    rota: string;
-    state: (step: number) => void;
-    step: number
-}
+import type { FormularioProps } from '../../type/components';
 
-const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps) => {
+/**
+ * Primeira etapa do cadastro de interesse.
+ *
+ * O componente é deliberadamente voltado à renderização: valores, handlers,
+ * validação, chamadas de API e estados de modal vêm de `useFormularioPreCadastro`.
+ * A universidade e o comitê são alternativas, e o produto só é exibido
+ * manualmente para a rota de talento quando não houve pré-seleção automática.
+ */
+const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
     const {
         nome, setNome,
         sobrenome, setSobrenome,

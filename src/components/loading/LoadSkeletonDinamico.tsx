@@ -1,11 +1,8 @@
 import React from 'react';
 
-interface LoadSkeletonProps {
-  aberta: boolean;
-  // Cada número no array representa quantas colunas aquela linha vai ter (ex: [2, 1, 3, 4])
-  layoutLinhas?: number[]; 
-}
+import type { LoadSkeletonProps } from '../../type/components';
 
+/** Gera uma prévia do formato do formulário enquanto os metadados carregam. */
 export default function LoadSkeletonDinamico({ 
   aberta, 
   layoutLinhas = [2, 1, 1] // Padrão caso não passe nada

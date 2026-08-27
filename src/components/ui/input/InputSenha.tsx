@@ -13,20 +13,11 @@ import { Eye, EyeOff } from 'lucide-react';
  * Importação dos estilos modulares específicos para o layout do input.
  */
 import styles from "./style.module.css";
+import type { PasswordInputProps } from '../../../type/components';
 
 /**
  * Propriedades aceitas pelo componente InputSenha.
  */
-interface InputSenhaProps {
-  id: string;
-  legenda: string;
-  valor: string;
-  atualizar: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  /** Permite receber uma string única ou uma lista de condições/erros não atingidos. */
-  error?: string[];
-  obrigatorio?: boolean;
-}
-
 const InputSenha = ({
   id,
   legenda,
@@ -34,11 +25,11 @@ const InputSenha = ({
   atualizar,
   error,
   obrigatorio = true
-}: InputSenhaProps) => {
+}: PasswordInputProps) => {
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
   // Transforma o erro em array para garantir que possamos iterar sobre ele facilmente
-  const listaErros: string[] = error ?? [];
+  const listaErros: any = error;
   const temErro = listaErros.length > 0 && listaErros[0] !== '';
 
   return (
@@ -83,7 +74,7 @@ const InputSenha = ({
           role="alert"
           aria-live="polite"
         >
-          {listaErros.map((msg, index) => (
+          {listaErros.map((msg:string, index:number) => (
             <p key={index}>{msg}</p>
           ))}
         </div>

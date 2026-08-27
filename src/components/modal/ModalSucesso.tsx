@@ -4,16 +4,15 @@
  */
 import ButtonEditar from '../ui/buttons/ButtonEditar';
 import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
+import type { SummaryModalProps } from '../../type/components';
 
-interface ModalSucessoProps {
-    aberta: boolean;
-    titulo?: string;
-    mensagem?: string;
-    resumoDados?: Record<string, string | number | string[]>;
-    aoEditar: () => void;
-    aoConfirmar: () => void;
-}
-
+/**
+ * Confirmação intermediária antes do envio.
+ *
+ * Fechar ou editar chama `aoEditar`; confirmar chama `aoConfirmar`. O modal não
+ * conhece a API: ele apenas apresenta o resumo recebido e delega a decisão ao
+ * hook que controla o formulário.
+ */
 const ModalSucesso = ({
     aberta,
     titulo = "Confirme seus dados",
@@ -21,7 +20,7 @@ const ModalSucesso = ({
     resumoDados,
     aoEditar,
     aoConfirmar
-}: ModalSucessoProps) => {
+}: SummaryModalProps) => {
     if (!aberta) return null;
 
     return (

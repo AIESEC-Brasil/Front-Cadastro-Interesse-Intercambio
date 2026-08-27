@@ -5,6 +5,14 @@ import { useFormModals } from './useFormModals';
 import { useDadosFormulario } from './useDadosFormulario';
 import {aplicarMascaraTelefone } from '../helpers/formatter';
 
+/**
+ * Orquestra a primeira etapa do cadastro.
+ *
+ * Este hook junta quatro responsabilidades que precisam conversar entre si:
+ * campos compartilhados, validação, modais e dados carregados da API. O
+ * componente visual apenas descreve os campos e chama os handlers devolvidos
+ * aqui. Assim, a regra de negócio continua fora do JSX.
+ */
 export function useFormularioPreCadastro(rota: string, state: (step: number) => void,step:number) {
     const fields = useFormFields();
     const { erros, validarTudo } = useFormValidation(fields,step);
@@ -12,7 +20,8 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
     const dadosFormulario = useDadosFormulario(modals,fields,step,rota);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    // Pré-seleção por Rota
+    // Algumas páginas entram já associadas a um programa conhecido. A seleção
+    // automática só acontece quando os metadados já chegaram da API.
     useEffect(() => {
         if (dadosFormulario.listaProdutos.length === 0) return;
         if (rota === 'voluntario-global') {
@@ -24,6 +33,11 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
         }
     }, [rota, dadosFormulario.listaProdutos]);
 
+    /**
+     * Valida a primeira etapa e, quando tudo está correto, prepara o resumo que
+     * o usuário verá antes do POST definitivo. A confirmação desse resumo é
+     * separada e acontece em `realizarPreCadastro`.
+     */
     const validarEProcessar = async () => {
         modals.setCarregandoEnvio(true);
         await new Promise(resolve => setTimeout(resolve, 1500));
@@ -85,6 +99,8 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
         fields.setUniversidadeSelecionada(nome);
         fields.setIdUniversidade(id);
     };
+    /** Universidade e comitê são alternativas: o checkbox limpa a seleção que
+     * deixou de ser aplicável para evitar enviar as duas no mesmo cadastro. */
     const handleAlternarUniversidade = (marcada: boolean) => {
         fields.setMarcarSemUniversidade(marcada);
         if (marcada) {
@@ -109,6 +125,8 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
         }
     };
 
+    /** Fecha o resumo, envia o cadastro e abre o sucesso intermediário somente
+     * se a API confirmar a criação. O avanço para a qualificação ocorre depois. */
     const realizarPreCadastro = async () => {
         modals.setModalSucessoAberta(false);
         const response = await dadosFormulario.enviarDados();

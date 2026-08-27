@@ -3,18 +3,27 @@ import { useFormValidation } from './useFormValidation';
 import { useFormModals } from './useFormModals';
 import { useDadosFormulario } from './useDadosFormulario';
 
-export function useFormularioQualificacao(rota: string, state: (step: number | any) => void,step:number) {
+/**
+ * Orquestra a segunda etapa, chamada de qualificação.
+ *
+ * Diferentemente do pré-cadastro, os campos desta tela podem ser deixados
+ * vazios. Quando há preenchimento, nomes e IDs precisam permanecer alinhados
+ * para que a API receba tanto o texto escolhido quanto sua identificação.
+ */
+export function useFormularioQualificacao(rota: string, state: (step: number) => void,step:number) {
     const fields = useFormFields();
     const { erros, validarTudo } = useFormValidation(fields,step);
     const modals = useFormModals();
     const dadosFormulario = useDadosFormulario(modals,fields,step,rota);
     
+    // O componente de seleção trabalha com objetos; o estado global guarda os
+    // nomes e IDs em arrays paralelos para manter compatibilidade com o payload.
     const idiomaFomartado = fields.idiomasSelecionados.map((nome,index) => ({
         id: fields.idIdiomas[index],
         nome
     }));
 
-    // Função que recebe a nova lista do input e atualiza os dois arrays separadamente no hook
+    // Converte a lista rica do componente para os dois arrays simples do estado.
     const handleAtualizarIdiomas = (novosSelecionados: Array<{ id: number | string; nome: string }>) => {
         const nomes = novosSelecionados.map(item => item.nome);
         const ids = novosSelecionados.map(item => item.id);
@@ -43,6 +52,8 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
         fields.setIdNivelAtuacao(idSelecionado);
     }
 
+    /** Valida o que foi preenchido e decide entre resumo de confirmação ou
+     * sucesso direto quando a qualificação foi deixada totalmente vazia. */
     const validarEProcessar = async () => {
         modals.setCarregandoEnvio(true);
         
@@ -93,6 +104,7 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
         modals.setCarregandoEnvio(false);
     };
 
+    /** Confirma o resumo e envia a atualização da qualificação para a API. */
     const atualizarDadosQualificacao = async () => {
                     modals.setModalSucessoAberta(false);
                     const resultado = await dadosFormulario.enviarDados();
