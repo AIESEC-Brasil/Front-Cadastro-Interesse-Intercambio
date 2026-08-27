@@ -2,18 +2,9 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import type { CalendarDay, CalendarView, DateInputProps } from '../../../type/components';
 
-interface InputDataProps {
-    id: string;
-    legenda: string;
-    valor: string; // Formato DD/MM/AAAA
-    atualizar: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    error?: string;
-    obrigatorio?: boolean;
-}
-
-type VisaoCalendario = 'dias' | 'anos';
-
+/** Representa uma célula do calendário, inclusive dias exibidos de meses vizinhos. */
 const MESES = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
@@ -21,6 +12,11 @@ const MESES = [
 
 const DIAS_DA_SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];
 
+/**
+ * Campo controlado de data com máscara textual e calendário customizado.
+ * A data continua pertencendo ao formulário pai; o estado local guarda apenas
+ * a abertura do popover e o mês/ano atualmente visualizado.
+ */
 export default function InputData({
     id,
     legenda,
@@ -28,7 +24,7 @@ export default function InputData({
     atualizar,
     error,
     obrigatorio = false
-}: InputDataProps) {
+}: DateInputProps) {
     const [aberto, setAberto] = useState<boolean>(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +32,7 @@ export default function InputData({
     const hoje = new Date();
     const [anoAtualVisual, setAnoAtualVisual] = useState<number>(hoje.getFullYear());
     const [mesAtualVisual, setMesAtualVisual] = useState<number>(hoje.getMonth()); // 0 a 11
-    const [visao, setVisao] = useState<VisaoCalendario>('dias');
+    const [visao, setVisao] = useState<CalendarView>('dias');
     const [anoInicioDecada, setAnoInicioDecada] = useState<number>(Math.floor(hoje.getFullYear() / 12) * 12);
 
     // Sincroniza o calendário com a data digitada ou selecionada se válida
@@ -74,7 +70,8 @@ export default function InputData({
     };
 
     // Geração dos dias do mês atual
-    const obterDiasDoMes = () => {
+    /** Monta uma grade de 35 ou 42 células para que o calendário não mude de tamanho. */
+    const obterDiasDoMes = (): CalendarDay[] => {
         const primeiroDiaSemana = new Date(anoAtualVisual, mesAtualVisual, 1).getDay();
         const ultimoDiaData = new Date(anoAtualVisual, mesAtualVisual + 1, 0).getDate();
         const ultimoDiaMesAnterior = new Date(anoAtualVisual, mesAtualVisual, 0).getDate();

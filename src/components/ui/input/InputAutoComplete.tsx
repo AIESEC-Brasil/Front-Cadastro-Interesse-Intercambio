@@ -11,25 +11,16 @@ import React, { useState, useRef, useEffect } from 'react';
  * Importação dos estilos modulares específicos para o layout do input.
  */
 import styles from "./style.module.css";
+import type { AutoCompleteProps } from '../../../type/components';
 
-interface OpcaoAutoComplete {
-    id: number | string;
-    nome: string;
-}
-
-interface InputAutoCompleteProps {
-    id: string;
-    legenda: string;
-    valor: string;
-    atualizar: (nomeSelecionado: string, idSelecionado: number | string) => void;
-    opcoes: OpcaoAutoComplete[];
-    error?: string;
-    obrigatorio?: boolean;
-    placeholder?: string;
-    desabilitado?: boolean;
-}
-
-const InputAutoComplete: React.FC<InputAutoCompleteProps> = ({
+/**
+ * Campo de texto com sugestões vindas da API.
+ *
+ * Digitar chama `atualizar` com ID vazio, pois o texto pode ainda não
+ * corresponder a uma opção oficial. Somente clicar em uma sugestão devolve o
+ * ID real; essa diferença permite que a validação rejeite texto não selecionado.
+ */
+const InputAutoComplete: React.FC<AutoCompleteProps> = ({
     id,
     legenda,
     valor,
@@ -57,7 +48,7 @@ const InputAutoComplete: React.FC<InputAutoCompleteProps> = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const selecionarOpcao = (opcao: OpcaoAutoComplete) => {
+    const selecionarOpcao = (opcao: AutoCompleteProps['opcoes'][number]) => {
         atualizar(opcao.nome, opcao.id);
         setAtivo(false);
     };

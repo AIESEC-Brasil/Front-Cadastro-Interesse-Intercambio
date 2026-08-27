@@ -25,25 +25,29 @@ import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
 
 import { useFormularioPreCadastro } from '../../hook/useFormularioPreCadastro';
 
-interface FormularioPreCadastroProps {
-    rota: string;
-    state: (step: number | any) => void;
-    step: number
-}
+import type { FormularioProps } from '../../type/components';
 
-const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps) => {
+/**
+ * Primeira etapa do cadastro de interesse.
+ *
+ * O componente é deliberadamente voltado à renderização: valores, handlers,
+ * validação, chamadas de API e estados de modal vêm de `useFormularioPreCadastro`.
+ * A universidade e o comitê são alternativas, e o produto só é exibido
+ * manualmente para a rota de talento quando não houve pré-seleção automática.
+ */
+const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
     const {
         nome, setNome,
         sobrenome, setSobrenome,
         senha, setSenha,
         dataNascimento, setDataNascimento,
-        emails, setEmails,
-        telefones, setTelefones,
-        produtoSelecionado, setProdutoSelecionado, setIdProduto,
-        origemSelecionada, setOrigemSelecionada, setIdOrigem,
-        marcarSemUniversidade, setMarcarSemUniversidade,
-        universidadeSelecionada, setUniversidadeSelecionada, setIdUniversidade,
-        escritorioSelecionado, setEscritorioSelecionado, setIdEscritorio,
+        emails,
+        telefones,
+        produtoSelecionado,
+        origemSelecionada,
+        marcarSemUniversidade,
+        universidadeSelecionada,
+        escritorioSelecionado,
         termoLGPD, setTermoLGPD,
         
         isOpen, setIsOpen,
@@ -54,7 +58,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
         modalErroAberta, setModalErroAberta,
         modalErroConexaoAberta,modalConflitoAberta,setModalConflitoAberta,
         modalSucessoAberta, setModalSucessoAberta,
-        modalSucessoCadastroAberta, setModalSucessoCadastroAberta,
+        modalSucessoCadastroAberta,
         tipoErroConexao, errosJson, dadosResumo,dataConflito,
 
         erroNome, erroSobrenome, erroSenha, erroDataNascimento,
@@ -62,8 +66,11 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
         erroUniversidade, erroEscritorio, erroTermoLGPD,
 
         validarEProcessar,
-        aplicarMascaraTelefone,
-        enviarDados
+        handleAdicionarEmail, handleRemoverEmail, handleAtualizarTipoEmail, handleAtualizarValorEmail,
+        handleAdicionarTelefone, handleRemoverTelefone, handleAtualizarTipoTelefone, handleAtualizarValorTelefone,
+        handleSelecionarProduto, handleLimparProduto, handleSelecionarUniversidade,
+        handleAlternarUniversidade, handleSelecionarEscritorio, handleSelecionarOrigem,fecharModalSucessoCadastro,
+        realizarPreCadastro
     } = useFormularioPreCadastro(rota, state,step);
     
     return (
@@ -78,7 +85,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                             id="nome" 
                             legenda="Nome" 
                             valor={nome} 
-                            atualizar={(e: any) => setNome(e.target.value)} 
+                            atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setNome(e.target.value)}
                             error={erroNome} 
                             obrigatorio 
                         />
@@ -86,7 +93,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                             id="sobrenome" 
                             legenda="Sobrenome" 
                             valor={sobrenome} 
-                            atualizar={(e: any) => setSobrenome(e.target.value)} 
+                            atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setSobrenome(e.target.value)}
                             error={erroSobrenome} 
                             obrigatorio 
                         />
@@ -96,7 +103,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                         id="senha" 
                         legenda="Definir senha" 
                         valor={senha} 
-                        atualizar={(e: any) => setSenha(e.target.value)} 
+                        atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setSenha(e.target.value)}
                         error={erroSenha} 
                         obrigatorio 
                     />
@@ -105,7 +112,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                         id="dataNascimento" 
                         legenda="Data de Nascimento" 
                         valor={dataNascimento} 
-                        atualizar={(e: any) => setDataNascimento(e.target.value)} 
+                        atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setDataNascimento(e.target.value)}
                         error={erroDataNascimento} 
                         obrigatorio 
                     />
@@ -116,10 +123,10 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                         tipoInput="email" 
                         itens={emails} 
                         opcoesTipo={opcoesEmail} 
-                        aoAdicionar={() => setEmails([...emails, { tipo: 'other', valor: '' }])} 
-                        aoRemover={(i) => setEmails(emails.filter((_, idx) => idx !== i))} 
-                        aoAtualizarTipo={(i, v) => setEmails(emails.map((item, idx) => idx === i ? {...item, tipo: v} : item))} 
-                        aoAtualizarValor={(i, v) => setEmails(emails.map((item, idx) => idx === i ? {...item, valor: v} : item))} 
+                        aoAdicionar={handleAdicionarEmail}
+                        aoRemover={handleRemoverEmail}
+                        aoAtualizarTipo={handleAtualizarTipoEmail}
+                        aoAtualizarValor={handleAtualizarValorEmail}
                         erros={erroEmail} 
                         obrigatorio 
                     />
@@ -130,10 +137,10 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                         tipoInput="tel" 
                         itens={telefones} 
                         opcoesTipo={opcoesTelefone} 
-                        aoAdicionar={() => setTelefones([...telefones, { tipo: 'other', valor: '' }])} 
-                        aoRemover={(i) => setTelefones(telefones.filter((_, idx) => idx !== i))} 
-                        aoAtualizarTipo={(i, v) => setTelefones(telefones.map((item, idx) => idx === i ? {...item, tipo: v} : item))} 
-                        aoAtualizarValor={(i, v) => setTelefones(telefones.map((item, idx) => idx === i ? {...item, valor: aplicarMascaraTelefone(v)} : item))} 
+                        aoAdicionar={handleAdicionarTelefone}
+                        aoRemover={handleRemoverTelefone}
+                        aoAtualizarTipo={handleAtualizarTipoTelefone}
+                        aoAtualizarValor={handleAtualizarValorTelefone}
                         erros={erroTelefone} 
                         obrigatorio 
                     />
@@ -159,11 +166,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                                 <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden py-2 px-1 space-y-1 max-h-60 overflow-y-auto">
                                     <div
                                         className="px-3 py-2.5 hover:bg-gray-100 rounded-xl cursor-pointer text-gray-700 text-sm"
-                                        onClick={() => {
-                                            setProdutoSelecionado("");
-                                            setIdProduto("");
-                                            setIsOpen(false);
-                                        }}
+                                        onClick={handleLimparProduto}
                                     >
                                         Selecione
                                     </div>
@@ -171,11 +174,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                                         <div
                                             key={prod.id}
                                             className="px-3 py-2.5 hover:bg-gray-100 rounded-xl cursor-pointer text-gray-900 text-sm"
-                                            onClick={() => {
-                                                setProdutoSelecionado(prod.nome);
-                                                setIdProduto(prod.id);
-                                                setIsOpen(false);
-                                            }}
+                                            onClick={() => handleSelecionarProduto(prod.nome, prod.id)}
                                         >
                                             {prod.nome}
                                         </div>
@@ -194,10 +193,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                             legenda="Qual sua Universidade?" 
                             opcoes={listaUniversidades} 
                             valor={universidadeSelecionada} 
-                            atualizar={(nomeSel, idSel) => {
-                                setUniversidadeSelecionada(nomeSel);
-                                setIdUniversidade(idSel);
-                            }} 
+                            atualizar={handleSelecionarUniversidade}
                             error={erroUniversidade}
                             desabilitado={marcarSemUniversidade}
                             obrigatorio={!marcarSemUniversidade}
@@ -208,14 +204,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                                 type="checkbox" 
                                 id="semUniversidade" 
                                 checked={marcarSemUniversidade} 
-                                onChange={(e) => {
-                                    setMarcarSemUniversidade(e.target.checked);
-                                    if (e.target.checked) {
-                                        setUniversidadeSelecionada('');
-                                    } else {
-                                        setEscritorioSelecionado('');
-                                    }
-                                }} 
+                                onChange={(e) => handleAlternarUniversidade(e.target.checked)}
                             />
                             <label htmlFor="semUniversidade" className="text-base cursor-pointer select-none text-blue-900">
                                 Minha universidade não está listada ou não tenho vínculo com nenhum universidade
@@ -229,10 +218,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                                     legenda="Qual AIESEC mais próxima?" 
                                     opcoes={listaEscritorios} 
                                     valor={escritorioSelecionado} 
-                                    atualizar={(nomeSel, idSel) => {
-                                        setEscritorioSelecionado(nomeSel);
-                                        setIdEscritorio(idSel);
-                                    }} 
+                                    atualizar={handleSelecionarEscritorio}
                                     error={erroEscritorio}
                                     obrigatorio={marcarSemUniversidade}
                                 />
@@ -247,10 +233,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                             legenda="Como conheceu a AIESEC?" 
                             opcoes={listaOrigens} 
                             valor={origemSelecionada} 
-                            atualizar={(nomeSel, idSel) => {
-                                setOrigemSelecionada(nomeSel);
-                                setIdOrigem(idSel);
-                            }} 
+                            atualizar={handleSelecionarOrigem}
                             error={erroOrigem}
                             obrigatorio
                         />
@@ -302,10 +285,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                 aberta={modalSucessoAberta} 
                 titulo="Confirme" 
                 resumoDados={dadosResumo} 
-                aoConfirmar={() => {
-                    setModalSucessoAberta(false);
-                    enviarDados();
-                }} 
+                aoConfirmar={realizarPreCadastro} 
                 aoEditar={() => setModalSucessoAberta(false)} 
             />
 
@@ -313,12 +293,7 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioPreCadastroProps)
                 aberta={modalSucessoCadastroAberta}
                 senha={senha}
                 emailReferencia={emails[0]?.valor || ''}
-                aoConcluir={() => {
-                    setModalSucessoCadastroAberta(false);
-                    if (typeof state === 'function') {
-                        state(2);
-                    }
-                }}
+                aoConcluir={fecharModalSucessoCadastro}
             />
 
             <ModalErroConexao 

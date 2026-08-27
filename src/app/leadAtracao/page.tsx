@@ -1,3 +1,4 @@
+/** Rota reservada para a futura experiência de atração de leads. */
 export default function Page() {
     return (
         <main>

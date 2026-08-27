@@ -7,6 +7,8 @@ import axios from "axios";
 import http from "http";
 import https from "https";
 
+// A API externa é acessada pelo servidor Next.js, não diretamente pelo browser.
+// Os agentes fixam IPv4 e permitem reaproveitar conexões entre requisições.
 const httpAgent = new http.Agent({ family: 4 });
 const httpsAgent = new https.Agent({ family: 4 });
 

@@ -23,13 +23,16 @@ import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
 
 import { useFormularioQualificacao } from '../../hook/useFormularioQualificacao';
 
-interface FormularioQualificacaoProps {
-    rota: string;
-    state: (step: number | any) => void;
-    step: number
-}
+import type { FormularioProps } from '../../type/components';
 
-const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProps) => {
+/**
+ * Segunda tela do fluxo de cadastro.
+ *
+ * Os idiomas, semestre, curso, área, nível e currículo são complementos do
+ * cadastro inicial. A maior parte deles é opcional; por isso esta tela pode
+ * concluir diretamente ou abrir um resumo, dependendo do que foi preenchido.
+ */
+const FormularioQualificacao = ({ rota, state,step }: FormularioProps) => {
     const {
         curso,setCurso,erroCurso,semestreSelecionado,areaAtuacaoSelecionada,nivelAtuacaoSelecionado,
         anexoPdf,
@@ -62,7 +65,7 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
             {!carregandoMetadados && (
                 <div id="meuFormQuali" className="flex flex-col gap-4">
                     
-                    {/* Input MultiSelect de Idiomas */}
+                    {/* Idiomas: o hook converte os objetos escolhidos para nomes e IDs do payload. */}
                     <div className="flex flex-col">
                         <InputMultiSelectIdiomas 
                             id="idiomas"
@@ -74,15 +77,17 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioQualificacaoProp
                         />
                     </div>
 
+                    {/* Curso só faz sentido para o fluxo de voluntário global. */}
                     { rota === 'voluntario-global' && <InputTexto 
                             id="curso" 
                             legenda="Qual seu curso?(Opcional)" 
                             valor={curso} 
-                            atualizar={(e: any) => setCurso(e.target.value)} 
+                            atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setCurso(e.target.value)} 
                             error={erroCurso} 
                             obrigatorio={false}
                         />}
 
+                    {/* Talento e professor usam dados profissionais em vez do campo de curso. */}
                     {['talento-global','professor-global'].includes(rota) && (
                         <>
 

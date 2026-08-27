@@ -1,19 +1,14 @@
 // src/components/modal/ModalSucessoCadastro.tsx
 import React from 'react';
+import type { CadastroSuccessModalProps } from '../../type/components';
 
-interface ModalSucessoProps {
-  aberta: boolean;
-  senha: string;
-  emailReferencia: string;
-  aoConcluir: () => void;
-}
-
+/** Confirma a criação da primeira etapa e oferece a entrada na qualificação. */
 export default function ModalSucessoCadastro({
   aberta,
   senha,
   emailReferencia,
   aoConcluir,
-}: ModalSucessoProps) {
+}: CadastroSuccessModalProps) {
   if (!aberta) return null;
 
   return (

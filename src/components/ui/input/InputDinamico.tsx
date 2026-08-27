@@ -9,31 +9,16 @@ import React, { useState } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 import ButtonConfirmar from '../buttons/ButtonConfirmar';
 import styles from "./style.module.css";
+import type { DynamicInputProps } from '../../../type/components';
+import type { TranslatedOption } from '../../../type/common';
 
-interface ItemDinamico {
-  tipo: string;
-  valor: string;
-}
-
-interface OpcaoTipo {
-  original: string;
-  traduzido: string;
-}
-
-interface InputDinamicoProps {
-  tituloLabel: string;
-  placeholderInput: string;
-  tipoInput?: string;
-  itens: ItemDinamico[];
-  opcoesTipo: OpcaoTipo[];
-  erros?: string[];
-  aoAdicionar: () => void;
-  aoRemover: (index: number) => void;
-  aoAtualizarTipo: (index: number, novoTipo: string) => void;
-  aoAtualizarValor: (index: number, novoValor: string) => void;
-  obrigatorio?: boolean;
-}
-
+/**
+ * Renderiza uma lista editável de e-mails ou telefones.
+ *
+ * Cada linha tem um tipo e um valor, e o índice da linha conecta o campo ao
+ * erro correspondente. A última linha não pode ser removida para que o
+ * formulário nunca fique sem o único contato obrigatório inicial.
+ */
 const InputDinamico = ({
   tituloLabel,
   placeholderInput,
@@ -46,7 +31,7 @@ const InputDinamico = ({
   aoAtualizarTipo,
   aoAtualizarValor,
   obrigatorio = true
-}: InputDinamicoProps) => {
+}: DynamicInputProps) => {
   const apenasUmItem = itens.length === 1;
 
   // Estado para controlar qual índice está com o select aberto (evita abrir todos ao mesmo tempo)
@@ -61,7 +46,7 @@ const InputDinamico = ({
       {itens.map((item, index) => {
         const erroAtual = erros[index];
         const isOpen = dropdownAbertoIndex === index;
-        const opcaoSelecionada = opcoesTipo.find(o => o.original === item.tipo)
+        const opcaoSelecionada = opcoesTipo.find((o: TranslatedOption) => o.original === item.tipo)
 
         return (
           <React.Fragment key={index}>

@@ -24,6 +24,7 @@
       }
     ],
     "paths": {
+      /* Permite importar arquivos de src sem repetir caminhos relativos longos. */
       "@/*": [
         "./src/*"
       ],

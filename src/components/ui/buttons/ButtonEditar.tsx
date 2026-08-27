@@ -7,13 +7,10 @@
 
 import React from 'react';
 
-interface ButtonEditarProps {
-    texto: string;
-    aoClicar: () => void;
-    type?: 'button';
-}
+import type { ButtonProps } from '../../../type/components';
 
-const ButtonEditar = ({ texto, aoClicar, type = 'button' }: ButtonEditarProps) => {
+/** Botão secundário para editar, corrigir ou fechar uma confirmação. */
+const ButtonEditar = ({ texto, aoClicar, type = 'button' }: ButtonProps) => {
     return (
         <button
             type={type}

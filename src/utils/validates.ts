@@ -4,6 +4,8 @@
  */
 
 const validarTexto = (Texto: string, campo: string): string[] => {
+    // Retorna uma lista porque um campo pode acumular mais de uma mensagem;
+    // a camada visual decide como apresentar o primeiro ou todos os erros.
     if (!Texto.trim()) {
         return [`O campo ${campo} é obrigatório.`];
     } else if (!/^[A-Za-zÀ-ÿ\s]+$/.test(Texto.trim())) {
@@ -24,6 +26,8 @@ const contemApenasLetrasEspacos = (valor: string): boolean => {
 };
 
 const validarSenha = (senha: string): string[] => {
+    // As regras são verificadas separadamente para que o usuário saiba
+    // exatamente quais requisitos ainda faltam cumprir.
     const erros: string[] = [];
     
     if (!senha.trim()) {
@@ -59,6 +63,7 @@ const validarSenha = (senha: string): string[] => {
 };
 
 const validarEmail = (emails: string[]): string[] => {
+    // O índice da mensagem corresponde à posição da linha no InputDinamico.
     const erros: string[] = [];
     const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -86,6 +91,8 @@ const validarEmail = (emails: string[]): string[] => {
 };
 
 const validarTelefone = (telefones: string[]): string[] => {
+    // A expressão aceita telefone celular com ou sem DDD e com separadores
+    // usuais; a máscara visual é aplicada em outro helper.
     const erros: string[] = [];
     const regexTelefone = /^(?:\(?\d{2}\)?\s?)?9\d{4}[-\s]?\d{4}$/;
 

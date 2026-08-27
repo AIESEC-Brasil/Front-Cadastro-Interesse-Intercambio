@@ -3,18 +3,15 @@
 import React, { useRef, useState } from 'react';
 import { FileText, Upload, X } from 'lucide-react';
 import styles from './style.module.css';
+import type { PdfInputProps } from '../../../type/components';
 
-interface InputAnexoPdfProps {
-    id: string;
-    legenda: string;
-    arquivo: File | null;
-    // Agora a função de atualização pode receber também o base64 (opcional)
-    atualizar: (arquivo: File | null, base64: string | null) => void;
-    obrigatorio?: boolean;
-    desabilitado?: boolean;
-    tamanhoMaximoMb?: number;
-}
-
+/**
+ * Controla a escolha local de um currículo PDF.
+ *
+ * O arquivo é validado antes do processamento e, quando aceito, é convertido
+ * para Base64 para ser incluído no payload. A barra de progresso representa o
+ * processamento local da interface, não o progresso de um upload de rede.
+ */
 const InputAnexoPdf = ({
     id,
     legenda,
@@ -23,7 +20,7 @@ const InputAnexoPdf = ({
     obrigatorio = false,
     desabilitado = false,
     tamanhoMaximoMb
-}: InputAnexoPdfProps) => {
+}: PdfInputProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [carregando, setCarregando] = useState<boolean>(false);
     const [progresso, setProgresso] = useState<number>(0);

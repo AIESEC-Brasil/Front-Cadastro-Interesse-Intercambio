@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Tokens globais usados pelo Tailwind e pela estrutura base do documento. */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -24,6 +25,7 @@ body {
   font-family: var(--font-sans), sans-serif;
 }
 
+/* Classe comum para mensagens de validação renderizadas por inputs e modais. */
 .errorMsg {
     color: #dc3545;
     font-size: 13px;

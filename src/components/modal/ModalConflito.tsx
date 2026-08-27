@@ -7,28 +7,19 @@
 
 import React from 'react';
 import ButtonEditar from '../ui/buttons/ButtonEditar';
+import type { ConflictData, ConflictModalProps } from '../../type/components';
 
-// Define a estrutura dos dados que a API pode retornar no conflito
-interface DadosConflito {
-    erro?: string;
-    emails?: Array<{ email: string }>;
-    telefone?: Array<{ numero: string }>;
-    [key: string]: any; // Para aceitar outros campos caso apareçam no futuro
-}
-
-interface ModalConflitoProps {
-    aberta: boolean;
-    titulo?: string;
-    dadosErro: DadosConflito | string;
-    aoFechar: () => void;
-}
-
+/**
+ * Exibe dados que já existem na API, normalmente após HTTP 409.
+ * Aceita tanto uma mensagem simples quanto listas de e-mails/telefones; essa
+ * tolerância existe porque o backend pode responder em formatos diferentes.
+ */
 const ModalConflito = ({ 
     aberta, 
     titulo = "Conflito de Dados Detectado", 
     dadosErro, 
     aoFechar 
-}: ModalConflitoProps) => {
+}: ConflictModalProps) => {
     if (!aberta) return null;
 
     // Se receber apenas uma string de erro direta (Exemplo 1)
@@ -47,9 +38,13 @@ const ModalConflito = ({
     };
 
     // Função para extrair o valor correto de dentro do array de objetos do campo
-    const extrairValorItem = (item: any): string => {
+    const extrairValorItem = (item: unknown): string => {
         if (typeof item === 'string') return item;
-        return item.email || item.numero || item.mensagem || JSON.stringify(item);
+        if (item && typeof item === 'object') {
+            const valor = item as Record<string, unknown>;
+            return String(valor.email || valor.numero || valor.mensagem || JSON.stringify(item));
+        }
+        return String(item);
     };
 
     return (

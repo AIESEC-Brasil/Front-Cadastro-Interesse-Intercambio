@@ -18,7 +18,8 @@ const apiOgxClient = axios.create({
   }
 });
 
-// ⚡ Interceptor de Resposta
+// O interceptor entrega somente o corpo da resposta aos hooks. Por isso os
+// consumidores não recebem o objeto Axios completo por padrão.
 apiOgxClient.interceptors.response.use(
   (response) => {
     // Aqui você pega o que vem da API e já "filtra" para retornar direto o .data

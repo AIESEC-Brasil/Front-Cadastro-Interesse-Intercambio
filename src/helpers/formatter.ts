@@ -4,6 +4,8 @@
  */
 
 export async function traduzirPalavras(palavras: string[]) {
+    /** O backend envia valores técnicos; esta tabela traduz apenas rótulos
+     * conhecidos e preserva o texto original quando não há tradução segura. */
     const dicionarioBase: Record<string, string> = {
         home: "Casa",
         main: "Principal",
@@ -31,6 +33,8 @@ export async function traduzirPalavras(palavras: string[]) {
  * Aplica a máscara de telefone brasileiro no formato (DD) 9XXXXXXXX.
  */
 const aplicarMascaraTelefone = (valor: string): string => {
+    // A máscara é visual: antes do envio, removerMascaraTelefone extrai apenas
+    // os dígitos para atender ao formato esperado pelo backend.
     const apenasNumeros = valor.replace(/\D/g, "").slice(0, 11);
     
     if (apenasNumeros.length <= 2) {
