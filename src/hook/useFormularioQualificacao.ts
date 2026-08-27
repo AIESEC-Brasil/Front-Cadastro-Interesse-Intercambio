@@ -107,7 +107,9 @@ export function useFormularioQualificacao(rota: string, state: (step: number | a
     const fecharModalSucessoQualificacao = () => {
         modals.setModalSucessoQualificaco(false);
         fields.limpar();
-        state(1);
+        if (typeof state === 'function') {
+            state(1);
+        }
     }
 
     return {

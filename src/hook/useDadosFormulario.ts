@@ -266,8 +266,6 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 if (response?.data?.item_id) {
                     fields.setItemId(response.data.item_id);
                 }
-
-                modals.setModalSucessoCadastroAberta(true);
                 resultado = response?.sucesso;
             } catch (error:any) {
                 const dadosErro = error.response?.data?.data;
@@ -334,7 +332,6 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
             
             try {
                 const response:any = await apiOgxClient.put('/new-lead-ogx/cadastro', jsonQualificacao);
-                modals.setModalSucessoCadastroAberta(true);
                 resultado = response?.sucesso;
             } catch (error:any) {
                 const dadosErro = error.response?.data?.data;
