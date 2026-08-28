@@ -3,11 +3,8 @@
 import React from 'react';
 import styles from './style.module.css';
 
-interface LoadSpinnerProps {
-  aberta: boolean;
-  message?: string;
-}
-  import type { LoadSpinnerProps } from '../../type/components';
+
+import type { LoadSpinnerProps } from '../../type/components';
 
 /** Bloqueia a interação durante operações assíncronas de envio. */
 export default function LoadSpinner({ aberta, message = 'Carregando...' }: LoadSpinnerProps) {
