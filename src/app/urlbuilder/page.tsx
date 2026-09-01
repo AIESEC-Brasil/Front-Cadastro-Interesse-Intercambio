@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import InputTexto from '@/components/ui/input/InputTexto';
 import InputAutoComplete from '@/components/ui/input/InputAutoComplete';
 
+import { useDadosFormulario } from '@/hook/useDadosFormulario';
+import { useModaisFormulario } from '@/hook/useModaisFormulario';
+
 export default function GeradorUrlPage() {
   const [canal, setCanal] = useState('');
   const [tipoAnuncio, setTipoAnuncio] = useState('');
@@ -14,17 +17,27 @@ export default function GeradorUrlPage() {
   const [urlGerada, setUrlGerada] = useState('');
   const [copiado, setCopiado] = useState(false);
 
+  const modals = useModaisFormulario();
+  const { listaMeio, listaOrigens, listaEscritorios, listaProdutos } = useDadosFormulario({ modals });
+
   // Gera a URL automaticamente apenas quando TODOS os campos forem preenchidos
   useEffect(() => {
-    const todosPreenchidos = 
-      canal.trim() !== '' && 
-      tipoAnuncio.trim() !== '' && 
-      programa.trim() !== '' && 
-      cl.trim() !== '' && 
+    const todosPreenchidos =
+      canal.trim() !== '' &&
+      tipoAnuncio.trim() !== '' &&
+      programa.trim() !== '' &&
+      cl.trim() !== '' &&
       campanha.trim() !== '';
 
     if (todosPreenchidos) {
-      const url = `https://aiesec.org.br/voluntario-global/?utm_source=${encodeURIComponent(canal)}&utm_medium=${encodeURIComponent(tipoAnuncio)}&utm_campaign=${encodeURIComponent(campanha)}&utm_term=${encodeURIComponent(cl)}&utm_content=${encodeURIComponent(programa)}`;
+      const url = `https://aiesec.org.br/voluntario-global/?utm_source=${encodeURIComponent(
+        canal
+      )}&utm_medium=${encodeURIComponent(
+        tipoAnuncio
+      )}&utm_campaign=${encodeURIComponent(campanha)}&utm_term=${encodeURIComponent(
+        cl
+      )}&utm_content=${encodeURIComponent(programa)}`;
+
       setUrlGerada(url);
     } else {
       setUrlGerada('');
@@ -41,11 +54,11 @@ export default function GeradorUrlPage() {
 
   return (
     <div className="min-h-screen bg-[#f3f4f6] flex flex-col justify-center items-center py-10 px-4">
-      {/* Container Card Branco Centralizado */}
+      {/* Card Principal */}
       <main className="w-full max-w-3xl bg-white rounded-lg shadow-sm p-8 space-y-6 text-[#00204a] font-sans border border-gray-100">
         
         {/* Cabeçalho */}
-        <div className="text-center space-y-2 mb-8">
+        <div className="text-center space-y-2 mb-6">
           <h1 className="text-3xl font-bold text-[#007bff]">
             Gerador de URL - AIESEC
           </h1>
@@ -55,14 +68,15 @@ export default function GeradorUrlPage() {
         </div>
 
         {/* Linha 1: Canal e Tipo de anúncio */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <InputAutoComplete
               id="canal"
               legenda="Canal"
               valor={canal}
               atualizar={(valor: string) => setCanal(valor)}
-              opcoes={[]}
+              opcoes={listaOrigens}
+              obrigatorio={true}
             />
           </div>
 
@@ -72,20 +86,22 @@ export default function GeradorUrlPage() {
               legenda="Tipo de Anuncio"
               valor={tipoAnuncio}
               atualizar={(valor: string) => setTipoAnuncio(valor)}
-              opcoes={[]}
+              opcoes={listaMeio}
+              obrigatorio={true}
             />
           </div>
         </div>
 
         {/* Linha 2: Programas e CL */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <InputAutoComplete
               id="programas"
-              legenda="Programas"
+              legenda="Programa"
               valor={programa}
               atualizar={(valor: string) => setPrograma(valor)}
-              opcoes={[]}
+              opcoes={listaProdutos}
+              obrigatorio={true}
             />
           </div>
 
@@ -95,7 +111,8 @@ export default function GeradorUrlPage() {
               legenda="Escritorio"
               valor={cl}
               atualizar={(valor: string) => setCl(valor)}
-              opcoes={[]}
+              opcoes={listaEscritorios}
+              obrigatorio={true}
             />
           </div>
         </div>
@@ -103,34 +120,42 @@ export default function GeradorUrlPage() {
         {/* Linha 3: Campanha */}
         <div>
           <InputTexto
-            id="campanha"
-            legenda="Campanha"
+            id="Tag"
+            legenda="Tag"
             valor={campanha}
             atualizar={(e: React.ChangeEvent<HTMLInputElement> | string) => {
               const val = typeof e === 'string' ? e : e.target.value;
               setCampanha(val);
             }}
+            obrigatorio={true}
           />
         </div>
 
-        {/* Exibição da URL Gerada (Aparece automaticamente apenas se todos estiverem preenchidos) */}
+        {/* Informativo de geração automática */}
+        {!urlGerada && (
+          <p className="text-xs text-gray-500 text-center italic pt-2">
+            A URL será gerada automaticamente assim que todos os campos forem preenchidos.
+          </p>
+        )}
+
+        {/* Exibição da URL Gerada */}
         {urlGerada && (
           <div className="pt-4 space-y-4">
             <div className="flex items-center gap-3">
               <label className="font-bold text-[#00204a] text-sm whitespace-nowrap">
                 Url Gerada:
               </label>
-              
+
               <input
                 type="text"
                 readOnly
                 value={urlGerada}
                 className="w-full bg-[#e8f0fe] border border-[#d0e1fd] text-[#00204a] px-3 py-2 rounded-md font-mono text-sm focus:outline-none"
               />
-              
+
               <button
                 onClick={handleCopiar}
-                className="bg-[#6c757d] hover:bg-[#5a6268] text-white font-medium px-4 py-2 rounded-md transition-colors cursor-pointer text-sm"
+                className="bg-[#6c757d] hover:bg-[#5a6268] text-white font-medium px-5 py-2 rounded-md transition-colors cursor-pointer text-sm"
               >
                 Copiar
               </button>
@@ -138,8 +163,8 @@ export default function GeradorUrlPage() {
 
             {/* Mensagem de sucesso */}
             {copiado && (
-              <div className="flex items-center justify-center gap-2 text-[#00c9a7] font-semibold text-sm pt-1">
-                <span className="w-4 h-4 bg-[#00c9a7] text-white rounded flex items-center justify-center text-[10px]">
+              <div className="flex items-center justify-center gap-2 text-[#00d2d3] font-semibold text-base pt-2">
+                <span className="w-5 h-5 bg-[#00d2d3] text-white rounded flex items-center justify-center text-xs font-bold">
                   ✓
                 </span>
                 URL copiada com sucesso!
@@ -149,8 +174,8 @@ export default function GeradorUrlPage() {
         )}
 
         {/* Rodapé Interno */}
-        <footer className="text-center text-gray-400 text-xs pt-6 border-t border-gray-100">
-          © AIESEC no Brasil
+        <footer className="text-center text-gray-500 text-sm pt-8">
+          © AIESEC no Brasil(2025-2026)
         </footer>
       </main>
     </div>

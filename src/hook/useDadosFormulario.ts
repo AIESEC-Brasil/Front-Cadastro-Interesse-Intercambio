@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import apiOgxClient from '../service/clients/apiOgxClient';
 import { traduzirPalavras } from '../helpers/formatter';
-import { removerMascaraData,removerMascaraTelefone } from '../helpers/formatter';
+import { removerMascaraData, removerMascaraTelefone } from '../helpers/formatter';
 import type { OpcaoMetadados } from '../types/comum';
 
 /**
@@ -19,6 +19,7 @@ const tituloTermoPadrao = 'Eu concordo com a coleta e uso dos meus dados conform
 let cacheGlobal: {
     listaProdutos: OpcaoMetadados[];
     listaOrigens: OpcaoMetadados[];
+    listaMeio: OpcaoMetadados[];
     listaUniversidades: OpcaoMetadados[];
     listaEscritorios: OpcaoMetadados[];
     listaIdiomas: OpcaoMetadados[];
@@ -33,12 +34,13 @@ let cacheGlobal: {
 } = {
     listaProdutos: [],
     listaOrigens: [],
+    listaMeio: [],
     listaUniversidades: [],
     listaEscritorios: [],
     listaIdiomas: [],
     listaSemestres: [],
-    listaAreaAtuacao:[],
-    listaNivelMercado:[],
+    listaAreaAtuacao: [],
+    listaNivelMercado: [],
     opcoesEmail: [],
     opcoesTelefone: [],
     tituloTermoLGPD: tituloTermoPadrao,
@@ -46,29 +48,31 @@ let cacheGlobal: {
     jaCarregou: false,
 };
 
+interface UseDadosFormularioProps {
+    modals: any;
+    fields?: any;
+    step?: number;
+    rota?: string;
+}
+
 /**
  * Hook customizado responsável por gerenciar o carregamento de metadados, 
  * o tratamento de formulários (etapas 1 e 2) e o envio de dados para a API do sistema.
- * 
- * @param modals - Objeto contendo os estados e funções de controle dos modais da aplicação.
- * @param fields - Objeto contendo os valores atuais dos campos do formulário preenchidos pelo usuário.
- * @param step - Número da etapa atual do formulário (ex: 1 para pré-cadastro, 2 para qualificação).
- * @param rota - String indicando a rota/produto atual (ex: 'voluntario-global', 'talento-global').
- * @returns Um objeto contendo os estados carregados (listas, termos LGPD, flags de carregamento) e a função de envio.
  */
-export function useDadosFormulario(modals:any, fields:any,step:number,rota:string) {
+export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormularioProps) {
     // Inicializa com o cache caso já tenha sido carregado antes
     const [carregandoMetadados, setCarregandoMetadados] = useState(!cacheGlobal.jaCarregou);
     const [erroMetadados, setErroMetadados] = useState(false);
 
     const [listaProdutos, setListaProdutos] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaProdutos);
     const [listaOrigens, setListaOrigens] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaOrigens);
+    const [listaMeio, setListaMeio] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaMeio);
     const [listaUniversidades, setListaUniversidades] = useState<any[]>(cacheGlobal.listaUniversidades);
     const [listaEscritorios, setListaEscritorios] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaEscritorios);
     const [listaIdiomas, setListaIdiomas] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaIdiomas);
-    const [listaSemestres,setListaSemestres] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaSemestres);
-    const [listaAreaAtuacao,setListaAreaAtuacao] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaAreaAtuacao);
-    const [listaNivelMercado,setListaNivelMercado] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaNivelMercado);
+    const [listaSemestres, setListaSemestres] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaSemestres);
+    const [listaAreaAtuacao, setListaAreaAtuacao] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaAreaAtuacao);
+    const [listaNivelMercado, setListaNivelMercado] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaNivelMercado);
     const [opcoesEmail, setOpcoesEmail] = useState<any[]>(cacheGlobal.opcoesEmail);
     const [opcoesTelefone, setOpcoesTelefone] = useState<any[]>(cacheGlobal.opcoesTelefone);
     const [tituloTermoLGPD, setTituloTermoLGPD] = useState(cacheGlobal.tituloTermoLGPD);
@@ -79,7 +83,6 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
      * utilizando o cache global caso já tenham sido obtidos anteriormente.
      */
     useEffect(() => {
-        // Se já carregou anteriormente, não faz a requisição de novo
         if (cacheGlobal.jaCarregou) {
             setCarregandoMetadados(false);
             return;
@@ -87,9 +90,6 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
 
         let componenteMontado = true;
 
-        /**
-         * Função assíncrona interna para requisição e processamento dos dados de metadados e universidades.
-         */
         const carregarDados = async () => {
             setCarregandoMetadados(true);
             setErroMetadados(false);
@@ -106,15 +106,9 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
 
                 if (!componenteMontado || !Array.isArray(metadados)) return;
 
-                /**
-                 * Localiza um campo específico dentro do array de metadados pelo seu identificador externo.
-                 */
                 const encontrarCampo = (identificador: string) =>
                     metadados.find((item: any) => item.external_id === identificador);
 
-                /**
-                 * Ordena as opções priorizando o item 'other' para o topo da lista.
-                 */
                 const ordenarOpcoes = (opcoes: any[]) => [...opcoes].sort((a, b) =>
                     a.toLowerCase() === 'other' ? -1 : b.toLowerCase() === 'other' ? 1 : 0
                 );
@@ -124,16 +118,17 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 const campoEscritorio = encontrarCampo('aiesec-mais-proxima');
                 const campoProduto = encontrarCampo('produto');
                 const campoOrigem = encontrarCampo('tag-origem-2');
+                const campoMeio = encontrarCampo('tag-meio-2-2');
                 const campoLGPD = encontrarCampo('eu-concordo-com-a-coleta-e-uso-dos-meus-dados-conforme-');
                 const campoIdiomas = encontrarCampo('possui-outro-idioma');
                 const campoSemestres = encontrarCampo('qual-semestre-do-curso');
                 const campoAreaAtuacao = encontrarCampo('qual-sua-area-de-atuacao');
                 const campoNivelAtuacao = encontrarCampo('qual-seu-nivel-de-atuacao');
-                
+
                 const [emailFormatado, telefoneFormatado] = await Promise.all([
                     traduzirPalavras(campoEmail?.options ? ordenarOpcoes(campoEmail.options) : []),
                     traduzirPalavras(campoTelefone?.options ? ordenarOpcoes(campoTelefone.options) : []),
-                ]) ;
+                ]);
 
                 const novoTitulo = campoLGPD?.name || tituloTermoPadrao;
                 const novaDescricao = campoLGPD?.description || '';
@@ -141,28 +136,29 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 const novosEscritorios = (campoEscritorio?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
                 const novosProdutos = (campoProduto?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
                 const novasOrigens = (campoOrigem?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosMeios = (campoMeio?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
                 const novosIdiomas = (campoIdiomas?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
                 const novosSemestres = (campoSemestres?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novasAreaAtuacao = (campoAreaAtuacao?.options || []).map((item:any) => ({ id:item.id,nome:item.text }));
-                const novosNivelAtuacao = (campoNivelAtuacao?.options || []).map((item:any) => ({ id:item.id,nome:item.text }));
+                const novasAreaAtuacao = (campoAreaAtuacao?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosNivelAtuacao = (campoNivelAtuacao?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
 
-                // Atualiza o cache global
                 cacheGlobal = {
                     listaProdutos: novosProdutos,
                     listaOrigens: novasOrigens,
+                    listaMeio: novosMeios,
                     listaUniversidades: novasUniversidades,
                     listaEscritorios: novosEscritorios,
                     listaIdiomas: novosIdiomas,
                     listaSemestres: novosSemestres,
                     listaAreaAtuacao: novasAreaAtuacao,
-                    listaNivelMercado:novosNivelAtuacao,
+                    listaNivelMercado: novosNivelAtuacao,
                     opcoesEmail: emailFormatado,
                     opcoesTelefone: telefoneFormatado,
                     tituloTermoLGPD: novoTitulo,
                     descricaoTermoLGPD: novaDescricao,
                     jaCarregou: true,
                 };
-                
+
                 if (componenteMontado) {
                     setTituloTermoLGPD(novoTitulo);
                     setDescricaoTermoLGPD(novaDescricao);
@@ -172,6 +168,7 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                     setListaEscritorios(novosEscritorios);
                     setListaProdutos(novosProdutos);
                     setListaOrigens(novasOrigens);
+                    setListaMeio(novosMeios);
                     setListaIdiomas(novosIdiomas);
                     setListaSemestres(novosSemestres);
                     setListaAreaAtuacao(novasAreaAtuacao);
@@ -179,14 +176,14 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 }
             } catch {
                 if (componenteMontado) {
-                    modals.setTipoErroConexao('conexao');
-                    modals.setModalErroConexaoAberta(true);
+                    modals?.setTipoErroConexao('conexao');
+                    modals?.setModalErroConexaoAberta(true);
                 }
             } finally {
                 if (componenteMontado) setCarregandoMetadados(false);
             }
         };
-        
+
         carregarDados();
 
         return () => {
@@ -194,48 +191,53 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
         };
     }, []);
 
-    const nome = fields.nome;
-    const sobrenome = fields.sobrenome;
-    const senha = fields.senha;
-    const dataNascimento = removerMascaraData(fields.dataNascimento);
-    const email = fields.emails.map((e: any) => ({ tipo: e.tipo, email: e.valor }));
-    const telefone = fields.telefones.map((e: any) => ({ tipo: e.tipo, numero: removerMascaraTelefone(e.valor) }));
-    
-    const comite = {
-        id: fields.idEscritorio,
-        nome: fields.escritorioSelecionado,
-    };
-    
-    const universidade = {
-        id: fields.idUniversidade,
-        nome: fields.universidadeSelecionada,
-    };
-    
-    const origem = {
-        id: fields.idOrigem,
-        nome: fields.origemSelecionada,
-    };
-    
-    const produto: any = {
-        id_podio: fields.idProduto,
-        titulo: fields.produtoSelecionado
-    };
-
-    if (rota === 'voluntario-global') {
-        produto.id_expa = 7;
-    } else if (rota === 'talento-global') {
-        produto.id_expa = 8;
-    } else if (rota === 'professor-global') {
-        produto.id_expa = 9;
-    }
-
     /**
      * Função responsável por processar e enviar os dados do formulário para a API,
      * diferenciando o comportamento entre a Etapa 1 (Pré-cadastro) e a Etapa 2 (Qualificação).
      */
     const enviarDados = async () => {
-        modals.setCarregandoEnvio(true);
+        if (!fields) {
+            console.warn("Tentativa de envio chamada sem o objeto 'fields' preenchido.");
+            return null;
+        }
+
+        const nome = fields.nome;
+        const sobrenome = fields.sobrenome;
+        const senha = fields.senha;
+        const dataNascimento = removerMascaraData(fields.dataNascimento);
+        const email = fields.emails?.map((e: any) => ({ tipo: e.tipo, email: e.valor })) || [];
+        const telefone = fields.telefones?.map((e: any) => ({ tipo: e.tipo, numero: removerMascaraTelefone(e.valor) })) || [];
+
+        const comite = {
+            id: fields.idEscritorio,
+            nome: fields.escritorioSelecionado,
+        };
+
+        const universidade = {
+            id: fields.idUniversidade,
+            nome: fields.universidadeSelecionada,
+        };
+
+        const origem = {
+            id: fields.idOrigem,
+            nome: fields.origemSelecionada,
+        };
+
+        const produto: any = {
+            id_podio: fields.idProduto,
+            titulo: fields.produtoSelecionado
+        };
+
+        if (rota === 'voluntario-global') {
+            produto.id_expa = 7;
+        } else if (rota === 'talento-global') {
+            produto.id_expa = 8;
+        } else if (rota === 'professor-global') {
+            produto.id_expa = 9;
+        }
+
         let resultado = null;
+
         if (step === 1) {
             const jsonPreCadastro: any = {
                 nome,
@@ -248,44 +250,43 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 origem,
                 autorizacao: 1
             };
-            
+
             if (fields.marcarSemUniversidade) {
                 jsonPreCadastro.comite = comite;
             } else {
                 jsonPreCadastro.universidade = universidade;
             }
-           
+
             try {
-                const response:any = await apiOgxClient.post('/new-lead-ogx/cadastro', jsonPreCadastro);
-                // 💡 Ajuste para capturar o item_id retornado pelo backend (ex: response.data.item_id ou ajuste conforme sua API)
+                const response: any = await apiOgxClient.post('/new-lead-ogx/cadastro', jsonPreCadastro);
                 if (response?.data?.item_id) {
                     fields.setItemId(response.data.item_id);
                 }
                 resultado = response?.sucesso;
-            } catch (error:any) {
+            } catch (error: any) {
                 const dadosErro = error.response?.data?.data;
-                if (error.response.status === 409){
-                    const conteudoModal = dadosErro.erro 
-                    ? dadosErro.erro.replace("EXPA", "").trim() 
-                    : dadosErro;
-                    modals.setDataConflito(conteudoModal)
-                    modals.setModalConflitoAberta(true)
+                if (error.response?.status === 409) {
+                    const conteudoModal = dadosErro?.erro 
+                        ? dadosErro.erro.replace("EXPA", "").trim() 
+                        : dadosErro;
+                    modals?.setDataConflito(conteudoModal);
+                    modals?.setModalConflitoAberta(true);
                 } else {
-                    modals.setTipoErroConexao('bug');
-                    modals.setModalErroConexaoAberta(true);
+                    modals?.setTipoErroConexao('bug');
+                    modals?.setModalErroConexaoAberta(true);
                 }
                 console.log('Erro ao enviar dados:', dadosErro);
             } finally {
-                modals.setCarregandoEnvio(false);
+                modals?.setCarregandoEnvio(false);
             }
-            return resultado
-            
+            return resultado;
+
         } else if (step === 2) {
             const jsonQualificacao: any = {
-                item_id : fields.itemId
+                item_id: fields.itemId
             };
 
-            if (fields.curso){
+            if (fields.curso) {
                 jsonQualificacao.curso = fields.curso;
             }
 
@@ -296,13 +297,13 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 };
             }
 
-            if (fields.idiomasSelecionados.length > 0){
-                jsonQualificacao.idiomas = fields.idiomasSelecionados.map((nome:string,index:number) => ({
+            if (fields.idiomasSelecionados?.length > 0) {
+                jsonQualificacao.idiomas = fields.idiomasSelecionados.map((nome: string, index: number) => ({
                     id: fields.idIdiomas[index],
                     nome
                 }));
             }
-            
+
             if (fields.semestreSelecionado) {
                 jsonQualificacao.semestreCurso = {
                     id: fields.idSemestre,
@@ -310,39 +311,38 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
                 };
             }
 
-            if (fields.areaAtuacaoSelecionada){
+            if (fields.areaAtuacaoSelecionada) {
                 jsonQualificacao.areaAtuacao = {
                     id: fields.idAreaAtuacao,
                     nome: fields.areaAtuacaoSelecionada
-                }
+                };
             }
 
-            if (fields.nivelAtuacaoSelecionado){
+            if (fields.nivelAtuacaoSelecionado) {
                 jsonQualificacao.nivelAtuacao = {
                     id: fields.idNivelAtuacao,
                     nome: fields.nivelAtuacaoSelecionado
-                }
+                };
             }
 
-            
             try {
-                const response:any = await apiOgxClient.put('/new-lead-ogx/cadastro', jsonQualificacao);
+                const response: any = await apiOgxClient.put('/new-lead-ogx/cadastro', jsonQualificacao);
                 resultado = response?.sucesso;
-            } catch (error:any) {
+            } catch (error: any) {
                 const dadosErro = error.response?.data?.data;
-                if (error.response.status === 409){
-                    const conteudoModal = dadosErro.erro 
-                    ? dadosErro.erro.replace("EXPA", "").trim() 
-                    : dadosErro;
-                    modals.setDataConflito(conteudoModal)
-                    modals.setModalConflitoAberta(true)
+                if (error.response?.status === 409) {
+                    const conteudoModal = dadosErro?.erro 
+                        ? dadosErro.erro.replace("EXPA", "").trim() 
+                        : dadosErro;
+                    modals?.setDataConflito(conteudoModal);
+                    modals?.setModalConflitoAberta(true);
                 } else {
-                    modals.setTipoErroConexao('bug');
-                    modals.setModalErroConexaoAberta(true);
+                    modals?.setTipoErroConexao('bug');
+                    modals?.setModalErroConexaoAberta(true);
                 }
                 console.log('Erro ao enviar dados:', dadosErro);
             } finally {
-                modals.setCarregandoEnvio(false);
+                modals?.setCarregandoEnvio(false);
             }
             return resultado;
         }
@@ -353,6 +353,7 @@ export function useDadosFormulario(modals:any, fields:any,step:number,rota:strin
         erroMetadados,
         listaProdutos,
         listaOrigens,
+        listaMeio,
         listaUniversidades,
         listaEscritorios,
         listaIdiomas,

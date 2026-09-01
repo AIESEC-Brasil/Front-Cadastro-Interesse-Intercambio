@@ -17,7 +17,7 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
     const fields = useCamposFormulario();
     const { erros, validarTudo } = useValidacaoFormulario(fields,step);
     const modals = useModaisFormulario();
-    const dadosFormulario = useDadosFormulario(modals,fields,step,rota);
+    const dadosFormulario = useDadosFormulario({modals,fields,step,rota});
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     // Algumas páginas entram já associadas a um programa conhecido. A seleção

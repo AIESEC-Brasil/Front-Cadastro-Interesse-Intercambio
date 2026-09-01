@@ -14,7 +14,7 @@ export function useFormularioQualificacao(rota: string, state: (step: number) =>
     const fields = useCamposFormulario();
     const { erros, validarTudo } = useValidacaoFormulario(fields,step);
     const modals = useModaisFormulario();
-    const dadosFormulario = useDadosFormulario(modals,fields,step,rota);
+    const dadosFormulario = useDadosFormulario({modals,fields,step,rota});
     
     // O componente de seleção trabalha com objetos; o estado global guarda os
     // nomes e IDs em arrays paralelos para manter compatibilidade com o payload.
