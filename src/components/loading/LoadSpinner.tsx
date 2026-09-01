@@ -5,6 +5,7 @@ import styles from './style.module.css';
 
 import type { LoadSpinnerProps } from '../../types/components';
 
+
 /** Bloqueia a interação durante operações assíncronas de envio. */
 export default function LoadSpinner({ aberta, message = 'Carregando...' }: LoadSpinnerProps) {
   if (!aberta) return null;
