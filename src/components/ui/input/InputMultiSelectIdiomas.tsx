@@ -7,7 +7,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import styles from "./style.module.css";
-import type { LanguageMultiSelectProps } from '../../../type/components';
+import type { LanguageMultiSelectProps } from '../../../type/componentes';
 
 /**
  * Permite selecionar níveis de idioma sem repetir o mesmo idioma-base.

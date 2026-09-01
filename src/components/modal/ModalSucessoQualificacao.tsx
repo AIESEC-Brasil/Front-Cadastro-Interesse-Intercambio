@@ -1,5 +1,5 @@
 import React from 'react';
-import type { QualificationSuccessModalProps } from '../../type/components';
+import type { QualificationSuccessModalProps } from '../../type/componentes';
 
 /** Informa a conclusão da qualificação; o pai decide quando limpar e voltar. */
 export default function ModalSucessoQualificacao({ isOpen, onClose }: QualificationSuccessModalProps) {

@@ -25,7 +25,7 @@ import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
 
 import { useFormularioPreCadastro } from '../../hook/useFormularioPreCadastro';
 
-import type { FormularioProps } from '../../type/components';
+import type { FormularioProps } from '../../types/componentes';
 
 /**
  * Primeira etapa do cadastro de interesse.

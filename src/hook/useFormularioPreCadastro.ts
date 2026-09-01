@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useFormFields } from './useFormFields';
-import { useFormValidation } from './useFormValidation';
-import { useFormModals } from './useFormModals';
+import { useCamposFormulario } from './useCamposFormulario';
+import { useValidacaoFormulario } from './useValidacaoFormulario';
+import { useModaisFormulario } from './useModaisFormulario';
 import { useDadosFormulario } from './useDadosFormulario';
 import {aplicarMascaraTelefone } from '../helpers/formatter';
 
@@ -14,9 +14,9 @@ import {aplicarMascaraTelefone } from '../helpers/formatter';
  * aqui. Assim, a regra de negócio continua fora do JSX.
  */
 export function useFormularioPreCadastro(rota: string, state: (step: number) => void,step:number) {
-    const fields = useFormFields();
-    const { erros, validarTudo } = useFormValidation(fields,step);
-    const modals = useFormModals();
+    const fields = useCamposFormulario();
+    const { erros, validarTudo } = useValidacaoFormulario(fields,step);
+    const modals = useModaisFormulario();
     const dadosFormulario = useDadosFormulario(modals,fields,step,rota);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -67,41 +67,41 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
         modals.setCarregandoEnvio(false);
     };
 
-    const handleAdicionarEmail = () => fields.setEmails([...fields.emails, { tipo: 'other', valor: '' }]);
-    const handleRemoverEmail = (indice: number) => fields.setEmails(fields.emails.filter((_, index) => index !== indice));
-    const handleAtualizarTipoEmail = (indice: number, valor: string) => {
+    const aoAdicionarEmail = () => fields.setEmails([...fields.emails, { tipo: 'other', valor: '' }]);
+    const aoRemoverEmail = (indice: number) => fields.setEmails(fields.emails.filter((_, index) => index !== indice));
+    const aoAtualizarTipoEmail = (indice: number, valor: string) => {
         fields.setEmails(fields.emails.map((item, index) => index === indice ? { ...item, tipo: valor } : item));
     };
-    const handleAtualizarValorEmail = (indice: number, valor: string) => {
+    const aoAtualizarValorEmail = (indice: number, valor: string) => {
         fields.setEmails(fields.emails.map((item, index) => index === indice ? { ...item, valor } : item));
     };
 
-    const handleAdicionarTelefone = () => fields.setTelefones([...fields.telefones, { tipo: 'other', valor: '' }]);
-    const handleRemoverTelefone = (indice: number) => fields.setTelefones(fields.telefones.filter((_, index) => index !== indice));
-    const handleAtualizarTipoTelefone = (indice: number, valor: string) => {
+    const aoAdicionarTelefone = () => fields.setTelefones([...fields.telefones, { tipo: 'other', valor: '' }]);
+    const aoRemoverTelefone = (indice: number) => fields.setTelefones(fields.telefones.filter((_, index) => index !== indice));
+    const aoAtualizarTipoTelefone = (indice: number, valor: string) => {
         fields.setTelefones(fields.telefones.map((item, index) => index === indice ? { ...item, tipo: valor } : item));
     };
-    const handleAtualizarValorTelefone = (indice: number, valor: string) => {
+    const aoAtualizarValorTelefone = (indice: number, valor: string) => {
         fields.setTelefones(fields.telefones.map((item, index) => index === indice ? { ...item, valor: aplicarMascaraTelefone(valor) } : item));
     };
 
-    const handleSelecionarProduto = (nome: string, id: number | string) => {
+    const aoSelecionarProduto = (nome: string, id: number | string) => {
         fields.setProdutoSelecionado(nome);
         fields.setIdProduto(id);
         setIsOpen(false);
     };
-    const handleLimparProduto = () => {
+    const aoLimparProduto = () => {
         fields.setProdutoSelecionado("");
         fields.setIdProduto("");
         setIsOpen(false);
     };
-    const handleSelecionarUniversidade = (nome: string, id: number | string) => {
+    const aoSelecionarUniversidade = (nome: string, id: number | string) => {
         fields.setUniversidadeSelecionada(nome);
         fields.setIdUniversidade(id);
     };
     /** Universidade e comitê são alternativas: o checkbox limpa a seleção que
      * deixou de ser aplicável para evitar enviar as duas no mesmo cadastro. */
-    const handleAlternarUniversidade = (marcada: boolean) => {
+    const aoAlternarUniversidade = (marcada: boolean) => {
         fields.setMarcarSemUniversidade(marcada);
         if (marcada) {
             fields.setUniversidadeSelecionada('');
@@ -109,11 +109,11 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
             fields.setEscritorioSelecionado('');
         }
     };
-    const handleSelecionarEscritorio = (nome: string, id: number | string) => {
+    const aoSelecionarEscritorio = (nome: string, id: number | string) => {
         fields.setEscritorioSelecionado(nome);
         fields.setIdEscritorio(id);
     };
-    const handleSelecionarOrigem = (nome: string, id: number | string) => {
+    const aoSelecionarOrigem = (nome: string, id: number | string) => {
         fields.setOrigemSelecionada(nome);
         fields.setIdOrigem(id);
     };
@@ -143,9 +143,21 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
         isOpen, setIsOpen,
         validarEProcessar,
         aplicarMascaraTelefone,
-        handleAdicionarEmail, handleRemoverEmail, handleAtualizarTipoEmail, handleAtualizarValorEmail,
-        handleAdicionarTelefone, handleRemoverTelefone, handleAtualizarTipoTelefone, handleAtualizarValorTelefone,
-        handleSelecionarProduto, handleLimparProduto, handleSelecionarUniversidade,
-        handleAlternarUniversidade, handleSelecionarEscritorio, handleSelecionarOrigem,fecharModalSucessoCadastro,realizarPreCadastro
+        handleAdicionarEmail: aoAdicionarEmail, 
+        handleRemoverEmail: aoRemoverEmail, 
+        handleAtualizarTipoEmail: aoAtualizarTipoEmail, 
+        handleAtualizarValorEmail: aoAtualizarValorEmail,
+        handleAdicionarTelefone: aoAdicionarTelefone, 
+        handleRemoverTelefone: aoRemoverTelefone, 
+        handleAtualizarTipoTelefone: aoAtualizarTipoTelefone, 
+        handleAtualizarValorTelefone: aoAtualizarValorTelefone,
+        handleSelecionarProduto: aoSelecionarProduto, 
+        handleLimparProduto: aoLimparProduto, 
+        handleSelecionarUniversidade: aoSelecionarUniversidade,
+        handleAlternarUniversidade: aoAlternarUniversidade, 
+        handleSelecionarEscritorio: aoSelecionarEscritorio, 
+        handleSelecionarOrigem: aoSelecionarOrigem,
+        fecharModalSucessoCadastro,
+        realizarPreCadastro
     };
 }

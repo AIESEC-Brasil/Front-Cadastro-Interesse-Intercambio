@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import apiOgxClient from '../service/clients/apiOgxClient';
 import { traduzirPalavras } from '../helpers/formatter';
-import { useFormModals } from './useFormModals';
 import { removerMascaraData,removerMascaraTelefone } from '../helpers/formatter';
-import type { MetadataOption } from '../type/common';
+import type { OpcaoMetadados } from '../types/comum';
 
 /**
  * Interface que define a estrutura padrão para os itens de metadados (listas suspensas, opções, etc.).
@@ -18,14 +17,14 @@ const tituloTermoPadrao = 'Eu concordo com a coleta e uso dos meus dados conform
  * evitando requisições HTTP repetidas ao carregar o componente múltiplas vezes.
  */
 let cacheGlobal: {
-    listaProdutos: MetadataOption[];
-    listaOrigens: MetadataOption[];
-    listaUniversidades: MetadataOption[];
-    listaEscritorios: MetadataOption[];
-    listaIdiomas: MetadataOption[];
-    listaSemestres: MetadataOption[];
-    listaAreaAtuacao: MetadataOption[];
-    listaNivelMercado: MetadataOption[];
+    listaProdutos: OpcaoMetadados[];
+    listaOrigens: OpcaoMetadados[];
+    listaUniversidades: OpcaoMetadados[];
+    listaEscritorios: OpcaoMetadados[];
+    listaIdiomas: OpcaoMetadados[];
+    listaSemestres: OpcaoMetadados[];
+    listaAreaAtuacao: OpcaoMetadados[];
+    listaNivelMercado: OpcaoMetadados[];
     opcoesEmail: any[];
     opcoesTelefone: any[];
     tituloTermoLGPD: string;

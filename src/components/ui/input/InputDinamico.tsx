@@ -9,8 +9,8 @@ import React, { useState } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 import ButtonConfirmar from '../buttons/ButtonConfirmar';
 import styles from "./style.module.css";
-import type { DynamicInputProps } from '../../../type/components';
-import type { TranslatedOption } from '../../../type/common';
+import type { DynamicInputProps } from '../../../type/componentes';
+import type { OpcaoTraduzida } from '../../../type/comum';
 
 /**
  * Renderiza uma lista editável de e-mails ou telefones.

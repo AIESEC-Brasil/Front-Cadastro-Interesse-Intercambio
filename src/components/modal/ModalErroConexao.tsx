@@ -1,7 +1,7 @@
 // src/components/modal/ModalErroConexao.tsx
 import React from 'react';
 
-import type { ConnectionErrorModalProps } from '../../type/components';
+import type { ConnectionErrorModalProps } from '../../type/componentes';
 
 /** Diferencia falha ao buscar metadados de erro inesperado durante o envio. */
 export default function ModalErroConexao({ aberta, aoTentarNovamente, tipo}: ConnectionErrorModalProps) {

@@ -2,20 +2,20 @@ import { useState } from 'react';
 import { aplicarMascaraData } from '../helpers/formatter';
 import { contemApenasLetrasEspacos } from '../utils/validates';
 
-import type { ContactItem } from '../type/common';
-import { FormFieldsState } from '../type/form';
+import type { ItemContato } from '../types/comum';
+import { EstadoCamposFormulario } from '../types/formulario';
 
 // ==========================================
 // CACHE / ESTADO GLOBAL EM MEMÓRIA (SINGLETON)
 // ==========================================
-let estadoGlobalFormulario: FormFieldsState = {
+let estadoGlobalFormulario: EstadoCamposFormulario = {
     nome: '',
     sobrenome: '',
     senha: '',
     dataNascimento: '',
     itemId: 0,
-    emails: [{ tipo: 'other', valor: '' }] as ContactItem[],
-    telefones: [{ tipo: 'other', valor: '' }] as ContactItem[],
+    emails: [{ tipo: 'other', valor: '' }] as ItemContato[],
+    telefones: [{ tipo: 'other', valor: '' }] as ItemContato[],
     curso: '',
     produtoSelecionado: '',
     idProduto: '' as number | string,
@@ -58,7 +58,7 @@ const notificarListeners = () => {
  * notificação força os componentes que usam este hook a renderizarem de novo,
  * simulando um pequeno store compartilhado sem adicionar uma biblioteca.
  */
-export function useFormFields() {
+export function useCamposFormulario() {
     const [, setForcarRender] = useState({});
 
     useState(() => {
@@ -91,8 +91,8 @@ export function useFormFields() {
                 senha: '',
                 dataNascimento: '',
                 itemId: 0,
-                emails: [{ tipo: 'other', valor: '' }] as ContactItem[],
-                telefones: [{ tipo: 'other', valor: '' }] as ContactItem[],
+                emails: [{ tipo: 'other', valor: '' }] as ItemContato[],
+                telefones: [{ tipo: 'other', valor: '' }] as ItemContato[],
                 curso: '',
                 produtoSelecionado: '',
                 idProduto: '' as number | string,
@@ -150,7 +150,7 @@ export function useFormFields() {
             notificarListeners();
         },
         emails: estadoGlobalFormulario.emails, 
-        setEmails: (v: ContactItem[] | ((prev: ContactItem[]) => ContactItem[])) => {
+        setEmails: (v: ItemContato[] | ((prev: ItemContato[]) => ItemContato[])) => {
             estadoGlobalFormulario.emails = typeof v === 'function' ? v(estadoGlobalFormulario.emails) : v;
             notificarListeners();
         },
@@ -160,7 +160,7 @@ export function useFormFields() {
             notificarListeners();
         },
         telefones: estadoGlobalFormulario.telefones, 
-        setTelefones: (v: ContactItem[] | ((prev: ContactItem[]) => ContactItem[])) => {
+        setTelefones: (v: ItemContato[] | ((prev: ItemContato[]) => ItemContato[])) => {
             estadoGlobalFormulario.telefones = typeof v === 'function' ? v(estadoGlobalFormulario.telefones) : v;
             notificarListeners();
         },

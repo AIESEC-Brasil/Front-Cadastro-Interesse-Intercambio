@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import type { CalendarDay, CalendarView, DateInputProps } from '../../../type/components';
+import type { CalendarDay, CalendarView, DateInputProps } from '../../../type/componentes';
 
 /** Representa uma célula do calendário, inclusive dias exibidos de meses vizinhos. */
 const MESES = [
