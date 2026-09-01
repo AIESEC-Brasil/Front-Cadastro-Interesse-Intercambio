@@ -46,7 +46,7 @@ const InputDinamico = ({
       {itens.map((item, index) => {
         const erroAtual = erros[index];
         const isOpen = dropdownAbertoIndex === index;
-        const opcaoSelecionada = opcoesTipo.find((o: TranslatedOption) => o.original === item.tipo)
+        const opcaoSelecionada = opcoesTipo.find((o: OpcaoTraduzida) => o.original === item.tipo)
 
         return (
           <React.Fragment key={index}>
