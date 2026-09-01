@@ -1,6 +1,6 @@
-import { useFormFields } from './useFormFields';
-import { useFormValidation } from './useFormValidation';
-import { useFormModals } from './useFormModals';
+import { useCamposFormulario } from './useCamposFormulario';
+import { useValidacaoFormulario } from './useValidacaoFormulario';
+import { useModaisFormulario } from './useModaisFormulario';
 import { useDadosFormulario } from './useDadosFormulario';
 
 /**
@@ -11,20 +11,20 @@ import { useDadosFormulario } from './useDadosFormulario';
  * para que a API receba tanto o texto escolhido quanto sua identificação.
  */
 export function useFormularioQualificacao(rota: string, state: (step: number) => void,step:number) {
-    const fields = useFormFields();
-    const { erros, validarTudo } = useFormValidation(fields,step);
-    const modals = useFormModals();
+    const fields = useCamposFormulario();
+    const { erros, validarTudo } = useValidacaoFormulario(fields,step);
+    const modals = useModaisFormulario();
     const dadosFormulario = useDadosFormulario(modals,fields,step,rota);
     
     // O componente de seleção trabalha com objetos; o estado global guarda os
     // nomes e IDs em arrays paralelos para manter compatibilidade com o payload.
-    const idiomaFomartado = fields.idiomasSelecionados.map((nome,index) => ({
+    const idiomaFormatado = fields.idiomasSelecionados.map((nome: string, index: number) => ({
         id: fields.idIdiomas[index],
         nome
     }));
 
     // Converte a lista rica do componente para os dois arrays simples do estado.
-    const handleAtualizarIdiomas = (novosSelecionados: Array<{ id: number | string; nome: string }>) => {
+    const aoAtualizarIdiomas = (novosSelecionados: Array<{ id: number | string; nome: string }>) => {
         const nomes = novosSelecionados.map(item => item.nome);
         const ids = novosSelecionados.map(item => item.id);
 
@@ -32,22 +32,22 @@ export function useFormularioQualificacao(rota: string, state: (step: number) =>
         fields.setIdIdiomas(ids);
     };
 
-    const handleAtualizarSemestre = (nomeSelecionado: string, idSelecionado: number | string) => {
+    const aoAtualizarSemestre = (nomeSelecionado: string, idSelecionado: number | string) => {
         fields.setSemestreSelecionado(nomeSelecionado);
         fields.setIdSemestre(idSelecionado);
     };
 
-    const handleAtualizarCurriculo = (arquivo: File | null, base64: string | null) => {
+    const aoAtualizarCurriculo = (arquivo: File | null, base64: string | null) => {
         fields.setAnexoBase64(base64)
         fields.setAnexoPdf(arquivo)
     }
 
-    const handleAtualizarAreaAtuacao = (nomeSelecionado: string, idSelecionado: number | string) => {
+    const aoAtualizarAreaAtuacao = (nomeSelecionado: string, idSelecionado: number | string) => {
         fields.setAreaAtuacao(nomeSelecionado);
         fields.setIdAreaAtuacao(idSelecionado);
     }
 
-    const handleAtualizarNivelAtuacao = (nomeSelecionado: string, idSelecionado: number | string) => {
+    const aoAtualizarNivelAtuacao = (nomeSelecionado: string, idSelecionado: number | string) => {
         fields.setNivelAtuacao(nomeSelecionado);
         fields.setIdNivelAtuacao(idSelecionado);
     }
@@ -129,12 +129,12 @@ export function useFormularioQualificacao(rota: string, state: (step: number) =>
         ...erros,
         ...modals,
         ...dadosFormulario,
-        idiomaFomartado,
-        handleAtualizarIdiomas,
-        handleAtualizarSemestre,
-        handleAtualizarCurriculo,
-        handleAtualizarAreaAtuacao,
-        handleAtualizarNivelAtuacao,
+        idiomaFormatado,
+        handleAtualizarIdiomas: aoAtualizarIdiomas,
+        handleAtualizarSemestre: aoAtualizarSemestre,
+        handleAtualizarCurriculo: aoAtualizarCurriculo,
+        handleAtualizarAreaAtuacao: aoAtualizarAreaAtuacao,
+        handleAtualizarNivelAtuacao: aoAtualizarNivelAtuacao,
         validarEProcessar,
         atualizarDadosQualificacao,
         fecharModalSucessoQualificacao,

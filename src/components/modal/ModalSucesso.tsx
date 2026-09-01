@@ -4,7 +4,7 @@
  */
 import ButtonEditar from '../ui/buttons/ButtonEditar';
 import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
-import type { SummaryModalProps } from '../../type/components';
+import type { SummaryModalProps } from '../../type/componentes';
 
 /**
  * Confirmação intermediária antes do envio.

@@ -9,7 +9,7 @@ import React from 'react';
  * Importação dos estilos modulares específicos para o comportamento e layout do campo de texto.
  */
 import styles from "./style.module.css";
-import type { TextInputProps } from '../../../type/components';
+import type { TextInputProps } from '../../../type/componentes';
 
 /**
  * Propriedades aceitas pelo componente InputTexto.

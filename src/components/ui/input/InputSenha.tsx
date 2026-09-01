@@ -13,7 +13,7 @@ import { Eye, EyeOff } from 'lucide-react';
  * Importação dos estilos modulares específicos para o layout do input.
  */
 import styles from "./style.module.css";
-import type { PasswordInputProps } from '../../../type/components';
+import type { PasswordInputProps } from '../../../type/componentes';
 
 /**
  * Propriedades aceitas pelo componente InputSenha.

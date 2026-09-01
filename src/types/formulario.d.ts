@@ -1,102 +1,102 @@
-import type { ContactItem, EntityId, MetadataOption, NullableEntityId } from './common';
+import type { ItemContato, IdEntidade, OpcaoMetadados, IdEntidadeSemDefinir } from './common';
 
 /** Estado completo compartilhado entre pré-cadastro e qualificação. */
-export interface FormFieldsState {
+export interface EstadoCamposFormulario {
   nome: string;
   sobrenome: string;
   senha: string;
   dataNascimento: string;
   itemId: number;
-  emails: ContactItem[];
-  telefones: ContactItem[];
+  emails: ItemContato[];
+  telefones: ItemContato[];
   curso: string;
   produtoSelecionado: string;
-  idProduto: NullableEntityId;
+  idProduto: IdEntidadeSemDefinir;
   origemSelecionada: string;
-  idOrigem: NullableEntityId;
+  idOrigem: IdEntidadeSemDefinir;
   marcarSemUniversidade: boolean;
   universidadeSelecionada: string;
-  idUniversidade: NullableEntityId;
+  idUniversidade: IdEntidadeSemDefinir;
   escritorioSelecionado: string;
-  idEscritorio: NullableEntityId;
+  idEscritorio: IdEntidadeSemDefinir;
   termoLGPD: boolean;
   idiomasSelecionados: string[];
-  idIdiomas: EntityId[];
+  idIdiomas: IdEntidade[];
   semestreSelecionado: string;
-  idSemestre: NullableEntityId;
+  idSemestre: IdEntidadeSemDefinir;
   anexoPdf: File | null;
   anexoBase64: string | null;
   areaAtuacao: string;
-  idAreaAtuacao: NullableEntityId;
+  idAreaAtuacao: IdEntidadeSemDefinir;
   nivelAtuacao: string;
-  idNivelAtuacao: NullableEntityId;
+  idNivelAtuacao: IdEntidadeSemDefinir;
 }
 
 /** Mensagens agrupadas pelo nome do campo. */
-export type FieldErrors = Record<string, string[]>;
+export type ErrosCampos = Record<string, string[]>;
 
 /** Valor que pode aparecer no resumo antes da confirmação do envio. */
-export type SummaryValue = string | number | string[];
+export type ValorResumo = string | number | string[];
 
 /** Resumo apresentado ao usuário antes do envio definitivo. */
-export type FormSummary = Record<string, SummaryValue>;
+export type ResumoFormulario = Record<string, ValorResumo>;
 
 /** Resultado padrão da validação completa de uma etapa. */
-export interface ValidationResult {
+export interface ResultadoValidacao {
   temErros: boolean;
-  errosJson: FieldErrors;
+  errosJson: ErrosCampos;
 }
 
 /** Contato no formato aceito pelo endpoint de cadastro. */
-export interface EmailPayload {
+export interface DadosEnvioEmail {
   tipo: string;
   email: string;
 }
 
 /** Telefone no formato aceito pelo endpoint de cadastro. */
-export interface PhonePayload {
+export interface DadosEnvioTelefone {
   tipo: string;
   numero: string;
 }
 
 /** Referência de uma opção selecionada enviada para a API. */
-export interface SelectedOptionPayload extends MetadataOption {}
+export interface DadosOpcaoSelecionada extends OpcaoMetadados {}
 
 /** Produto com os identificadores usados pelo sistema externo. */
-export interface ProductPayload {
-  id_podio: EntityId;
+export interface DadosProduto {
+  id_podio: IdEntidade;
   titulo: string;
   id_expa?: number;
 }
 
 /** Arquivo de currículo convertido para transporte no payload. */
-export interface CurriculumPayload {
+export interface DadosCurriculo {
   nome: string;
   base64: string | null;
 }
 
 /** Corpo enviado na primeira etapa do cadastro. */
-export interface PreCadastroPayload {
+export interface DadosPreCadastro {
   nome: string;
   sobrenome: string;
   senha: string;
   dataNascimento: string;
-  email: EmailPayload[];
-  telefone: PhonePayload[];
-  produto: ProductPayload;
-  origem: SelectedOptionPayload;
+  email: DadosEnvioEmail[];
+  telefone: DadosEnvioTelefone[];
+  produto: DadosProduto;
+  origem: DadosOpcaoSelecionada;
   autorizacao: 1;
-  universidade?: SelectedOptionPayload;
-  comite?: SelectedOptionPayload;
+  universidade?: DadosOpcaoSelecionada;
+  comite?: DadosOpcaoSelecionada;
 }
 
 /** Corpo enviado na atualização opcional da qualificação. */
-export interface QualificacaoPayload {
+export interface DadosQualificacao {
   item_id: number;
   curso?: string;
-  curriculo?: CurriculumPayload;
-  idiomas?: SelectedOptionPayload[];
-  semestreCurso?: SelectedOptionPayload;
-  areaAtuacao?: SelectedOptionPayload;
-  nivelAtuacao?: SelectedOptionPayload;
+  curriculo?: DadosCurriculo;
+  idiomas?: DadosOpcaoSelecionada[];
+  semestreCurso?: DadosOpcaoSelecionada;
+  areaAtuacao?: DadosOpcaoSelecionada;
+  nivelAtuacao?: DadosOpcaoSelecionada;
 }

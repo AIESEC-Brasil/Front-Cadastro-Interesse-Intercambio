@@ -7,7 +7,7 @@
 
 import React from 'react';
 import ButtonEditar from '../ui/buttons/ButtonEditar';
-import type { ErrorModalProps } from '../../type/components';
+import type { ErrorModalProps } from '../../type/componentes';
 
 /** Apresenta erros agrupados por campo, no formato `{ campo: [mensagens] }`. */
 const ModalErro = ({ aberta, titulo = "Dados incorretos.", erros, aoFechar }: ErrorModalProps) => {

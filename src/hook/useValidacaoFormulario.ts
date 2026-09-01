@@ -10,7 +10,7 @@ import { validarTexto, validarSenha, validarEmail, validarTelefone, validarData 
  * quando alguém começou a preenchê-los, mas ainda não escolheu uma opção válida
  * com ID correspondente.
  */
-export function useFormValidation(fields: any, step: number) {
+export function useValidacaoFormulario(fields: any, step: number) {
     const [erroNome, setErroNome] = useState<string>('');
     const [erroSobrenome, setErroSobrenome] = useState<string>('');
     const [erroSenha, setErroSenha] = useState<string[]>([]);

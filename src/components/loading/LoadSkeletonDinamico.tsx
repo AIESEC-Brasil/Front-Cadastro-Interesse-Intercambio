@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { LoadSkeletonProps } from '../../type/components';
+import type { LoadSkeletonProps } from '../../type/componentes';
 
 /** Gera uma prévia do formato do formulário enquanto os metadados carregam. */
 export default function LoadSkeletonDinamico({ 

@@ -7,7 +7,7 @@
 
 import React from 'react';
 import ButtonEditar from '../ui/buttons/ButtonEditar';
-import type { ConflictData, ConflictModalProps } from '../../type/components';
+import type { ConflictData, ConflictModalProps } from '../../type/componentes';
 
 /**
  * Exibe dados que já existem na API, normalmente após HTTP 409.

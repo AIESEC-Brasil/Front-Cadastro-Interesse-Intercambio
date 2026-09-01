@@ -7,7 +7,7 @@
 
 import React from 'react';
 
-import type { ButtonProps } from '../../../type/components';
+import type { ButtonProps } from '../../../type/componentes';
 
 /** Botão secundário para editar, corrigir ou fechar uma confirmação. */
 const ButtonEditar = ({ texto, aoClicar, type = 'button' }: ButtonProps) => {

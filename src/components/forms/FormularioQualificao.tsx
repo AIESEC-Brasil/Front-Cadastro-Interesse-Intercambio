@@ -23,7 +23,7 @@ import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
 
 import { useFormularioQualificacao } from '../../hook/useFormularioQualificacao';
 
-import type { FormularioProps } from '../../type/components';
+import type { FormularioProps } from '../../types/componentes';
 
 /**
  * Segunda tela do fluxo de cadastro.
@@ -40,7 +40,7 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioProps) => {
         modalErroConexaoAberta,tipoErroConexao,
         carregandoEnvio,
         carregandoMetadados,
-        idiomaFomartado,
+        idiomaFormatado,
         handleAtualizarIdiomas,
         handleAtualizarSemestre,
         handleAtualizarCurriculo,
@@ -70,7 +70,7 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioProps) => {
                         <InputMultiSelectIdiomas 
                             id="idiomas"
                             legenda="Idiomas e Proficiência(Opcional)"
-                            selecionados={idiomaFomartado}
+                            selecionados={idiomaFormatado}
                             atualizar={handleAtualizarIdiomas}
                             opcoes={listaIdiomas}
                             obrigatorio={false}

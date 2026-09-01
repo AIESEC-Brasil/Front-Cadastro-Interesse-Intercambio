@@ -1,6 +1,6 @@
 // src/components/modal/ModalSucessoCadastro.tsx
 import React from 'react';
-import type { CadastroSuccessModalProps } from '../../type/components';
+import type { CadastroSuccessModalProps } from '../../type/componentes';
 
 /** Confirma a criação da primeira etapa e oferece a entrada na qualificação. */
 export default function ModalSucessoCadastro({

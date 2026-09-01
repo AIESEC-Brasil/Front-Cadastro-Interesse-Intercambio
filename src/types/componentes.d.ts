@@ -1,9 +1,9 @@
-import type { FileChangeHandler, MetadataOption, MetadataSelectionHandler, StepChangeHandler, TextInputChangeHandler, TranslatedOption } from './common';
-import type { FieldErrors, FormSummary } from './form';
+import type { ManipuladorMudancaArquivo, OpcaoMetadados, ManipuladorSelecaoMetadados, ManipuladorMudancaEtapa, ManipuladorMudancaEntradaTexto, OpcaoTraduzida } from './comum';
+import type { ErrosCampos, ResumoFormulario } from './formulario';
 
 export interface FormularioProps {
   rota: string;
-  state: StepChangeHandler;
+  state: ManipuladorMudancaEtapa;
   step: number;
 }
 
@@ -26,7 +26,7 @@ export interface ButtonProps {
 export interface ErrorModalProps {
   aberta: boolean;
   titulo?: string;
-  erros: FieldErrors;
+  erros: ErrosCampos;
   aoFechar: () => void;
 }
 
@@ -56,7 +56,7 @@ export interface SummaryModalProps {
   aberta: boolean;
   titulo?: string;
   mensagem?: string;
-  resumoDados?: FormSummary;
+  resumoDados?: ResumoFormulario;
   aoEditar: () => void;
   aoConfirmar: () => void;
 }
@@ -77,7 +77,7 @@ export interface TextInputProps {
   id: string;
   legenda: string;
   valor: string;
-  atualizar: TextInputChangeHandler;
+  atualizar: ManipuladorMudancaEntradaTexto;
   error?: string | string[];
   obrigatorio?: boolean;
 }
@@ -90,8 +90,8 @@ export interface AutoCompleteProps {
   id: string;
   legenda: string;
   valor: string;
-  atualizar: MetadataSelectionHandler;
-  opcoes: MetadataOption[];
+  atualizar: ManipuladorSelecaoMetadados;
+  opcoes: OpcaoMetadados[];
   error?: string;
   obrigatorio?: boolean;
   placeholder?: string;
@@ -102,8 +102,8 @@ export interface DynamicInputProps {
   tituloLabel: string;
   placeholderInput: string;
   tipoInput?: string;
-  itens: import('./common').ContactItem[];
-  opcoesTipo: TranslatedOption[];
+  itens: import('./common').ItemContato[];
+  opcoesTipo: OpcaoTraduzida[];
   erros?: string[];
   aoAdicionar: () => void;
   aoRemover: (index: number) => void;
@@ -115,9 +115,9 @@ export interface DynamicInputProps {
 export interface LanguageMultiSelectProps {
   id: string;
   legenda: string;
-  selecionados: MetadataOption[];
-  atualizar: (novosSelecionados: MetadataOption[]) => void;
-  opcoes: MetadataOption[];
+  selecionados: OpcaoMetadados[];
+  atualizar: (novosSelecionados: OpcaoMetadados[]) => void;
+  opcoes: OpcaoMetadados[];
   error?: string;
   obrigatorio?: boolean;
   placeholder?: string;
@@ -128,7 +128,7 @@ export interface PdfInputProps {
   id: string;
   legenda: string;
   arquivo: File | null;
-  atualizar: FileChangeHandler;
+  atualizar: ManipuladorMudancaArquivo;
   obrigatorio?: boolean;
   desabilitado?: boolean;
   tamanhoMaximoMb?: number;

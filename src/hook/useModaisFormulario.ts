@@ -10,7 +10,7 @@ import { useState } from 'react';
  * Manter esses estados juntos evita que cada formulário precise conhecer os
  * detalhes de todos os modais.
  */
-export function useFormModals() {
+export function useModaisFormulario() {
     const [carregandoEnvio, setCarregandoEnvio] = useState<boolean>(false);
     
     const [modalErroAberta, setModalErroAberta] = useState<boolean>(false);
