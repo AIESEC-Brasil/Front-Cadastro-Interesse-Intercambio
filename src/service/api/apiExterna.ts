@@ -19,7 +19,7 @@ const apiExterna = axios.create({
   httpsAgent,
   timeout: 60000, // Timeout de segurança de 60 segundos
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": "application/json", //indica o formato esperado
     "Cache-Control": "no-cache",
     "Pragma": "no-cache",
   },
