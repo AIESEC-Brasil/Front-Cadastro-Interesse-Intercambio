@@ -11,7 +11,7 @@ import React, { useState, useRef, useEffect } from 'react';
  * Importação dos estilos modulares específicos para o layout do input.
  */
 import styles from "./style.module.css";
-import type { AutoCompleteProps } from '../../../type/componentes';
+import type { AutoCompleteProps } from '../../../types/componentes';
 
 /**
  * Campo de texto com sugestões vindas da API.

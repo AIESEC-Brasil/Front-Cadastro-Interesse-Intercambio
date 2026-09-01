@@ -7,7 +7,7 @@
 
 import React from 'react';
 
-import type { ButtonProps } from '../../../type/componentes';
+import type { ButtonProps } from '../../../types/componentes';
 
 /** Botão visualmente primário para confirmar, avançar ou concluir uma ação. */
 const ButtonConfirmar = ({ texto, aoClicar, type = 'button' }: ButtonProps) => {
