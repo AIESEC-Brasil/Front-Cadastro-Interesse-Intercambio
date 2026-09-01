@@ -3,7 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { FileText, Upload, X } from 'lucide-react';
 import styles from './style.module.css';
-import type { PdfInputProps } from '../../../type/componentes';
+import type { PdfInputProps } from '../../../types/componentes';
 
 /**
  * Controla a escolha local de um currículo PDF.

@@ -9,8 +9,8 @@ import React, { useState } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 import ButtonConfirmar from '../buttons/ButtonConfirmar';
 import styles from "./style.module.css";
-import type { DynamicInputProps } from '../../../type/componentes';
-import type { OpcaoTraduzida } from '../../../type/comum';
+import type { DynamicInputProps } from '../../../types/componentes';
+import type { OpcaoTraduzida } from '../../../types/comum';
 
 /**
  * Renderiza uma lista editável de e-mails ou telefones.
@@ -46,7 +46,7 @@ const InputDinamico = ({
       {itens.map((item, index) => {
         const erroAtual = erros[index];
         const isOpen = dropdownAbertoIndex === index;
-        const opcaoSelecionada = opcoesTipo.find((o: TranslatedOption) => o.original === item.tipo)
+        const opcaoSelecionada = opcoesTipo.find((o: OpcaoTraduzida) => o.original === item.tipo)
 
         return (
           <React.Fragment key={index}>
