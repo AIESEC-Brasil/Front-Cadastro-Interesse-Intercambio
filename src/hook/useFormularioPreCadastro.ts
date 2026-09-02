@@ -3,7 +3,7 @@ import { useCamposFormulario } from './useCamposFormulario';
 import { useValidacaoFormulario } from './useValidacaoFormulario';
 import { useModaisFormulario } from './useModaisFormulario';
 import { useDadosFormulario } from './useDadosFormulario';
-import {aplicarMascaraTelefone } from '../helpers/formatter';
+import { aplicarMascaraTelefone } from '../helpers/formatter';
 
 /**
  * Orquestra a primeira etapa do cadastro.
@@ -13,11 +13,11 @@ import {aplicarMascaraTelefone } from '../helpers/formatter';
  * componente visual apenas descreve os campos e chama os handlers devolvidos
  * aqui. Assim, a regra de negócio continua fora do JSX.
  */
-export function useFormularioPreCadastro(rota: string, state: (step: number) => void,step:number) {
+export function useFormularioPreCadastro(rota: string, state: (step: number) => void, step: number) {
     const fields = useCamposFormulario();
-    const { erros, validarTudo } = useValidacaoFormulario(fields,step);
+    const { erros, validarTudo } = useValidacaoFormulario(fields, step);
     const modals = useModaisFormulario();
-    const dadosFormulario = useDadosFormulario({modals,fields,step,rota});
+    const dadosFormulario = useDadosFormulario({ modals, fields, step, rota });
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     // Algumas páginas entram já associadas a um programa conhecido. A seleção
@@ -49,11 +49,11 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
             modals.setModalErroAberta(true);
         } else {
             const jsonResumo: Record<string, string | string[]> = {
-                ["Nome"]: fields.nome, 
-                ["Sobrenome"]: fields.sobrenome, 
-                ["Programa"]: fields.produtoSelecionado, 
-                ["Como conheceu a AIESEC"]: fields.origemSelecionada, 
-                ["Data de Nascimento"]: fields.dataNascimento, 
+                ["Nome"]: fields.nome,
+                ["Sobrenome"]: fields.sobrenome,
+                ["Programa"]: fields.produtoSelecionado,
+                ["Como conheceu a AIESEC"]: fields.origemSelecionada,
+                ["Data de Nascimento"]: fields.dataNascimento,
                 ["E-mail"]: fields.emails.map((email) => email.valor),
                 ["Telefone"]: fields.telefones.map((telefone) => telefone.valor),
                 ["Politica de Privacidade"]: fields.termoLGPD ? "Concordo" : "Não Concordo",
@@ -143,19 +143,19 @@ export function useFormularioPreCadastro(rota: string, state: (step: number) => 
         isOpen, setIsOpen,
         validarEProcessar,
         aplicarMascaraTelefone,
-        handleAdicionarEmail: aoAdicionarEmail, 
-        handleRemoverEmail: aoRemoverEmail, 
-        handleAtualizarTipoEmail: aoAtualizarTipoEmail, 
+        handleAdicionarEmail: aoAdicionarEmail,
+        handleRemoverEmail: aoRemoverEmail,
+        handleAtualizarTipoEmail: aoAtualizarTipoEmail,
         handleAtualizarValorEmail: aoAtualizarValorEmail,
-        handleAdicionarTelefone: aoAdicionarTelefone, 
-        handleRemoverTelefone: aoRemoverTelefone, 
-        handleAtualizarTipoTelefone: aoAtualizarTipoTelefone, 
+        handleAdicionarTelefone: aoAdicionarTelefone,
+        handleRemoverTelefone: aoRemoverTelefone,
+        handleAtualizarTipoTelefone: aoAtualizarTipoTelefone,
         handleAtualizarValorTelefone: aoAtualizarValorTelefone,
-        handleSelecionarProduto: aoSelecionarProduto, 
-        handleLimparProduto: aoLimparProduto, 
+        handleSelecionarProduto: aoSelecionarProduto,
+        handleLimparProduto: aoLimparProduto,
         handleSelecionarUniversidade: aoSelecionarUniversidade,
-        handleAlternarUniversidade: aoAlternarUniversidade, 
-        handleSelecionarEscritorio: aoSelecionarEscritorio, 
+        handleAlternarUniversidade: aoAlternarUniversidade,
+        handleSelecionarEscritorio: aoSelecionarEscritorio,
         handleSelecionarOrigem: aoSelecionarOrigem,
         fecharModalSucessoCadastro,
         realizarPreCadastro
