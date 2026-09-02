@@ -116,7 +116,7 @@ const nextConfig: NextConfig = {
       // 3. Regra de proteção geral: Bloqueia iframe em TODAS as outras rotas
       // -------------------------------------------------------------------
       {
-        source: "/((?!voluntario-global|talento-global|professor-global|programas-intercambio).*)",
+        source: "/((?!voluntario-global|talento-global|professor-global|programas-intercambio | urlbuilder).*)",
         headers: [
           {
             key: "Content-Security-Policy",
