@@ -64,7 +64,7 @@ export default function GeradorUrlPage() {
         { sigla: "MC", nome: "BRASIL" }
     ];
 
-    function slugify(texto) {
+    function slugify(texto:string) {
         return texto
             .toLowerCase()                       // tudo minúsculo
             .normalize("NFD")                    // separa letras dos acentos
