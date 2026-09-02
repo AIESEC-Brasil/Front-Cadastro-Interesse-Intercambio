@@ -1,183 +1,213 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
+import { slugify } from '@/helpers/formatter';
+import { siglaProduto, escritorios } from '@/helpers/dicionario';
+
 import InputTexto from '@/components/ui/input/InputTexto';
 import InputAutoComplete from '@/components/ui/input/InputAutoComplete';
+
+import LoadSkeletonDinamico from '@/components/loading/LoadSkeletonDinamico';
+import ModalErroGenerico from '@/components/modal/ModalErroGenerico';
 
 import { useDadosFormulario } from '@/hook/useDadosFormulario';
 import { useModaisFormulario } from '@/hook/useModaisFormulario';
 
 export default function GeradorUrlPage() {
-  const [canal, setCanal] = useState('');
-  const [tipoAnuncio, setTipoAnuncio] = useState('');
-  const [programa, setPrograma] = useState('');
-  const [cl, setCl] = useState('');
-  const [campanha, setCampanha] = useState('');
+    const [canal, setCanal] = useState('');
+    const [tipoAnuncio, setTipoAnuncio] = useState('');
+    const [programa, setPrograma] = useState('');
+    const [cl, setCl] = useState('');
+    const [campanha, setCampanha] = useState('');
 
-  const [urlGerada, setUrlGerada] = useState('');
-  const [copiado, setCopiado] = useState(false);
+    const [urlGerada, setUrlGerada] = useState('');
+    const [copiado, setCopiado] = useState(false);
 
-  const modals = useModaisFormulario();
-  const { listaMeio, listaOrigens, listaEscritorios, listaProdutos } = useDadosFormulario({ modals });
+    const modals = useModaisFormulario();
+    const { 
+        listaMeio, listaOrigens, listaEscritorios, listaProdutos, carregandoMetadados
+    } = useDadosFormulario({ modals });
 
-  // Gera a URL automaticamente apenas quando TODOS os campos forem preenchidos
-  useEffect(() => {
-    const todosPreenchidos =
-      canal.trim() !== '' &&
-      tipoAnuncio.trim() !== '' &&
-      programa.trim() !== '' &&
-      cl.trim() !== '' &&
-      campanha.trim() !== '';
+    // Gera a URL automaticamente apenas quando TODOS os campos forem preenchidos
+    useEffect(() => {
+        const todosPreenchidos =
+            canal.trim() !== '' &&
+            tipoAnuncio.trim() !== '' &&
+            programa.trim() !== '' &&
+            cl.trim() !== '' &&
+            campanha.trim() !== '';
 
-    if (todosPreenchidos) {
-      const url = `https://aiesec.org.br/voluntario-global/?utm_source=${encodeURIComponent(
-        canal
-      )}&utm_medium=${encodeURIComponent(
-        tipoAnuncio
-      )}&utm_campaign=${encodeURIComponent(campanha)}&utm_term=${encodeURIComponent(
-        cl
-      )}&utm_content=${encodeURIComponent(programa)}`;
+        if (todosPreenchidos) {
+            // A rota é aplicada de acordo com o programa que vai ser contratado
+            let rota = ''
+            if (programa.toLowerCase() === 'voluntário global') {
+                rota = "voluntario-global"
+            } else if (programa.toLowerCase() === 'professor global') {
+                rota = 'professor-global'
+            } else if (programa.toLowerCase().includes('talento global')) {
+                rota = 'talento-global'
+            }
 
-      setUrlGerada(url);
-    } else {
-      setUrlGerada('');
-    }
-    setCopiado(false);
-  }, [canal, tipoAnuncio, programa, cl, campanha]);
+            const url = `${process.env.NEXT_PUBLIC_URL_DIRECIONADA}/${rota}/?utm_source=${encodeURIComponent(
+                slugify(canal)
+            )}&utm_medium=${encodeURIComponent(
+                slugify(tipoAnuncio)
+            )}&utm_campaign=${encodeURIComponent(
+                slugify(campanha)
+            )}&utm_term=${encodeURIComponent(
+                escritorios.filter((e: any) => e.nome === cl.replace("AIESEC em", "").replace("AIESEC no", "").toUpperCase().trim())[0]?.sigla
+            )}&utm_content=${encodeURIComponent(siglaProduto.filter((e: any) => e.nome === programa)[0]?.sigla)}`;
 
-  const handleCopiar = async () => {
-    if (!urlGerada) return;
-    await navigator.clipboard.writeText(urlGerada);
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 3000);
-  };
+            setUrlGerada(url);
+        } else {
+            setUrlGerada('');
+        }
+        setCopiado(false);
+    }, [canal, tipoAnuncio, programa, cl, campanha]);
 
-  return (
-    <div className="min-h-screen bg-[#f3f4f6] flex flex-col justify-center items-center py-10 px-4">
-      {/* Card Principal */}
-      <main className="w-full max-w-3xl bg-white rounded-lg shadow-sm p-8 space-y-6 text-[#00204a] font-sans border border-gray-100">
-        
-        {/* Cabeçalho */}
-        <div className="text-center space-y-2 mb-6">
-          <h1 className="text-3xl font-bold text-[#007bff]">
-            Gerador de URL - AIESEC
-          </h1>
-          <p className="text-sm text-gray-600 font-medium">
-            Todos os links criados e compartilhados em QUALQUER meio devem ser gerados por aqui!
-          </p>
-        </div>
+    const handleCopiar = async () => {
+        if (!urlGerada) return;
+        await navigator.clipboard.writeText(urlGerada);
+        setCopiado(true);
+        setTimeout(() => setCopiado(false), 3000);
+    };
 
-        {/* Linha 1: Canal e Tipo de anúncio */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <InputAutoComplete
-              id="canal"
-              legenda="Canal"
-              valor={canal}
-              atualizar={(valor: string) => setCanal(valor)}
-              opcoes={listaOrigens}
-              obrigatorio={true}
-            />
-          </div>
+    return (
+        <div className="min-h-screen bg-[#f3f4f6] flex flex-col justify-center items-center py-2 px-4">
+            {/* Esqueleto de carregamento exibido enquanto metadados são buscados */}
+            <LoadSkeletonDinamico aberta={carregandoMetadados} layoutLinhas={[2, 2, 1]} />
+            {/* Card Principal */}
+            {!carregandoMetadados && ( 
+            <main className="w-full max-w-3xl bg-white rounded-lg shadow-sm p-8 space-y-6 text-[#00204a] font-sans border border-gray-100">
 
-          <div>
-            <InputAutoComplete
-              id="tipoAnuncio"
-              legenda="Tipo de Anuncio"
-              valor={tipoAnuncio}
-              atualizar={(valor: string) => setTipoAnuncio(valor)}
-              opcoes={listaMeio}
-              obrigatorio={true}
-            />
-          </div>
-        </div>
+                {/* Cabeçalho */}
+                <div className="text-center space-y-2 mb-6">
+                    <h1 className="text-3xl font-bold text-[#007bff]">
+                        Gerador de URL - AIESEC
+                    </h1>
+                    <p className="text-sm text-gray-600 font-medium">
+                        Todos os links criados e compartilhados em QUALQUER meio devem ser gerados por aqui!
+                    </p>
+                </div>
 
-        {/* Linha 2: Programas e CL */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <InputAutoComplete
-              id="programas"
-              legenda="Programa"
-              valor={programa}
-              atualizar={(valor: string) => setPrograma(valor)}
-              opcoes={listaProdutos}
-              obrigatorio={true}
-            />
-          </div>
+                {/* Linha 1: Canal e Tipo de anúncio */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <InputAutoComplete
+                            id="canal"
+                            legenda="Canal"
+                            valor={canal}
+                            atualizar={(valor: string) => setCanal(valor)}
+                            opcoes={listaOrigens}
+                            obrigatorio={true}
+                        />
+                    </div>
 
-          <div>
-            <InputAutoComplete
-              id="cl"
-              legenda="Escritorio"
-              valor={cl}
-              atualizar={(valor: string) => setCl(valor)}
-              opcoes={listaEscritorios}
-              obrigatorio={true}
-            />
-          </div>
-        </div>
+                    <div>
+                        <InputAutoComplete
+                            id="tipoAnuncio"
+                            legenda="Tipo de Anuncio"
+                            valor={tipoAnuncio}
+                            atualizar={(valor: string) => setTipoAnuncio(valor)}
+                            opcoes={listaMeio}
+                            obrigatorio={true}
+                        />
+                    </div>
+                </div>
 
-        {/* Linha 3: Campanha */}
-        <div>
-          <InputTexto
-            id="Tag"
-            legenda="Tag"
-            valor={campanha}
-            atualizar={(e: React.ChangeEvent<HTMLInputElement> | string) => {
-              const val = typeof e === 'string' ? e : e.target.value;
-              setCampanha(val);
-            }}
-            obrigatorio={true}
-          />
-        </div>
+                {/* Linha 2: Programas e CL */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <InputAutoComplete
+                            id="programas"
+                            legenda="Programa"
+                            valor={programa}
+                            atualizar={(valor: string) => setPrograma(valor)}
+                            opcoes={listaProdutos}
+                            obrigatorio={true}
+                        />
+                    </div>
 
-        {/* Informativo de geração automática */}
-        {!urlGerada && (
-          <p className="text-xs text-gray-500 text-center italic pt-2">
-            A URL será gerada automaticamente assim que todos os campos forem preenchidos.
-          </p>
-        )}
+                    <div>
+                        <InputAutoComplete
+                            id="cl"
+                            legenda="Escritorio"
+                            valor={cl}
+                            atualizar={(valor: string) => setCl(valor)}
+                            opcoes={listaEscritorios}
+                            obrigatorio={true}
+                        />
+                    </div>
+                </div>
 
-        {/* Exibição da URL Gerada */}
-        {urlGerada && (
-          <div className="pt-4 space-y-4">
-            <div className="flex items-center gap-3">
-              <label className="font-bold text-[#00204a] text-sm whitespace-nowrap">
-                Url Gerada:
-              </label>
+                {/* Linha 3: Campanha */}
+                <div>
+                    <InputTexto
+                        id="Tag"
+                        legenda="Tag"
+                        valor={campanha}
+                        atualizar={(e: React.ChangeEvent<HTMLInputElement> | string) => {
+                            const val = typeof e === 'string' ? e : e.target.value;
+                            setCampanha(val);
+                        }}
+                        obrigatorio={true}
+                    />
+                </div>
 
-              <input
-                type="text"
-                readOnly
-                value={urlGerada}
-                className="w-full bg-[#e8f0fe] border border-[#d0e1fd] text-[#00204a] px-3 py-2 rounded-md font-mono text-sm focus:outline-none"
-              />
+                {/* Informativo de geração automática */}
+                {!urlGerada && (
+                    <p className="text-xs text-gray-500 text-center italic pt-2">
+                        A URL será gerada automaticamente assim que todos os campos forem preenchidos.
+                    </p>
+                )}
 
-              <button
-                onClick={handleCopiar}
-                className="bg-[#6c757d] hover:bg-[#5a6268] text-white font-medium px-5 py-2 rounded-md transition-colors cursor-pointer text-sm"
-              >
-                Copiar
-              </button>
-            </div>
+                {/* Exibição da URL Gerada */}
+                {urlGerada && (
+                    <div className="pt-4 space-y-4">
+                        <div className="flex items-center gap-3">
+                            <label className="font-bold text-[#00204a] text-sm whitespace-nowrap">
+                                Url Gerada:
+                            </label>
 
-            {/* Mensagem de sucesso */}
-            {copiado && (
-              <div className="flex items-center justify-center gap-2 text-[#00d2d3] font-semibold text-base pt-2">
-                <span className="w-5 h-5 bg-[#00d2d3] text-white rounded flex items-center justify-center text-xs font-bold">
-                  ✓
-                </span>
-                URL copiada com sucesso!
-              </div>
+                            <input
+                                type="text"
+                                readOnly
+                                value={urlGerada}
+                                className="w-full bg-[#e8f0fe] border border-[#d0e1fd] text-[#00204a] px-3 py-2 rounded-md font-mono text-sm focus:outline-none"
+                            />
+
+                            <button
+                                onClick={handleCopiar}
+                                className="bg-[#6c757d] hover:bg-[#5a6268] text-white font-medium px-5 py-2 rounded-md transition-colors cursor-pointer text-sm"
+                            >
+                                Copiar
+                            </button>
+                        </div>
+
+                        {/* Mensagem de sucesso */}
+                        {copiado && (
+                            <div className="flex items-center justify-center gap-2 text-[#00d2d3] font-semibold text-base pt-2">
+                                <span className="w-5 h-5 bg-[#00d2d3] text-white rounded flex items-center justify-center text-xs font-bold">
+                                    ✓
+                                </span>
+                                URL copiada com sucesso!
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Rodapé Interno */}
+                <footer className="text-center text-gray-500 text-sm pt-8">
+                    © AIESEC no Brasil(2025-2026)
+                </footer>
+            </main>
             )}
-          </div>
-        )}
-
-        {/* Rodapé Interno */}
-        <footer className="text-center text-gray-500 text-sm pt-8">
-          © AIESEC no Brasil(2025-2026)
-        </footer>
-      </main>
-    </div>
-  );
+            <ModalErroGenerico
+                aberta={modals.modalErroConexaoAberta}
+                tipo={modals.tipoErroConexao}
+                aoTentarNovamente={() => window.parent.location.reload()}
+            />
+        </div>
+    );
 }

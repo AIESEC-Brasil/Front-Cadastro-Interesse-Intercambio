@@ -55,13 +55,12 @@ const InputAutoComplete: React.FC<AutoCompleteProps> = ({
     };
 
     return (
-        <div 
-            className={`${styles.inputGroup} ${error ? styles.hasError : ''} relative w-full`} 
+        <div
+            className={`${styles.inputGroup} ${error ? styles.hasError : ''} relative w-full`}
             ref={containerRef}
         >
-            <div className={`relative flex items-center w-full rounded-xl border bg-white transition-all ${
-                error ? 'border-red-500 focus-within:ring-2 focus-within:ring-red-200' : 'border-zinc-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100'
-            }`}>
+            <div className={`relative flex items-center w-full rounded-xl border bg-white transition-all ${error ? 'border-red-500 focus-within:ring-2 focus-within:ring-red-200' : 'border-zinc-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100'
+                }`}>
                 {/* Campo de entrada de texto */}
                 <input
                     id={id}
@@ -88,11 +87,11 @@ const InputAutoComplete: React.FC<AutoCompleteProps> = ({
                 </label>
 
                 {/* Ícone ChevronDown posicionado ao lado direito */}
-                <ChevronDown 
-                    size={18} 
-                    className={`absolute right-4 text-gray-500 transition-transform pointer-events-none ${ativo ? 'rotate-180' : ''}`} 
+                <ChevronDown
+                    size={18}
+                    className={`absolute right-4 text-gray-500 transition-transform pointer-events-none ${ativo ? 'rotate-180' : ''}`}
                 />
-                
+
             </div>
 
             {/* Lista de opções do Autocomplete (exibe tudo ao focar/clicar, filtrando conforme digita) */}

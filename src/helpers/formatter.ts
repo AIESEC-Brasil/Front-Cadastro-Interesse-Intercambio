@@ -85,9 +85,22 @@ const removerMascaraData = (valor: string): string => {
     return `${ano}-${mes}-${dia}`;
 };
 
+const slugify = (texto:string) => {
+        return texto
+            .toLowerCase()                       // tudo minúsculo
+            .normalize("NFD")                    // separa letras dos acentos
+            .replace(/[\u0300-\u036f]/g, "")     // remove acentos
+            .replace(/\s+/g, "-")                // substitui espaços por hífen
+            .replace(/[^a-z0-9-/]/g, "")         // mantém letras, números, hífen e barra
+            .replace(/-+/g, "-")                 // evita múltiplos hífens
+            .replace(/\/+/g, "/")                // evita múltiplas barras
+            .replace(/^[-/]+|[-/]+$/g, "");      // remove hífens ou barras no início/fim
+    }
+
 export {
     aplicarMascaraTelefone,
     removerMascaraTelefone,
     aplicarMascaraData,
-    removerMascaraData
+    removerMascaraData,
+    slugify
 };

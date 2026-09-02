@@ -103,7 +103,7 @@ const nextConfig: NextConfig = {
       // 2. Liberação de Iframe (CSP) unificada para as 4 rotas da AIESEC
       // -------------------------------------------------------------------
       {
-        source: "/(voluntario-global|talento-global|professor-global|programas-intercambio)",
+        source: "/(voluntario-global|talento-global|professor-global|urlbuilder)",
         headers: [
           {
             key: "Content-Security-Policy",
@@ -116,7 +116,7 @@ const nextConfig: NextConfig = {
       // 3. Regra de proteção geral: Bloqueia iframe em TODAS as outras rotas
       // -------------------------------------------------------------------
       {
-        source: "/((?!voluntario-global|talento-global|professor-global|programas-intercambio).*)",
+        source: "/((?!voluntario-global|talento-global|professor-global|urlbuilder).*)",
         headers: [
           {
             key: "Content-Security-Policy",

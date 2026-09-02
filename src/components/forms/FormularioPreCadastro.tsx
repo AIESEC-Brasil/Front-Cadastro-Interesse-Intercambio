@@ -35,7 +35,7 @@ import type { FormularioProps } from '../../types/componentes';
  * A universidade e o comitê são alternativas, e o produto só é exibido
  * manualmente para a rota de talento quando não houve pré-seleção automática.
  */
-const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
+const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
     const {
         nome, setNome,
         sobrenome, setSobrenome,
@@ -49,17 +49,17 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
         universidadeSelecionada,
         escritorioSelecionado,
         termoLGPD, setTermoLGPD,
-        
+
         isOpen, setIsOpen,
         listaProdutos, listaOrigens, listaUniversidades, listaEscritorios,
         opcoesEmail, opcoesTelefone, tituloTermoLGPD, descricaoTermoLGPD,
-        
+
         carregandoMetadados, carregandoEnvio,
         modalErroAberta, setModalErroAberta,
-        modalErroConexaoAberta,modalConflitoAberta,setModalConflitoAberta,
+        modalErroConexaoAberta, modalConflitoAberta, setModalConflitoAberta,
         modalSucessoAberta, setModalSucessoAberta,
         modalSucessoCadastroAberta,
-        tipoErroConexao, errosJson, dadosResumo,dataConflito,
+        tipoErroConexao, errosJson, dadosResumo, dataConflito,
 
         erroNome, erroSobrenome, erroSenha, erroDataNascimento,
         erroEmail, erroTelefone, erroProduto, erroOrigem,
@@ -69,10 +69,10 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
         handleAdicionarEmail, handleRemoverEmail, handleAtualizarTipoEmail, handleAtualizarValorEmail,
         handleAdicionarTelefone, handleRemoverTelefone, handleAtualizarTipoTelefone, handleAtualizarValorTelefone,
         handleSelecionarProduto, handleLimparProduto, handleSelecionarUniversidade,
-        handleAlternarUniversidade, handleSelecionarEscritorio, handleSelecionarOrigem,fecharModalSucessoCadastro,
+        handleAlternarUniversidade, handleSelecionarEscritorio, handleSelecionarOrigem, fecharModalSucessoCadastro,
         realizarPreCadastro
-    } = useFormularioPreCadastro(rota, state,step);
-    
+    } = useFormularioPreCadastro(rota, state, step);
+
     return (
         <div className="relative">
             {/* Esqueleto de carregamento exibido enquanto metadados são buscados */}
@@ -81,68 +81,68 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
             {!carregandoMetadados && (
                 <div id="meuForm" className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <InputTexto 
-                            id="nome" 
-                            legenda="Nome" 
-                            valor={nome} 
+                        <InputTexto
+                            id="nome"
+                            legenda="Nome"
+                            valor={nome}
                             atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setNome(e.target.value)}
-                            error={erroNome} 
-                            obrigatorio 
+                            error={erroNome}
+                            obrigatorio
                         />
-                        <InputTexto 
-                            id="sobrenome" 
-                            legenda="Sobrenome" 
-                            valor={sobrenome} 
+                        <InputTexto
+                            id="sobrenome"
+                            legenda="Sobrenome"
+                            valor={sobrenome}
                             atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setSobrenome(e.target.value)}
-                            error={erroSobrenome} 
-                            obrigatorio 
+                            error={erroSobrenome}
+                            obrigatorio
                         />
                     </div>
 
-                    <InputSenha 
-                        id="senha" 
-                        legenda="Definir senha" 
-                        valor={senha} 
+                    <InputSenha
+                        id="senha"
+                        legenda="Definir senha"
+                        valor={senha}
                         atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setSenha(e.target.value)}
-                        error={erroSenha} 
-                        obrigatorio 
+                        error={erroSenha}
+                        obrigatorio
                     />
 
-                    <InputData 
-                        id="dataNascimento" 
-                        legenda="Data de Nascimento" 
-                        valor={dataNascimento} 
+                    <InputData
+                        id="dataNascimento"
+                        legenda="Data de Nascimento"
+                        valor={dataNascimento}
                         atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setDataNascimento(e.target.value)}
-                        error={erroDataNascimento} 
-                        obrigatorio 
+                        error={erroDataNascimento}
+                        obrigatorio
                     />
 
-                    <InputDinamico 
-                        placeholderInput="E-mail" 
-                        tituloLabel="Email" 
-                        tipoInput="email" 
-                        itens={emails} 
-                        opcoesTipo={opcoesEmail} 
+                    <InputDinamico
+                        placeholderInput="E-mail"
+                        tituloLabel="Email"
+                        tipoInput="email"
+                        itens={emails}
+                        opcoesTipo={opcoesEmail}
                         aoAdicionar={handleAdicionarEmail}
                         aoRemover={handleRemoverEmail}
                         aoAtualizarTipo={handleAtualizarTipoEmail}
                         aoAtualizarValor={handleAtualizarValorEmail}
-                        erros={erroEmail} 
-                        obrigatorio 
+                        erros={erroEmail}
+                        obrigatorio
                     />
 
-                    <InputDinamico 
-                        placeholderInput="(99) 9 9999-9999" 
-                        tituloLabel="Telefone" 
-                        tipoInput="tel" 
-                        itens={telefones} 
-                        opcoesTipo={opcoesTelefone} 
+                    <InputDinamico
+                        placeholderInput="(99) 9 9999-9999"
+                        tituloLabel="Telefone"
+                        tipoInput="tel"
+                        itens={telefones}
+                        opcoesTipo={opcoesTelefone}
                         aoAdicionar={handleAdicionarTelefone}
                         aoRemover={handleRemoverTelefone}
                         aoAtualizarTipo={handleAtualizarTipoTelefone}
                         aoAtualizarValor={handleAtualizarValorTelefone}
-                        erros={erroTelefone} 
-                        obrigatorio 
+                        erros={erroTelefone}
+                        obrigatorio
                     />
 
                     {/* Seleção de Produto */}
@@ -151,12 +151,11 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
                             <label className="text-sm font-medium text-gray-700">
                                 Produto <span className="text-red-500">*</span>
                             </label>
-                            
+
                             <div
                                 onClick={() => setIsOpen(!isOpen)}
-                                className={`w-full p-2.5 border rounded-lg bg-white text-gray-900 cursor-pointer flex justify-between items-center ${
-                                    erroProduto ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-blue-200'
-                                }`}
+                                className={`w-full p-2.5 border rounded-lg bg-white text-gray-900 cursor-pointer flex justify-between items-center ${erroProduto ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-blue-200'
+                                    }`}
                             >
                                 <span>{produtoSelecionado || "Selecione"}</span>
                                 <ChevronDown size={18} className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -188,11 +187,11 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
 
                     {/* Divisão de Mercado: Universidade ou Escritório */}
                     <div className="flex flex-col">
-                        <InputAutoComplete 
+                        <InputAutoComplete
                             id="universidade"
-                            legenda="Qual sua Universidade?" 
-                            opcoes={listaUniversidades} 
-                            valor={universidadeSelecionada} 
+                            legenda="Qual sua Universidade?"
+                            opcoes={listaUniversidades}
+                            valor={universidadeSelecionada}
                             atualizar={handleSelecionarUniversidade}
                             error={erroUniversidade}
                             desabilitado={marcarSemUniversidade}
@@ -200,10 +199,10 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
                         />
 
                         <div className="flex items-center gap-2 mt-2">
-                            <input 
-                                type="checkbox" 
-                                id="semUniversidade" 
-                                checked={marcarSemUniversidade} 
+                            <input
+                                type="checkbox"
+                                id="semUniversidade"
+                                checked={marcarSemUniversidade}
                                 onChange={(e) => handleAlternarUniversidade(e.target.checked)}
                             />
                             <label htmlFor="semUniversidade" className="text-base cursor-pointer select-none text-blue-900">
@@ -213,11 +212,11 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
 
                         {marcarSemUniversidade && (
                             <div className="flex flex-col gap-2 mt-7">
-                                <InputAutoComplete 
+                                <InputAutoComplete
                                     id="escritorio"
-                                    legenda="Qual AIESEC mais próxima?" 
-                                    opcoes={listaEscritorios} 
-                                    valor={escritorioSelecionado} 
+                                    legenda="Qual AIESEC mais próxima?"
+                                    opcoes={listaEscritorios}
+                                    valor={escritorioSelecionado}
                                     atualizar={handleSelecionarEscritorio}
                                     error={erroEscritorio}
                                     obrigatorio={marcarSemUniversidade}
@@ -228,11 +227,11 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
 
                     {/* Origem */}
                     <div className="flex flex-col">
-                        <InputAutoComplete 
+                        <InputAutoComplete
                             id="origem"
-                            legenda="Como conheceu a AIESEC?" 
-                            opcoes={listaOrigens} 
-                            valor={origemSelecionada} 
+                            legenda="Como conheceu a AIESEC?"
+                            opcoes={listaOrigens}
+                            valor={origemSelecionada}
                             atualizar={handleSelecionarOrigem}
                             error={erroOrigem}
                             obrigatorio
@@ -242,11 +241,11 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
                     {/* Termo LGPD */}
                     <div className="flex flex-col">
                         <div className="flex items-start gap-2">
-                            <input 
-                                type="checkbox" 
-                                id="termoLGPD" 
-                                checked={termoLGPD} 
-                                onChange={(e) => setTermoLGPD(e.target.checked)} 
+                            <input
+                                type="checkbox"
+                                id="termoLGPD"
+                                checked={termoLGPD}
+                                onChange={(e) => setTermoLGPD(e.target.checked)}
                                 className="mt-1"
                             />
                             <div className="flex flex-col">
@@ -263,10 +262,10 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
                         {erroTermoLGPD && <span className="min-h-4 text-xs text-red-500 mt-0.5">{erroTermoLGPD}</span>}
                     </div>
 
-                    <ButtonConfirmar 
-                        texto="Continuar" 
-                        aoClicar={validarEProcessar} 
-                        type="button" 
+                    <ButtonConfirmar
+                        texto="Continuar"
+                        aoClicar={validarEProcessar}
+                        type="button"
                     />
                 </div>
             )}
@@ -274,35 +273,35 @@ const FormularioPreCadastro = ({ rota, state,step }: FormularioProps) => {
             {/* Modais e Loaders */}
             <LoadSpinner aberta={carregandoEnvio} />
 
-            <ModalErro 
-                aberta={modalErroAberta} 
-                titulo="Dados incorretos." 
-                erros={errosJson} 
-                aoFechar={() => setModalErroAberta(false)} 
+            <ModalErro
+                aberta={modalErroAberta}
+                titulo="Dados incorretos."
+                erros={errosJson}
+                aoFechar={() => setModalErroAberta(false)}
             />
 
-            <ModalSucesso 
-                aberta={modalSucessoAberta} 
-                titulo="Confirme" 
-                resumoDados={dadosResumo} 
-                aoConfirmar={realizarPreCadastro} 
-                aoEditar={() => setModalSucessoAberta(false)} 
+            <ModalSucesso
+                aberta={modalSucessoAberta}
+                titulo="Confirme"
+                resumoDados={dadosResumo}
+                aoConfirmar={realizarPreCadastro}
+                aoEditar={() => setModalSucessoAberta(false)}
             />
 
-            <ModalSucessoCadastro 
+            <ModalSucessoCadastro
                 aberta={modalSucessoCadastroAberta}
                 senha={senha}
                 emailReferencia={emails[0]?.valor || ''}
                 aoConcluir={fecharModalSucessoCadastro}
             />
 
-            <ModalErroConexao 
-                aberta={modalErroConexaoAberta} 
+            <ModalErroConexao
+                aberta={modalErroConexaoAberta}
                 tipo={tipoErroConexao}
-                aoTentarNovamente={() => window.parent.location.reload()} 
+                aoTentarNovamente={() => window.parent.location.reload()}
             />
 
-            <ModalConflito aberta={modalConflitoAberta} dadosErro={dataConflito} aoFechar={() => {setModalConflitoAberta(false)}}/>
+            <ModalConflito aberta={modalConflitoAberta} dadosErro={dataConflito} aoFechar={() => { setModalConflitoAberta(false) }} />
         </div>
     );
 };
