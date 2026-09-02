@@ -13,7 +13,7 @@ import type { NextConfig } from "next";
  * e em qualquer domínio ou subdomínio pertencente a aiesec.org.br.
  */
 const AIESEC_FRAME_ANCESTORS =
-  "frame-ancestors 'self' https://aiesec.org.br https://*.aiesec.org.br http://localhost:8000 https://encapsula-frame.pages.dev;";
+  "frame-ancestors 'self' https://aiesec.org.br https://*.aiesec.org.br http://localhost:8000 https://encapsula-frame.pages.dev https://amused-martin-sacred.ngrok-free.app;";
 
 const nextConfig: NextConfig = {
   // Esta configuração é lida pelo servidor Next.js durante build e execução;
@@ -103,7 +103,7 @@ const nextConfig: NextConfig = {
       // 2. Liberação de Iframe (CSP) unificada para as 4 rotas da AIESEC
       // -------------------------------------------------------------------
       {
-        source: "/(voluntario-global|talento-global|professor-global|urlbuilder)",
+        source: "/:path(voluntario-global|talento-global|professor-global|urlbuilder)",
         headers: [
           {
             key: "Content-Security-Policy",
@@ -116,7 +116,7 @@ const nextConfig: NextConfig = {
       // 3. Regra de proteção geral: Bloqueia iframe em TODAS as outras rotas
       // -------------------------------------------------------------------
       {
-        source: "/((?!voluntario-global|talento-global|professor-global|urlbuilder).*)",
+        source: "/((?!voluntario-global|talento-global|professor-global|urlbuilder$).*)",
         headers: [
           {
             key: "Content-Security-Policy",
