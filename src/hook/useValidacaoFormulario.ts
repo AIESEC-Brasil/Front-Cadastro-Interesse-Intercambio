@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { validarTexto, validarSenha, validarEmail, validarTelefone, validarData } from '../utils/validates';
+import { params } from '@/types/componentes';
 
 /**
  * Centraliza as mensagens de validação das duas etapas.
@@ -10,7 +11,7 @@ import { validarTexto, validarSenha, validarEmail, validarTelefone, validarData 
  * quando alguém começou a preenchê-los, mas ainda não escolheu uma opção válida
  * com ID correspondente.
  */
-export function useValidacaoFormulario(fields: any, step: number) {
+export function useValidacaoFormulario(fields: any, step: number, params?:params) {
     const [erroNome, setErroNome] = useState<string>('');
     const [erroSobrenome, setErroSobrenome] = useState<string>('');
     const [erroSenha, setErroSenha] = useState<string[]>([]);
@@ -219,8 +220,8 @@ export function useValidacaoFormulario(fields: any, step: number) {
         const errsT = step === 1 ? validarTelefone(fields.telefones.map((i: any) => i.valor)) : [];
         const errProd = step === 1 && !fields.idProduto ? 'Campo obrigatório.' : '';
         const errOrigem = step === 1 && !fields.idOrigem ? 'Campo obrigatório.' : '';
-        const errUni = step === 1 && !fields.marcarSemUniversidade && !fields.idUniversidade ? 'Campo obrigatório.' : '';
-        const errEsc = step === 1 && fields.marcarSemUniversidade && !fields.idEscritorio ? 'Campo obrigatório.' : '';
+        const errUni = step === 1 && !params?.utm_term && !fields.marcarSemUniversidade && !fields.idUniversidade ? 'Campo obrigatório.' : '';
+        const errEsc = step === 1 && !params?.utm_term && fields.marcarSemUniversidade && !fields.idEscritorio ? 'Campo obrigatório.' : '';
         const errLGPD = step === 1 && !fields.termoLGPD ? 'Campo obrigatório.' : '';
        
         // Step 2 Opcional: Só valida se tem algo preenchido/selecionado mas falta o ID correspondente

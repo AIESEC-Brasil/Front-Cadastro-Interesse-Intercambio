@@ -2,31 +2,52 @@
 
 /**
  * @file ProgramasIntercambio.tsx
- * @description Página de fluxo de cadastro para Voluntário Global.
+ * @description Página de fluxo de cadastro para Programas de Intercâmbio.
  */
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 import FormularioPreCadastro from "@components/forms/FormularioPreCadastro";
+import FormularioPreCadastroParams from "@components/forms/FormularioPreCadastroParams";
 import FormularioQualificao from "@components/forms/FormularioQualificao";
 
+interface ProgramasIntercambioProps {
+    req?: { 
+        path: string 
+    };
+}
+
 /**
- * Componente da página de Voluntário Global.
- * @param {Object} props 
- * @param {Object} props.req - Objeto da requisição.
+ * Controla o fluxo de duas etapas do cadastro.
+ * Se houver parâmetros de query na URL durante o Step 1, renderiza o formulário preparado para parâmetros.
+ * 
+ * @param {ProgramasIntercambioProps} props Props do componente.
+ * @returns {JSX.Element} Componente da página de programas de intercâmbio.
  */
-/**
- * Controla o fluxo de duas etapas. As rewrites preservam o programa na URL;
- * `pathname` é repassado aos formulários para que cada hook aplique suas regras.
- */
-const ProgramasIntercambio = ({ req }: { req: { path: string } }) => {
-    const [step, setStep] = useState(1);
+const ProgramasIntercambio: React.FC<ProgramasIntercambioProps> = () => {
+    const [step, setStep] = useState<number>(1);
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const totalSteps = 2;
 
+    // Converte os parâmetros da URL diretamente para o tipo esperado
+    const paramsObjeto = Object.fromEntries(searchParams.entries()) as {
+        utm_source: string;
+        utm_medium: string;
+        utm_campaign: string;
+        utm_term: string;
+        utm_content: string;
+    };
+
+    // Normaliza o caminho removendo a barra inicial
+    const rotaFormatada = pathname?.replace(/^\//, '') || '';
+
+    // Verifica se existem parâmetros de query na URL (ex: ?utm_source=xyz)
+    const temParametrosUrl = searchParams ? searchParams.toString().length > 0 : false;
+    
     return (
         <main>
             <div className="w-full max-w-4xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-xl">
-                {/* Indicador de Etapas */}
+                {/* Indicador Visual de Etapas */}
                 <div className="flex items-center justify-center mb-8 px-4">
                     {Array.from({ length: totalSteps }, (_, index) => {
                         const stepNumber = index + 1;
@@ -60,23 +81,31 @@ const ProgramasIntercambio = ({ req }: { req: { path: string } }) => {
                     })}
                 </div>
 
-                {/* Renderização condicional: rota é o req.path puro, state é o setStep */}
+                {/* STEP 1: Renderização condicional baseada na presença de parâmetros na URL */}
                 {step === 1 && (
-                    <FormularioPreCadastro 
-                        rota={pathname?.replace(/^\//, '')} 
+                    temParametrosUrl ? (
+                        <FormularioPreCadastroParams 
+                            rota={rotaFormatada} 
+                            state={setStep} 
+                            step={step}
+                            params={paramsObjeto}
+                        />
+                    ) : (
+                        <FormularioPreCadastro 
+                            rota={rotaFormatada} 
+                            state={setStep} 
+                            step={step}
+                        />
+                    )
+                )}
+                
+                {/* STEP 2: Continua inalterado */}
+                {step === 2 && (
+                    <FormularioQualificao
+                        rota={rotaFormatada} 
                         state={setStep} 
                         step={step}
                     />
-                )}
-                
-                {step === 2 && (
-                    
-                <FormularioQualificao
-                    rota={pathname?.replace(/^\//, '')} 
-                    state={setStep} 
-                    step={step}
-                />
-                    
                 )}
             </div>
         </main>
