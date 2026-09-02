@@ -28,7 +28,7 @@ import { useModaisFormulario } from '@/hook/useModaisFormulario';
  * 
  * @returns {JSX.Element} Elemento React representando o formulário e resultado da URL.
  */
-export default function GeradorUrlPage(): JSX.Element {
+export default function GeradorUrlPage() {
     // --- ESTADOS DO FORMULÁRIO ---
     /** @type {[string, React.Dispatch<React.SetStateAction<string>>]} Estado do campo Canal (utm_source) */
     const [canal, setCanal] = useState<string>('');
@@ -97,12 +97,12 @@ export default function GeradorUrlPage(): JSX.Element {
 
             // Busca a sigla do escritório no dicionário
             const siglaEscritorio: string = escritorios.filter(
-                (e: ItemEscritorio) => e.nome === nomeEscritorioLimpo
+                (e: any) => e.nome === nomeEscritorioLimpo
             )[0]?.sigla || '';
 
             // Busca a sigla do produto/programa no dicionário
             const siglaProdutoEncontrada: string = siglaProduto.filter(
-                (e: ItemSigla) => e.nome === programa
+                (e: any) => e.nome === programa
             )[0]?.sigla || '';
 
             // Tratamento da variável de ambiente para evitar barras duplas na montagem da URL base
