@@ -64,6 +64,18 @@ export default function GeradorUrlPage() {
         { sigla: "MC", nome: "BRASIL" }
     ];
 
+    function slugify(texto) {
+        return texto
+            .toLowerCase()                       // tudo minúsculo
+            .normalize("NFD")                    // separa letras dos acentos
+            .replace(/[\u0300-\u036f]/g, "")     // remove acentos
+            .replace(/\s+/g, "-")                // substitui espaços por hífen
+            .replace(/[^a-z0-9-/]/g, "")         // mantém letras, números, hífen e barra
+            .replace(/-+/g, "-")                 // evita múltiplos hífens
+            .replace(/\/+/g, "/")                // evita múltiplas barras
+            .replace(/^[-/]+|[-/]+$/g, "");      // remove hífens ou barras no início/fim
+    }
+
     // Gera a URL automaticamente apenas quando TODOS os campos forem preenchidos
     useEffect(() => {
         const todosPreenchidos =
@@ -85,10 +97,12 @@ export default function GeradorUrlPage() {
             }
 
             const url = `https://aiesec.org.br/${rota}/?utm_source=${encodeURIComponent(
-                canal
+                slugify(canal)
             )}&utm_medium=${encodeURIComponent(
-                tipoAnuncio
-            )}&utm_campaign=${encodeURIComponent(campanha)}&utm_term=${encodeURIComponent(
+                slugify(tipoAnuncio)
+            )}&utm_campaign=${encodeURIComponent(
+                slugify(campanha)
+            )}&utm_term=${encodeURIComponent(
                 escritorios.filter((e: any) => e.nome === cl.replace("AIESEC em", "").replace("AIESEC no", "").toUpperCase().trim())[0]?.sigla
             )}&utm_content=${encodeURIComponent(siglaProduto.filter((e: any) => e.nome === programa)[0]?.sigla)}`;
 
