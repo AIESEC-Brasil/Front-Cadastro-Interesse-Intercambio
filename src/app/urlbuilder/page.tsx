@@ -116,9 +116,9 @@ export default function GeradorUrlPage() {
             )}&utm_campaign=${encodeURIComponent(
                 slugify(campanha)
             )}&utm_term=${encodeURIComponent(
-                siglaEscritorio
+                siglaEscritorio.toLowerCase()
             )}&utm_content=${encodeURIComponent(
-                siglaProdutoEncontrada
+                siglaProdutoEncontrada.toLowerCase()
             )}`;
 
             setUrlGerada(url);

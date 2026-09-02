@@ -200,7 +200,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             console.warn("Tentativa de envio chamada sem o objeto 'fields' preenchido.");
             return null;
         }
-
+        modals.setCarregandoEnvio(true);
         const nome = fields.nome;
         const sobrenome = fields.sobrenome;
         const senha = fields.senha;
@@ -222,6 +222,11 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             id: fields.idOrigem,
             nome: fields.origemSelecionada,
         };
+
+        const meio = {
+            id: fields.idMeio,
+            nome: fields.meioSelecionado,
+        }
 
         const produto: any = {
             id_podio: fields.idProduto,
@@ -255,6 +260,10 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 jsonPreCadastro.comite = comite;
             } else {
                 jsonPreCadastro.universidade = universidade;
+            }
+
+            if (fields.meioSelecionado){
+                jsonPreCadastro.meio = meio;
             }
 
             try {

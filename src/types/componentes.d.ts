@@ -1,10 +1,19 @@
 import type { ManipuladorMudancaArquivo, OpcaoMetadados, ManipuladorSelecaoMetadados, ManipuladorMudancaEtapa, ManipuladorMudancaEntradaTexto, OpcaoTraduzida } from './comum';
 import type { ErrosCampos, ResumoFormulario } from './formulario';
 
+export interface params {
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_term: string;
+  utm_content: string;
+}
+
 export interface FormularioProps {
   rota: string;
   state: ManipuladorMudancaEtapa;
   step: number;
+  params?: params
 }
 
 export interface LoadSkeletonProps {

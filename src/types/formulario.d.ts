@@ -14,6 +14,8 @@ export interface EstadoCamposFormulario {
   idProduto: IdEntidadeSemDefinir;
   origemSelecionada: string;
   idOrigem: IdEntidadeSemDefinir;
+  meioSelecionado:IdEntidadeSemDefinir;
+  idMeio:IdEntidadeSemDefinir;
   marcarSemUniversidade: boolean;
   universidadeSelecionada: string;
   idUniversidade: IdEntidadeSemDefinir;

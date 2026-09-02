@@ -21,6 +21,8 @@ let estadoGlobalFormulario: EstadoCamposFormulario = {
     idProduto: '' as number | string,
     origemSelecionada: '',
     idOrigem: '' as number | string,
+    meioSelecionado:'',
+    idMeio:'' as number | string,
     marcarSemUniversidade: false,
     universidadeSelecionada: '',
     idUniversidade: '' as number | string,
@@ -98,6 +100,8 @@ export function useCamposFormulario() {
                 idProduto: '' as number | string,
                 origemSelecionada: '',
                 idOrigem: '' as number | string,
+                meioSelecionado: '',
+                idMeio: '' as number | string,
                 marcarSemUniversidade: false,
                 universidadeSelecionada: '',
                 idUniversidade: '' as number | string,
@@ -182,6 +186,16 @@ export function useCamposFormulario() {
         idOrigem: estadoGlobalFormulario.idOrigem, 
         setIdOrigem: (v: number | string) => {
             estadoGlobalFormulario.idOrigem = v;
+            notificarListeners();
+        },
+        meioSelecionado: estadoGlobalFormulario.meioSelecionado, 
+        setMeioSelecionado: (v: string) => {
+            estadoGlobalFormulario.meioSelecionado = v;
+            notificarListeners();
+        },
+        idMeio: estadoGlobalFormulario.idMeio, 
+        setIdMeio: (v: number | string) => {
+            estadoGlobalFormulario.idMeio = v;
             notificarListeners();
         },
         marcarSemUniversidade: estadoGlobalFormulario.marcarSemUniversidade, 
