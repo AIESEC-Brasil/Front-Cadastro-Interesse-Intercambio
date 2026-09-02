@@ -1,6 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
+import { slugify } from '@/helpers/formatter';
+import { siglaProduto, escritorios } from '@/helpers/dicionario';
+
 import InputTexto from '@/components/ui/input/InputTexto';
 import InputAutoComplete from '@/components/ui/input/InputAutoComplete';
 
@@ -25,57 +29,6 @@ export default function GeradorUrlPage() {
         listaMeio, listaOrigens, listaEscritorios, listaProdutos, carregandoMetadados
     } = useDadosFormulario({ modals });
 
-    // Estruturas de produto com sigla e nome por extenso para facilitar matching.
-    //Formato dos itens: { sigla: 'gv', nome: 'Voluntário Globa' }
-    const siglaProduto: Array<{ sigla: string, nome: string }> = [
-        { sigla: 'gv', nome: 'Voluntário Global' },
-        { sigla: 'gtast', nome: 'Talento Global Short Term' },
-        { sigla: 'gtalt', nome: 'Talento Global Mid e Long Term' },
-        { sigla: 'gte', nome: 'Professor Global' }
-    ];
-    // Estruturas de escritórios (CLs) com sigla e nome por extenso para facilitar matching.
-    //Formato dos itens: { sigla: 'AB', nome: 'ABC' } 
-    const escritorios: Array<{ sigla: string, nome: string }> = [
-        { sigla: "AB", nome: "ABC" },
-        { sigla: "AJ", nome: "ARACAJU" },
-        { sigla: "BA", nome: "BAURU" },
-        { sigla: "BH", nome: "BELO HORIZONTE" },
-        { sigla: "BS", nome: "BRASÍLIA" },
-        { sigla: "CT", nome: "CURITIBA" },
-        { sigla: "FL", nome: "FLORIANÓPOLIS" },
-        { sigla: "FR", nome: "FRANCA" },
-        { sigla: "FO", nome: "FORTALEZA" },
-        { sigla: "JP", nome: "JOÃO PESSOA" },
-        { sigla: "LM", nome: "LIMEIRA" },
-        { sigla: "MZ", nome: "MACEIÓ" },
-        { sigla: "MN", nome: "MANAUS" },
-        { sigla: "MA", nome: "MARINGÁ" },
-        { sigla: "PA", nome: "PORTO ALEGRE" },
-        { sigla: "RC", nome: "RECIFE" },
-        { sigla: "RJ", nome: "RIO DE JANEIRO" },
-        { sigla: "SS", nome: "SALVADOR" },
-        { sigla: "SM", nome: "SANTA MARIA" },
-        { sigla: "GV", nome: "GETÚLIO VARGAS" },
-        { sigla: "MK", nome: "MACKENZIE" },
-        { sigla: "US", nome: "USP" },
-        { sigla: "SO", nome: "SOROCABA" },
-        { sigla: "UB", nome: "UBERLÂNDIA" },
-        { sigla: "VT", nome: "VITÓRIA" },
-        { sigla: "MC", nome: "BRASIL" }
-    ];
-
-    function slugify(texto:string) {
-        return texto
-            .toLowerCase()                       // tudo minúsculo
-            .normalize("NFD")                    // separa letras dos acentos
-            .replace(/[\u0300-\u036f]/g, "")     // remove acentos
-            .replace(/\s+/g, "-")                // substitui espaços por hífen
-            .replace(/[^a-z0-9-/]/g, "")         // mantém letras, números, hífen e barra
-            .replace(/-+/g, "-")                 // evita múltiplos hífens
-            .replace(/\/+/g, "/")                // evita múltiplas barras
-            .replace(/^[-/]+|[-/]+$/g, "");      // remove hífens ou barras no início/fim
-    }
-
     // Gera a URL automaticamente apenas quando TODOS os campos forem preenchidos
     useEffect(() => {
         const todosPreenchidos =
@@ -96,7 +49,7 @@ export default function GeradorUrlPage() {
                 rota = 'talento-global'
             }
 
-            const url = `https://aiesec.org.br/${rota}/?utm_source=${encodeURIComponent(
+            const url = `${process.env.NEXT_PUBLIC_URL_DIRECIONADA}/${rota}/?utm_source=${encodeURIComponent(
                 slugify(canal)
             )}&utm_medium=${encodeURIComponent(
                 slugify(tipoAnuncio)
