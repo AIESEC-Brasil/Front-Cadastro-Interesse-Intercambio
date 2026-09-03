@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { aplicarMascaraData } from '../helpers/formatter';
 import { contemApenasLetrasEspacos } from '../utils/validates';
 
@@ -63,14 +63,14 @@ const notificarListeners = () => {
 export function useCamposFormulario() {
     const [, setForcarRender] = useState({});
 
-    useState(() => {
+    useEffect(() => {
         const atualizar = () => setForcarRender({});
         listenersGlobal.push(atualizar);
 
         return () => {
             listenersGlobal = listenersGlobal.filter((l) => l !== atualizar);
         };
-    });
+    }, []);
 
     const formatarNome = (val: string) => {
         const conectivos = ['da', 'de', 'di', 'do', 'du', 'a', 'e', 'i', 'o', 'u'];

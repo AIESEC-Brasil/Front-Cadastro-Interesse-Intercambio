@@ -5,7 +5,7 @@
  * @description Página de fluxo de cadastro para Programas de Intercâmbio.
  */
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import FormularioPreCadastro from "@components/forms/FormularioPreCadastro";
 import FormularioPreCadastroParams from "@components/forms/FormularioPreCadastroParams";
 import FormularioQualificao from "@components/forms/FormularioQualificao";
@@ -17,13 +17,9 @@ interface ProgramasIntercambioProps {
 }
 
 /**
- * Controla o fluxo de duas etapas do cadastro.
- * Se houver parâmetros de query na URL durante o Step 1, renderiza o formulário preparado para parâmetros.
- * 
- * @param {ProgramasIntercambioProps} props Props do componente.
- * @returns {JSX.Element} Componente da página de programas de intercâmbio.
+ * Componente interno com a lógica e os hooks.
  */
-const ProgramasIntercambio: React.FC<ProgramasIntercambioProps> = () => {
+const ProgramasIntercambioContent: React.FC<ProgramasIntercambioProps> = () => {
     const [step, setStep] = useState<number>(1);
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -112,4 +108,17 @@ const ProgramasIntercambio: React.FC<ProgramasIntercambioProps> = () => {
     );
 };
 
-export default ProgramasIntercambio;
+/**
+ * Componente principal exportado que protege o useSearchParams com o Suspense.
+ */
+export default function ProgramasIntercambio(props: ProgramasIntercambioProps) {
+    return (
+        <Suspense fallback={
+            <div className="w-full max-w-4xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-xl text-center py-12">
+                <p className="text-gray-500 font-medium">Carregando formulário...</p>
+            </div>
+        }>
+            <ProgramasIntercambioContent {...props} />
+        </Suspense>
+    );
+}

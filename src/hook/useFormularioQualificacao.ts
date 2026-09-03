@@ -117,12 +117,17 @@ export function useFormularioQualificacao(rota: string, state: (step: number) =>
      * Se tudo ocorrer bem essa função vai se chamada pra fechar tudo limpar os dados e voltar pro state 1 do formulario
      */
     const fecharModalSucessoQualificacao = () => {
+        // 1. Envia a mensagem IMEDIATAMENTE para a janela Pai sem esperar nada
+        window.parent.postMessage({ action: 'RELOAD_PARENT', newUrl: `/${rota}` }, '*');
+
+        // 2. Fecha os modais e limpa os campos logo em seguida
         modals.setModalSucessoQualificaco(false);
         fields.limpar();
+
         if (typeof state === 'function') {
             state(1);
         }
-    }
+    };
 
     return {
         ...fields,
