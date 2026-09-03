@@ -4,10 +4,9 @@
  * @file ProgramasIntercambio.tsx
  * @description Página de fluxo de cadastro para Programas de Intercâmbio.
  */
-import { usePathname, useSearchParams, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useState, Suspense } from 'react';
 import FormularioPreCadastro from "@components/forms/FormularioPreCadastro";
-import FormularioPreCadastroParams from "@components/forms/FormularioPreCadastroParams";
 import FormularioPreCadastroParams from "@components/forms/FormularioPreCadastroParams";
 import FormularioQualificao from "@components/forms/FormularioQualificao";
 
@@ -30,21 +29,6 @@ const ProgramasIntercambioContent: React.FC<ProgramasIntercambioProps> = () => {
     const searchParams = useSearchParams();
     const totalSteps = 2;
 
-    // Converte os parâmetros da URL diretamente para o tipo esperado
-    const paramsObjeto = Object.fromEntries(searchParams.entries()) as {
-        utm_source: string;
-        utm_medium: string;
-        utm_campaign: string;
-        utm_term: string;
-        utm_content: string;
-    };
-
-    // Normaliza o caminho removendo a barra inicial
-    const rotaFormatada = pathname?.replace(/^\//, '') || '';
-
-    // Verifica se existem parâmetros de query na URL (ex: ?utm_source=xyz)
-    const temParametrosUrl = searchParams ? searchParams.toString().length > 0 : false;
-    
     // Converte os parâmetros da URL diretamente para o tipo esperado
     const paramsObjeto = Object.fromEntries(searchParams.entries()) as {
         utm_source: string;
