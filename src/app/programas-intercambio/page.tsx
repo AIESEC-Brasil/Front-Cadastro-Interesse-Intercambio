@@ -4,9 +4,10 @@
  * @file ProgramasIntercambio.tsx
  * @description Página de fluxo de cadastro para Programas de Intercâmbio.
  */
-import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import { usePathname, useSearchParams, useSearchParams } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
 import FormularioPreCadastro from "@components/forms/FormularioPreCadastro";
+import FormularioPreCadastroParams from "@components/forms/FormularioPreCadastroParams";
 import FormularioPreCadastroParams from "@components/forms/FormularioPreCadastroParams";
 import FormularioQualificao from "@components/forms/FormularioQualificao";
 
@@ -23,12 +24,27 @@ interface ProgramasIntercambioProps {
  * @param {ProgramasIntercambioProps} props Props do componente.
  * @returns {JSX.Element} Componente da página de programas de intercâmbio.
  */
-const ProgramasIntercambio: React.FC<ProgramasIntercambioProps> = () => {
+const ProgramasIntercambioContent: React.FC<ProgramasIntercambioProps> = () => {
     const [step, setStep] = useState<number>(1);
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const totalSteps = 2;
 
+    // Converte os parâmetros da URL diretamente para o tipo esperado
+    const paramsObjeto = Object.fromEntries(searchParams.entries()) as {
+        utm_source: string;
+        utm_medium: string;
+        utm_campaign: string;
+        utm_term: string;
+        utm_content: string;
+    };
+
+    // Normaliza o caminho removendo a barra inicial
+    const rotaFormatada = pathname?.replace(/^\//, '') || '';
+
+    // Verifica se existem parâmetros de query na URL (ex: ?utm_source=xyz)
+    const temParametrosUrl = searchParams ? searchParams.toString().length > 0 : false;
+    
     // Converte os parâmetros da URL diretamente para o tipo esperado
     const paramsObjeto = Object.fromEntries(searchParams.entries()) as {
         utm_source: string;
@@ -112,4 +128,17 @@ const ProgramasIntercambio: React.FC<ProgramasIntercambioProps> = () => {
     );
 };
 
-export default ProgramasIntercambio;
+/**
+ * Componente principal exportado que protege o useSearchParams com o Suspense.
+ */
+export default function ProgramasIntercambio(props: ProgramasIntercambioProps) {
+    return (
+        <Suspense fallback={
+            <div className="w-full max-w-4xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-xl text-center py-12">
+                <p className="text-gray-500 font-medium">Carregando formulário...</p>
+            </div>
+        }>
+            <ProgramasIntercambioContent {...props} />
+        </Suspense>
+    );
+}
