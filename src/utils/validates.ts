@@ -33,13 +33,19 @@ const validarSenha = (senha: string): string[] => {
     if (!senha.trim()) {
         erros.push("O campo senha é obrigatório.");
     } else {
-        const caracteresProibidos = /[;'"`\\\t\n\r]/;
+        const caracteresProibidos = /[;'"`\\]/;
 
         if (caracteresProibidos.test(senha)) {
             erros.push("A senha contém caracteres proibidos (como aspas, ponto e vírgula ou barras).");
         }
+        if (/\s/.test(senha)) {
+            erros.push("A senha não pode conter espaços.");
+        }
         if (senha.length < 8) {
             erros.push("A senha deve ter pelo menos 8 caracteres.");
+        }
+        if (senha.length > 128) {
+            erros.push("A senha deve ter no máximo 128 caracteres.");
         }
         if (!/[A-Z]/.test(senha)) {
             erros.push("A senha deve conter pelo menos uma letra maiúscula.");
@@ -50,7 +56,7 @@ const validarSenha = (senha: string): string[] => {
         if (!/\d/.test(senha)) {
             erros.push("A senha deve conter pelo menos um número.");
         }
-        if (!/[!@#$%^&*(),.?":{}|<>]/.test(senha)) {
+        if (!/[@$!%*?&]/.test(senha)) {
             erros.push("A senha deve conter pelo menos um caractere especial.");
         }
     }
@@ -91,22 +97,20 @@ const validarEmail = (emails: string[]): string[] => {
 };
 
 const validarTelefone = (telefones: string[]): string[] => {
-    // A expressão aceita telefone celular com ou sem DDD e com separadores
-    // usuais; a máscara visual é aplicada em outro helper.
     const erros: string[] = [];
-    const regexTelefone = /^(?:\(?\d{2}\)?\s?)?9\d{4}[-\s]?\d{4}$/;
+    const regexTelefone = /^[1-9]{2}9\d{8}$/;
 
     if (!telefones || telefones.length === 0) {
         return ["O campo telefone é obrigatório."];
     }
 
     telefones.forEach((telefone, index) => {
-        const telefoneLimpo = telefone.trim();
+        const telefoneLimpo = telefone.replace(/\D/g, "");
 
         if (!telefoneLimpo) {
             erros.push(`O telefone na posição ${index + 1} não pode estar vazio.`);
         } else if (!regexTelefone.test(telefoneLimpo)) {
-            erros.push(`O telefone "${telefone}" é inválido. O formato deve ser (DD) 9XXXXXXXX.`);
+            erros.push(`O telefone "${telefone}" é inválido. Informe um celular com DDD e 11 dígitos.`);
         } else {
             erros.push('')
         }
@@ -117,6 +121,18 @@ const validarTelefone = (telefones: string[]): string[] => {
     }
 
     return erros;
+};
+
+const validarCurso = (curso: string): string[] => {
+    const valor = curso.trim();
+    if (!valor) return [''];
+    if (!/^[A-Za-zÀ-ÿ\s]+$/.test(valor)) {
+        return ['O curso deve conter apenas letras e espaços.'];
+    }
+    if (valor.length > 100) {
+        return ['O curso deve ter no máximo 100 caracteres.'];
+    }
+    return [''];
 };
 
 /**
@@ -177,5 +193,6 @@ export {
     contemApenasLetrasEspacos, 
     validarEmail, 
     validarTelefone,
-    validarData
+    validarData,
+    validarCurso
 };

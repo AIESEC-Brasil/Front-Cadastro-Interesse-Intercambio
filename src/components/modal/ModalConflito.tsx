@@ -7,12 +7,10 @@
 
 import React from 'react';
 import ButtonEditar from '../ui/buttons/ButtonEditar';
-import type { ConflictData, ConflictModalProps } from '../../types/componentes';
+import type { ConflictModalProps } from '../../types/componentes';
 
 /**
- * Exibe dados que já existem na API, normalmente após HTTP 409.
- * Aceita tanto uma mensagem simples quanto listas de e-mails/telefones; essa
- * tolerância existe porque o backend pode responder em formatos diferentes.
+ * Exibe a mensagem e os contatos retornados pelo backend em um HTTP 409.
  */
 const ModalConflito = ({ 
     aberta, 
@@ -22,11 +20,23 @@ const ModalConflito = ({
 }: ConflictModalProps) => {
     if (!aberta) return null;
 
-    // Se receber apenas uma string de erro direta (Exemplo 1)
     const isMensagemSimples = typeof dadosErro === 'string';
-
-    // Se for o objeto da API, extrai as chaves disponíveis
-    const entradasConflito = !isMensagemSimples && dadosErro ? Object.entries(dadosErro) : [];
+    const mensagem = isMensagemSimples
+        ? dadosErro
+        : dadosErro.message
+            ?? (typeof dadosErro.error === 'string' ? dadosErro.error : undefined)
+            ?? dadosErro.erro;
+    const entradasConflito = !isMensagemSimples && dadosErro
+        ? Object.entries(dadosErro).filter(
+            ([campo, itens]) =>
+                ['emails', 'telefone'].includes(campo)
+                && Array.isArray(itens)
+                && itens.length > 0
+        )
+        : [];
+    const detalhesErro = !isMensagemSimples && dadosErro?.error_details
+        ? dadosErro.error_details
+        : [];
 
     // Função para traduzir/formatar o nome do campo para exibição amigável
     const formatarNomeCampo = (chave: string) => {
@@ -65,37 +75,50 @@ const ModalConflito = ({
 
                 {/* Corpo do Modal */}
                 <div className="p-6 max-h-80 overflow-y-auto">
-                    <p className="text-gray-700 mb-4 font-medium">
-                        Não foi possível concluir a operação pois os seguintes dados já existem no sistema:
-                    </p>
-
-                    {isMensagemSimples ? (
-                        // Exemplo 1: Mensagem de erro em texto puro
+                    {mensagem && (
                         <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 text-amber-800 text-sm">
-                            {dadosErro}
+                            {mensagem}
                         </div>
-                    ) : (
-                        // Exemplo 2: Listagem dinâmica de arrays (emails, telefones ou ambos)
-                        <ul className="space-y-3">
-                            {entradasConflito.map(([campo, itens], index) => {
-                                if (!Array.isArray(itens) || itens.length === 0) return null;
+                    )}
 
-                                return (
-                                    <li key={index} className="bg-amber-50 p-3 rounded-lg border border-amber-200">
-                                        <strong className="text-amber-900 block mb-1">
-                                            {formatarNomeCampo(campo)}:
-                                        </strong>
-                                        <ul className="list-disc list-inside space-y-1 pl-2">
-                                            {itens.map((subItem, idx) => (
-                                                <li key={idx} className="text-sm text-amber-800 font-mono">
-                                                    {extrairValorItem(subItem)}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </li>
-                                );
-                            })}
+                    {entradasConflito.length > 0 && (
+                        <>
+                            <p className="text-gray-700 my-4 font-medium">
+                                Os seguintes dados já existem no sistema:
+                            </p>
+                            <ul className="space-y-3">
+                                {entradasConflito.map(([campo, itens], index) => {
+                                    if (!Array.isArray(itens)) return null;
+
+                                    return (
+                                        <li key={index} className="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                                            <strong className="text-amber-900 block mb-1">
+                                                {formatarNomeCampo(campo)}:
+                                            </strong>
+                                            <ul className="list-disc list-inside space-y-1 pl-2">
+                                                {itens.map((subItem, idx) => (
+                                                    <li key={idx} className="text-sm text-amber-800 font-mono">
+                                                        {extrairValorItem(subItem)}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </>
+                    )}
+
+                    {detalhesErro.length > 0 && (
+                        <ul className="mt-4 list-disc list-inside text-sm text-amber-800">
+                            {detalhesErro.map((detalhe, index) => (
+                                <li key={index}>{detalhe.loc}: {detalhe.msg}</li>
+                            ))}
                         </ul>
+                    )}
+
+                    {!mensagem && entradasConflito.length === 0 && detalhesErro.length === 0 && (
+                        <p className="text-gray-700">A solicitação conflita com um cadastro existente.</p>
                     )}
                 </div>
 

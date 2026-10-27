@@ -50,6 +50,7 @@ async function handleProxy(
       headers[key] = value;
     }
   });
+  headers["Accept"] = "application/json";
 
   try {
     const response = await apiExterna({
