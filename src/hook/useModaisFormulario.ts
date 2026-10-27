@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import type { ConflictData } from '../types/componentes';
+import type { ValorResumo } from '../types/formulario';
 
 /**
  * Reúne o estado de todas as mensagens de feedback do cadastro.
@@ -20,10 +22,10 @@ export function useModaisFormulario() {
     const [modalSucessoCadastroAberta, setModalSucessoCadastroAberta] = useState<boolean>(false);
     const [modalSucessoQualificaco,setModalSucessoQualificaco] = useState<boolean>(false);
     
-    const [dataConflito,setDataConflito] = useState<Record<string, string[]> | string>('');
+    const [dataConflito,setDataConflito] = useState<ConflictData | string>('');
     const [tipoErroConexao, setTipoErroConexao] = useState<'conexao' | 'bug'>('conexao');
     const [errosJson, setErrosJson] = useState<Record<string, string[]>>({});
-    const [dadosResumo, setDadosResumo] = useState<Record<string, any>>({});
+    const [dadosResumo, setDadosResumo] = useState<Record<string, ValorResumo>>({});
 
     return {
         carregandoEnvio, setCarregandoEnvio,

@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { validarTexto, validarSenha, validarEmail, validarTelefone, validarData } from '../utils/validates';
+import { useState, useEffect } from 'react';
+import { validarTexto, validarSenha, validarEmail, validarTelefone, validarData, validarCurso } from '../utils/validates';
 import { params } from '@/types/componentes';
+import type { useCamposFormulario } from './useCamposFormulario';
+import type { ErrosCampos } from '../types/formulario';
 
 /**
  * Centraliza as mensagens de validação das duas etapas.
@@ -11,7 +13,11 @@ import { params } from '@/types/componentes';
  * quando alguém começou a preenchê-los, mas ainda não escolheu uma opção válida
  * com ID correspondente.
  */
-export function useValidacaoFormulario(fields: any, step: number, params?:params) {
+export function useValidacaoFormulario(
+    fields: ReturnType<typeof useCamposFormulario>,
+    step: number,
+    params?: params
+) {
     const [erroNome, setErroNome] = useState<string>('');
     const [erroSobrenome, setErroSobrenome] = useState<string>('');
     const [erroSenha, setErroSenha] = useState<string[]>([]);
@@ -29,9 +35,6 @@ export function useValidacaoFormulario(fields: any, step: number, params?:params
     // Novos estados de erro para Área e Nível de Atuação:
     const [erroAreaAtuacao, setErroAreaAtuacao] = useState<string>('');
     const [erroNivelAtuacao, setErroNivelAtuacao] = useState<string>('');
-
-    const prevEmailsLen = useRef(fields.emails.length);
-    const prevTelefonesLen = useRef(fields.telefones.length);
 
     // Extração segura de valores primitivos para o array de dependências
     const nome = fields.nome;
@@ -55,9 +58,9 @@ export function useValidacaoFormulario(fields: any, step: number, params?:params
     const idiomaSelecionados = fields.idiomasSelecionados;
     const idIdiomas = fields.idIdiomas;
     const termoLGPD = fields.termoLGPD;
-    const areaAtuacao = fields.areaAtuacao;
+    const areaAtuacao = fields.areaAtuacaoSelecionada;
     const idAreaAtuacao = fields.idAreaAtuacao;
-    const nivelAtuacao = fields.nivelAtuacao;
+    const nivelAtuacao = fields.nivelAtuacaoSelecionado;
     const idNivelAtuacao = fields.idNivelAtuacao;
 
     useEffect(() => {
@@ -98,12 +101,12 @@ export function useValidacaoFormulario(fields: any, step: number, params?:params
                 }
             }
 
-            if (emails.some((e: any) => e.valor !== '')) {
-                setErroEmail(validarEmail(emails.map((i: any) => i.valor)));
+            if (emails.some((email) => email.valor !== '')) {
+                setErroEmail(validarEmail(emails.map((item) => item.valor)));
             }
 
-            if (telefones.some((t: any) => t.valor !== '')) {
-                setErroTelefone(validarTelefone(telefones.map((i: any) => i.valor)));
+            if (telefones.some((telefone) => telefone.valor !== '')) {
+                setErroTelefone(validarTelefone(telefones.map((item) => item.valor)));
             }
 
             if (idProduto) {
@@ -131,7 +134,7 @@ export function useValidacaoFormulario(fields: any, step: number, params?:params
             }
         } else if (step === 2) {
             if (curso) {
-                const eCurso = validarTexto(curso, "curso");
+                const eCurso = validarCurso(curso);
                 if (!eCurso || (eCurso.length > 0 && eCurso[0] === '')) {
                     setErroCurso('');
                 } else if (eCurso && eCurso[0]) {
@@ -142,7 +145,7 @@ export function useValidacaoFormulario(fields: any, step: number, params?:params
             }
 
             if (idiomaSelecionados) {
-                if (idiomaSelecionados === '' || (Array.isArray(idiomaSelecionados) && idiomaSelecionados.length === 0) || (idIdiomas && idIdiomas.length > 0)) {
+                if (idiomaSelecionados.length === 0 || (idIdiomas && idIdiomas.length > 0)) {
                     setErroIdiomas('');
                 }
             } else {
@@ -175,9 +178,6 @@ export function useValidacaoFormulario(fields: any, step: number, params?:params
                 setErroNivelAtuacao('');
             }
         }
-
-        prevEmailsLen.current = emails.length;
-        prevTelefonesLen.current = telefones.length;
 
     }, [
         step,
@@ -213,11 +213,11 @@ export function useValidacaoFormulario(fields: any, step: number, params?:params
     const validarTudo = () => {
         const eNome = step === 1 ? validarTexto(fields.nome, "nome") : [''];
         const eSobrenome = step === 1 ? validarTexto(fields.sobrenome, "sobrenome") : [''];
-        const eCurso = step === 2 ? (fields.curso ? validarTexto(fields.curso, "curso") : ['']) : [''];
+        const eCurso = step === 2 ? validarCurso(fields.curso) : [''];
         const eSenha = step === 1 ? validarSenha(fields.senha) : [];
         const eData = step === 1 ? validarData(fields.dataNascimento) : [''];
-        const errsE = step === 1 ? validarEmail(fields.emails.map((i: any) => i.valor)) : [];
-        const errsT = step === 1 ? validarTelefone(fields.telefones.map((i: any) => i.valor)) : [];
+        const errsE = step === 1 ? validarEmail(fields.emails.map((item) => item.valor)) : [];
+        const errsT = step === 1 ? validarTelefone(fields.telefones.map((item) => item.valor)) : [];
         const errProd = step === 1 && !fields.idProduto ? 'Campo obrigatório.' : '';
         const errOrigem = step === 1 && !fields.idOrigem ? 'Campo obrigatório.' : '';
         const errUni = step === 1 && !params?.utm_term && !fields.marcarSemUniversidade && !fields.idUniversidade ? 'Campo obrigatório.' : '';
@@ -228,7 +228,7 @@ export function useValidacaoFormulario(fields: any, step: number, params?:params
         const temAlgoSemestre = fields.semestreSelecionado !== undefined && fields.semestreSelecionado !== null && fields.semestreSelecionado !== '' && fields.semestreSelecionado.length > 0;
         const errSemestre = step === 2 && temAlgoSemestre && !fields.idSemestre ? 'Selecione uma opção válida da lista.' : '';
         
-        const temAlgoIdiomas = fields.idiomasSelecionados !== undefined && fields.idiomasSelecionados !== null && fields.idiomasSelecionados !== '' && fields.idiomasSelecionados.length > 0;
+        const temAlgoIdiomas = fields.idiomasSelecionados.length > 0;
         const errIdiomas = step === 2 && temAlgoIdiomas && (!fields.idIdiomas || fields.idIdiomas.length === 0) ? 'Selecione uma opção válida da lista.' : '';
 
         // Validações opcionais para Área e Nível de Atuação (caso preencha o texto, o ID precisa existir)
@@ -238,7 +238,7 @@ export function useValidacaoFormulario(fields: any, step: number, params?:params
         const temAlgoNivel = fields.nivelAtuacaoSelecionado !== undefined && fields.nivelAtuacaoSelecionado !== null && fields.nivelAtuacaoSelecionado !== '' && fields.nivelAtuacaoSelecionado.length > 0;
         const errNivelAtuacao = step === 2 && temAlgoNivel && !fields.idNivelAtuacao ? 'Selecione uma opção válida da lista.' : '';
 
-        const errosJson: any = {};
+        const errosJson: ErrosCampos = {};
         if (step === 1) {
             if (eNome?.[0]) { setErroNome(eNome[0]); errosJson["Nome"] = eNome; }
             if (eSobrenome?.[0]) { setErroSobrenome(eSobrenome[0]); errosJson["Sobrenome"] = eSobrenome; }

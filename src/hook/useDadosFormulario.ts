@@ -1,8 +1,86 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import apiOgxClient from '../service/clients/apiOgxClient';
 import { traduzirPalavras } from '../helpers/formatter';
 import { removerMascaraData, removerMascaraTelefone } from '../helpers/formatter';
-import type { OpcaoMetadados } from '../types/comum';
+import type {
+    OpcaoMetadados,
+    OpcaoMetadadosApi,
+    OpcaoTraduzida,
+} from '../types/comum';
+import type {
+    ApiErrorResponse,
+    DadosPreCadastro,
+    DadosQualificacao,
+    LeadPreCadastroResponse,
+    RegistroDivisaoMercado,
+    UniversidadesResponse,
+} from '../types/formulario';
+import type { useCamposFormulario } from './useCamposFormulario';
+import type { useModaisFormulario } from './useModaisFormulario';
+
+interface CampoMetadadoApi {
+    external_id: string;
+    name?: string;
+    description?: string;
+    config?: {
+        settings?: {
+            description?: string;
+            options?: OpcaoMetadadosApi[];
+        };
+    };
+}
+
+interface MetadadosResponse {
+    data: {
+        fields: CampoMetadadoApi[];
+    };
+    timestamp: string;
+}
+
+interface RespostaQualificacao {
+    id: number;
+    status: 'qualificação';
+}
+
+function formatarErrosDaApi(resposta: ApiErrorResponse): Record<string, string[]> {
+    const nomesCampos: Record<string, string> = {
+        nome: 'Nome',
+        sobrenome: 'Sobrenome',
+        senha: 'Senha',
+        dataNascimento: 'Data de Nascimento',
+        telefone: 'Telefone',
+        email: 'E-mail',
+        produto: 'Programa',
+        origem: 'Como conheceu a AIESEC',
+        universidade: 'Universidade',
+        comite: 'AIESEC mais próxima',
+        autorizacao: 'Política de Privacidade',
+        curso: 'Curso',
+        idiomas: 'Idiomas',
+        semestreCurso: 'Semestre',
+        areaAtuacao: 'Área de Atuação',
+        nivelAtuacao: 'Nível de Atuação',
+        curriculo: 'Currículo',
+    };
+    const erros: Record<string, string[]> = {};
+
+    for (const detalhe of resposta.error_details ?? []) {
+        const partes = detalhe.loc.split(' -> ');
+        const campo = partes[0] === 'body' ? partes[1] ?? partes[0] : partes[0];
+        const nomeCampo = nomesCampos[campo] ?? campo;
+        (erros[nomeCampo] ??= []).push(detalhe.msg);
+    }
+
+    if (Object.keys(erros).length === 0) {
+        const mensagem = resposta.message
+            ?? (typeof resposta.error === 'string' ? resposta.error : undefined)
+            ?? 'A API rejeitou a solicitação.';
+        erros.Erro = [mensagem];
+    }
+
+    return erros;
+}
 
 /**
  * Interface que define a estrutura padrão para os itens de metadados (listas suspensas, opções, etc.).
@@ -26,8 +104,8 @@ let cacheGlobal: {
     listaSemestres: OpcaoMetadados[];
     listaAreaAtuacao: OpcaoMetadados[];
     listaNivelMercado: OpcaoMetadados[];
-    opcoesEmail: any[];
-    opcoesTelefone: any[];
+    opcoesEmail: OpcaoTraduzida[];
+    opcoesTelefone: OpcaoTraduzida[];
     tituloTermoLGPD: string;
     descricaoTermoLGPD: string;
     jaCarregou: boolean;
@@ -49,8 +127,8 @@ let cacheGlobal: {
 };
 
 interface UseDadosFormularioProps {
-    modals: any;
-    fields?: any;
+    modals: ReturnType<typeof useModaisFormulario>;
+    fields?: ReturnType<typeof useCamposFormulario>;
     step?: number;
     rota?: string;
 }
@@ -67,16 +145,18 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
     const [listaProdutos, setListaProdutos] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaProdutos);
     const [listaOrigens, setListaOrigens] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaOrigens);
     const [listaMeio, setListaMeio] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaMeio);
-    const [listaUniversidades, setListaUniversidades] = useState<any[]>(cacheGlobal.listaUniversidades);
+    const [listaUniversidades, setListaUniversidades] = useState<OpcaoMetadados[]>(cacheGlobal.listaUniversidades);
     const [listaEscritorios, setListaEscritorios] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaEscritorios);
     const [listaIdiomas, setListaIdiomas] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaIdiomas);
     const [listaSemestres, setListaSemestres] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaSemestres);
     const [listaAreaAtuacao, setListaAreaAtuacao] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaAreaAtuacao);
     const [listaNivelMercado, setListaNivelMercado] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaNivelMercado);
-    const [opcoesEmail, setOpcoesEmail] = useState<any[]>(cacheGlobal.opcoesEmail);
-    const [opcoesTelefone, setOpcoesTelefone] = useState<any[]>(cacheGlobal.opcoesTelefone);
+    const [opcoesEmail, setOpcoesEmail] = useState<OpcaoTraduzida[]>(cacheGlobal.opcoesEmail);
+    const [opcoesTelefone, setOpcoesTelefone] = useState<OpcaoTraduzida[]>(cacheGlobal.opcoesTelefone);
     const [tituloTermoLGPD, setTituloTermoLGPD] = useState(cacheGlobal.tituloTermoLGPD);
     const [descricaoTermoLGPD, setDescricaoTermoLGPD] = useState(cacheGlobal.descricaoTermoLGPD);
+    const setTipoErroConexao = modals.setTipoErroConexao;
+    const setModalErroConexaoAberta = modals.setModalErroConexaoAberta;
 
     /**
      * Efeito responsável por buscar os metadados do backend e as universidades na montagem do componente,
@@ -84,35 +164,35 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
      */
     useEffect(() => {
         if (cacheGlobal.jaCarregou) {
-            setCarregandoMetadados(false);
             return;
         }
 
         let componenteMontado = true;
 
         const carregarDados = async () => {
-            setCarregandoMetadados(true);
-            setErroMetadados(false);
-
             try {
                 const [respostaMetadados, respostaUniversidades] = await Promise.all([
-                    apiOgxClient.get('/new-lead-ogx/metadados'),
-                    apiOgxClient.get('/divisao-mercado/universidades'),
+                    apiOgxClient.get<MetadadosResponse>('/new-lead-ogx/metadados'),
+                    apiOgxClient.get<UniversidadesResponse>('/divisao-mercado/universidades/metadados'),
                 ]);
 
-                const metadados = respostaMetadados?.data?.fields
-                    ?? (Array.isArray(respostaMetadados) ? respostaMetadados : respostaMetadados?.data);
+                const metadados = respostaMetadados.data.data.fields;
 
-                if (!componenteMontado || !Array.isArray(metadados)) return;
+                if (!componenteMontado) return;
 
-                const encontrarCampo = (identificador: string) =>
-                    metadados.find((item: any) => item.external_id === identificador);
-                const opcoesCampo = (campo: any) =>
-                    campo?.config?.settings?.options || campo?.options || [];
+                const encontrarCampo = (identificador: string): CampoMetadadoApi | undefined =>
+                    metadados.find((item) => item.external_id === identificador);
+                const opcoesCampo = (campo: CampoMetadadoApi | undefined): OpcaoMetadadosApi[] =>
+                    campo?.config?.settings?.options ?? [];
+                const textoOpcao = (opcao: OpcaoMetadadosApi): string =>
+                    opcao.text;
 
-                const ordenarOpcoes = (opcoes: any[]) => [...opcoes].sort((a, b) =>
-                    a.toLowerCase() === 'other' ? -1 : b.toLowerCase() === 'other' ? 1 : 0
-                );
+                const ordenarOpcoes = (opcoes: OpcaoMetadadosApi[]) =>
+                    [...opcoes].sort((a, b) =>
+                        textoOpcao(a).toLowerCase() === 'other'
+                            ? -1
+                            : textoOpcao(b).toLowerCase() === 'other' ? 1 : 0
+                    );
 
                 const campoEmail = encontrarCampo('email');
                 const campoTelefone = encontrarCampo('telefone');
@@ -127,21 +207,31 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 const campoNivelAtuacao = encontrarCampo('nivel_mercado');
 
                 const [emailFormatado, telefoneFormatado] = await Promise.all([
-                    traduzirPalavras(opcoesCampo(campoEmail).length ? ordenarOpcoes(opcoesCampo(campoEmail)) : []),
-                    traduzirPalavras(opcoesCampo(campoTelefone).length ? ordenarOpcoes(opcoesCampo(campoTelefone)) : []),
+                    traduzirPalavras(ordenarOpcoes(opcoesCampo(campoEmail)).map(textoOpcao)),
+                    traduzirPalavras(ordenarOpcoes(opcoesCampo(campoTelefone)).map(textoOpcao)),
                 ]);
 
                 const novoTitulo = campoLGPD?.name || tituloTermoPadrao;
                 const novaDescricao = campoLGPD?.config?.settings?.description || campoLGPD?.description || '';
-                const novasUniversidades = respostaUniversidades?.data?.universidades || [];
-                const novosEscritorios = opcoesCampo(campoEscritorio).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosProdutos = opcoesCampo(campoProduto).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novasOrigens = opcoesCampo(campoOrigem).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosMeios = opcoesCampo(campoMeio).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosIdiomas = opcoesCampo(campoIdiomas).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosSemestres = opcoesCampo(campoSemestres).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novasAreaAtuacao = opcoesCampo(campoAreaAtuacao).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosNivelAtuacao = opcoesCampo(campoNivelAtuacao).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novasUniversidades: OpcaoMetadados[] = respostaUniversidades.data.dados.map(
+                    (universidade: RegistroDivisaoMercado) => ({
+                        id: universidade.id ?? universidade.nome,
+                        nome: universidade.nome,
+                    })
+                );
+                const mapearOpcoes = (campo: CampoMetadadoApi | undefined): OpcaoMetadados[] =>
+                    opcoesCampo(campo).map((item) => ({
+                        id: item.id,
+                        nome: textoOpcao(item),
+                    }));
+                const novosEscritorios = mapearOpcoes(campoEscritorio);
+                const novosProdutos = mapearOpcoes(campoProduto);
+                const novasOrigens = mapearOpcoes(campoOrigem);
+                const novosMeios = mapearOpcoes(campoMeio);
+                const novosIdiomas = mapearOpcoes(campoIdiomas);
+                const novosSemestres = mapearOpcoes(campoSemestres);
+                const novasAreaAtuacao = mapearOpcoes(campoAreaAtuacao);
+                const novosNivelAtuacao = mapearOpcoes(campoNivelAtuacao);
 
                 cacheGlobal = {
                     listaProdutos: novosProdutos,
@@ -177,8 +267,9 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 }
             } catch {
                 if (componenteMontado) {
-                    modals?.setTipoErroConexao('conexao');
-                    modals?.setModalErroConexaoAberta(true);
+                    setErroMetadados(true);
+                    setTipoErroConexao('conexao');
+                    setModalErroConexaoAberta(true);
                 }
             } finally {
                 if (componenteMontado) setCarregandoMetadados(false);
@@ -190,7 +281,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
         return () => {
             componenteMontado = false;
         };
-    }, []);
+    }, [setModalErroConexaoAberta, setTipoErroConexao]);
 
     /**
      * Função responsável por processar e enviar os dados do formulário para a API,
@@ -206,17 +297,18 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
         const sobrenome = fields.sobrenome;
         const senha = fields.senha;
         const dataNascimento = removerMascaraData(fields.dataNascimento);
-        const email = fields.emails?.map((e: any) => ({ tipo: e.tipo, email: e.valor })) || [];
-        const telefone = fields.telefones?.map((e: any) => ({ tipo: e.tipo, numero: removerMascaraTelefone(e.valor) })) || [];
+        const email = fields.emails.map((item) => ({
+            tipo: item.tipo,
+            email: item.valor,
+        }));
+        const telefone = fields.telefones.map((item) => ({
+            tipo: item.tipo,
+            numero: removerMascaraTelefone(item.valor),
+        }));
 
         const comite = {
             id: fields.idEscritorio,
             nome: fields.escritorioSelecionado,
-        };
-
-        const universidade = {
-            id: fields.idUniversidade,
-            nome: fields.universidadeSelecionada,
         };
 
         const origem = {
@@ -229,23 +321,20 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             nome: fields.meioSelecionado,
         }
 
-        const produto: any = {
-            id_b2c: fields.idProduto,
-            titulo: fields.produtoSelecionado
+        const produto = {
+            id: fields.idProduto,
+            titulo: fields.produtoSelecionado,
+            id_expa: {
+                'voluntario-global': 7,
+                'talento-global': 8,
+                'professor-global': 9,
+            }[rota ?? ''] ?? 0,
         };
-
-        if (rota === 'voluntario-global') {
-            produto.id_expa = 7;
-        } else if (rota === 'talento-global') {
-            produto.id_expa = 8;
-        } else if (rota === 'professor-global') {
-            produto.id_expa = 9;
-        }
 
         let resultado = null;
 
         if (step === 1) {
-            const jsonPreCadastro: any = {
+            const jsonPreCadastro: DadosPreCadastro = {
                 nome,
                 sobrenome,
                 senha,
@@ -260,7 +349,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             if (fields.marcarSemUniversidade) {
                 jsonPreCadastro.comite = comite;
             } else {
-                jsonPreCadastro.universidade = universidade;
+                jsonPreCadastro.universidade = fields.universidadeSelecionada;
             }
 
             if (fields.meioSelecionado){
@@ -268,32 +357,37 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             }
 
             try {
-                const response: any = await apiOgxClient.post('/new-lead-ogx/cadastro', jsonPreCadastro);
-                if (response?.data?.item_id) {
-                    fields.setItemId(response.data.item_id);
+                const response = await apiOgxClient.post<LeadPreCadastroResponse>(
+                    '/new-lead-ogx/cadastro',
+                    jsonPreCadastro
+                );
+                if (!Number.isInteger(response.data.id) || response.data.id <= 0) {
+                    throw new Error('O backend não retornou um identificador válido para o lead.');
                 }
-                resultado = response?.sucesso;
-            } catch (error: any) {
-                const dadosErro = error.response?.data?.data;
-                if (error.response?.status === 409) {
-                    const conteudoModal = dadosErro?.erro 
-                        ? dadosErro.erro.replace("EXPA", "").trim() 
-                        : dadosErro;
-                    modals?.setDataConflito(conteudoModal);
-                    modals?.setModalConflitoAberta(true);
+                fields.setItemId(response.data.id);
+                resultado = true;
+            } catch (error: unknown) {
+                if (axios.isAxiosError<ApiErrorResponse>(error) && error.response) {
+                    const respostaErro = error.response.data;
+                    if (error.response.status === 409) {
+                        modals?.setDataConflito(respostaErro);
+                        modals?.setModalConflitoAberta(true);
+                    } else {
+                        modals?.setErrosJson(formatarErrosDaApi(respostaErro));
+                        modals?.setModalErroAberta(true);
+                    }
                 } else {
-                    modals?.setTipoErroConexao('bug');
+                    modals?.setTipoErroConexao(error instanceof Error ? 'bug' : 'conexao');
                     modals?.setModalErroConexaoAberta(true);
                 }
-                console.log('Erro ao enviar dados:', dadosErro);
             } finally {
                 modals?.setCarregandoEnvio(false);
             }
             return resultado;
 
         } else if (step === 2) {
-            const jsonQualificacao: any = {
-                item_id: fields.itemId
+            const jsonQualificacao: DadosQualificacao = {
+                id: fields.itemId
             };
 
             if (fields.curso) {
@@ -302,7 +396,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
 
             if (fields.anexoPdf) {
                 jsonQualificacao.curriculo = {
-                    nome: fields.anexoPdf.name,
+                    fileName: fields.anexoPdf.name,
                     base64: fields.anexoBase64
                 };
             }
@@ -336,21 +430,29 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             }
 
             try {
-                const response: any = await apiOgxClient.put('/new-lead-ogx/cadastro', jsonQualificacao);
-                resultado = response?.sucesso;
-            } catch (error: any) {
-                const dadosErro = error.response?.data?.data;
-                if (error.response?.status === 409) {
-                    const conteudoModal = dadosErro?.erro 
-                        ? dadosErro.erro.replace("EXPA", "").trim() 
-                        : dadosErro;
-                    modals?.setDataConflito(conteudoModal);
-                    modals?.setModalConflitoAberta(true);
+                const response = await apiOgxClient.put<RespostaQualificacao>(
+                    '/new-lead-ogx/cadastro',
+                    jsonQualificacao
+                );
+                resultado = response.data.id === fields.itemId
+                    && response.data.status === 'qualificação';
+                if (!resultado) {
+                    throw new Error('O backend retornou uma confirmação de qualificação inválida.');
+                }
+            } catch (error: unknown) {
+                if (axios.isAxiosError<ApiErrorResponse>(error) && error.response) {
+                    const respostaErro = error.response.data;
+                    if (error.response.status === 409) {
+                        modals?.setDataConflito(respostaErro);
+                        modals?.setModalConflitoAberta(true);
+                    } else {
+                        modals?.setErrosJson(formatarErrosDaApi(respostaErro));
+                        modals?.setModalErroAberta(true);
+                    }
                 } else {
-                    modals?.setTipoErroConexao('bug');
+                    modals?.setTipoErroConexao(error instanceof Error ? 'bug' : 'conexao');
                     modals?.setModalErroConexaoAberta(true);
                 }
-                console.log('Erro ao enviar dados:', dadosErro);
             } finally {
                 modals?.setCarregandoEnvio(false);
             }

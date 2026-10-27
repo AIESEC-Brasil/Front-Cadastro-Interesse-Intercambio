@@ -49,9 +49,11 @@ export interface ConnectionErrorModalProps {
 
 export interface ConflictData {
   erro?: string;
+  error?: boolean | string;
+  message?: string;
   emails?: Array<{ email: string }>;
   telefone?: Array<{ numero: string }>;
-  [key: string]: unknown;
+  error_details?: Array<{ loc: string; msg: string }>;
 }
 
 export interface ConflictModalProps {

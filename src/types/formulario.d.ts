@@ -1,4 +1,4 @@
-import type { ItemContato, IdEntidade, OpcaoMetadados, IdEntidadeSemDefinir } from './common';
+import type { ItemContato, IdEntidade, OpcaoMetadados, IdEntidadeSemDefinir } from './comum';
 
 /** Estado completo compartilhado entre pré-cadastro e qualificação. */
 export interface EstadoCamposFormulario {
@@ -14,7 +14,7 @@ export interface EstadoCamposFormulario {
   idProduto: IdEntidadeSemDefinir;
   origemSelecionada: string;
   idOrigem: IdEntidadeSemDefinir;
-  meioSelecionado:IdEntidadeSemDefinir;
+  meioSelecionado: string;
   idMeio:IdEntidadeSemDefinir;
   marcarSemUniversidade: boolean;
   universidadeSelecionada: string;
@@ -66,14 +66,14 @@ export interface DadosOpcaoSelecionada extends OpcaoMetadados {}
 
 /** Produto com os identificadores usados pelo sistema externo. */
 export interface DadosProduto {
-  id_b2c: IdEntidade;
+  id: IdEntidade;
   titulo: string;
-  id_expa?: number;
+  id_expa: number;
 }
 
 /** Arquivo de currículo convertido para transporte no payload. */
 export interface DadosCurriculo {
-  nome: string;
+  fileName: string;
   base64: string | null;
 }
 
@@ -88,17 +88,48 @@ export interface DadosPreCadastro {
   produto: DadosProduto;
   origem: DadosOpcaoSelecionada;
   autorizacao: 1;
-  universidade?: DadosOpcaoSelecionada;
+  universidade?: string;
   comite?: DadosOpcaoSelecionada;
+  meio?: DadosOpcaoSelecionada;
 }
 
 /** Corpo enviado na atualização opcional da qualificação. */
 export interface DadosQualificacao {
-  item_id: number;
+  id: number;
   curso?: string;
   curriculo?: DadosCurriculo;
   idiomas?: DadosOpcaoSelecionada[];
   semestreCurso?: DadosOpcaoSelecionada;
   areaAtuacao?: DadosOpcaoSelecionada;
   nivelAtuacao?: DadosOpcaoSelecionada;
+}
+
+/** Identificador retornado pelo backend após criar o pré-cadastro. */
+export interface LeadPreCadastroResponse {
+  id: number;
+  status: 'pré-cadastro';
+}
+
+/** Formato padronizado de erro de validação retornado pelo backend. */
+export interface ApiErrorResponse {
+  error?: boolean | string;
+  type?: string;
+  message?: string;
+  error_details?: Array<{ loc: string; msg: string }>;
+  status_code?: number;
+  emails?: Array<{ email: string }>;
+  telefone?: Array<{ numero: string }>;
+}
+
+/** Registro retornado pela rota de divisão de mercado. */
+export interface RegistroDivisaoMercado {
+  id?: IdEntidade;
+  nome: string;
+  [campo: string]: unknown;
+}
+
+/** Resposta efetiva do endpoint de universidades do backend. */
+export interface UniversidadesResponse {
+  dados: RegistroDivisaoMercado[];
+  timestamp: string;
 }
