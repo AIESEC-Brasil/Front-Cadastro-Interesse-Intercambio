@@ -1,0 +1,42 @@
+name: Deploy Next.js to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main # Altere para 'master' se essa for a sua branch principal
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write # Necessário para o Pages criar os status de deploy
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # 1. Build do Next.js via OpenNext (compatível com Cloudflare)
+      - name: Build with OpenNext
+        run: npx @opennextjs/cloudflare build
+        env:
+          NEXT_PUBLIC_URL_DIRECIONADA: ${{ secrets.NEXT_PUBLIC_URL_DIRECIONADA }}
+          EXTERNAL_API_URL: ${{ secrets.EXTERNAL_API_URL }}
+
+      # 2. Deploy no Cloudflare Pages (cria o projeto automaticamente se não existir)
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # O OpenNext gera os assets aqui e o Wrangler sobe para o Pages
+          command: pages deploy .open-next/assets --project-name=front-cadastro-interesse-intercambio
