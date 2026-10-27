@@ -1,6 +1,16 @@
 // Estruturas de produto com sigla e nome por extenso para facilitar matching.
 //Formato dos itens: { sigla: 'gv', nome: 'Voluntário Globa' }
-const siglaProduto: Array<{ sigla: string, nome: string }> = [
+export interface ItemSigla {
+    sigla: string;
+    nome: string;
+}
+
+export interface ItemEscritorio {
+    sigla: string;
+    nome: string;
+}
+
+const siglaProduto: ItemSigla[] = [
     { sigla: 'gv', nome: 'Voluntário Global' },
     { sigla: 'gtast', nome: 'Talento Global Short Term' },
     { sigla: 'gtalt', nome: 'Talento Global Mid e Long Term' },
@@ -8,7 +18,7 @@ const siglaProduto: Array<{ sigla: string, nome: string }> = [
 ];
 // Estruturas de escritórios (CLs) com sigla e nome por extenso para facilitar matching.
 //Formato dos itens: { sigla: 'AB', nome: 'ABC' } 
-const escritorios: Array<{ sigla: string, nome: string }> = [
+const escritorios: ItemEscritorio[] = [
     { sigla: "AB", nome: "ABC" },
     { sigla: "AJ", nome: "ARACAJU" },
     { sigla: "BA", nome: "BAURU" },
