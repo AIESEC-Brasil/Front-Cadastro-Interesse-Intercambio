@@ -11,8 +11,7 @@ async function handleProxy(
   req: NextRequest,
   context: { params: Promise<{ path?: string[] }> }
 ) {
-  // Encaminha métodos e dados recebidos pelo Next.js para a API externa,
-  // funcionando como uma ponte entre browser e servidor.
+  // Remove o prefixo público `/api` e encaminha para a rota real do backend.
   const { path } = await context.params;
 
   if (!path || path.length === 0) {
@@ -55,7 +54,7 @@ async function handleProxy(
   try {
     const response = await apiExterna({
       method: method,
-      url: `/api/${url}`,
+      url: `/${url}`,
       data: body,
       headers: headers,
       params: restQuery,
