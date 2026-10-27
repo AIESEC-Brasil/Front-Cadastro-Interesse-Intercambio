@@ -66,7 +66,7 @@ export interface DadosOpcaoSelecionada extends OpcaoMetadados {}
 
 /** Produto com os identificadores usados pelo sistema externo. */
 export interface DadosProduto {
-  id_podio: IdEntidade;
+  id_b2c: IdEntidade;
   titulo: string;
   id_expa?: number;
 }

@@ -100,14 +100,15 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                     apiOgxClient.get('/divisao-mercado/universidades'),
                 ]);
 
-                const metadados = Array.isArray(respostaMetadados)
-                    ? respostaMetadados
-                    : respostaMetadados?.data;
+                const metadados = respostaMetadados?.data?.fields
+                    ?? (Array.isArray(respostaMetadados) ? respostaMetadados : respostaMetadados?.data);
 
                 if (!componenteMontado || !Array.isArray(metadados)) return;
 
                 const encontrarCampo = (identificador: string) =>
                     metadados.find((item: any) => item.external_id === identificador);
+                const opcoesCampo = (campo: any) =>
+                    campo?.config?.settings?.options || campo?.options || [];
 
                 const ordenarOpcoes = (opcoes: any[]) => [...opcoes].sort((a, b) =>
                     a.toLowerCase() === 'other' ? -1 : b.toLowerCase() === 'other' ? 1 : 0
@@ -115,32 +116,32 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
 
                 const campoEmail = encontrarCampo('email');
                 const campoTelefone = encontrarCampo('telefone');
-                const campoEscritorio = encontrarCampo('aiesec-mais-proxima');
+                const campoEscritorio = encontrarCampo('aiesec_proxima');
                 const campoProduto = encontrarCampo('produto');
-                const campoOrigem = encontrarCampo('tag-origem-2');
-                const campoMeio = encontrarCampo('tag-meio-2-2');
-                const campoLGPD = encontrarCampo('eu-concordo-com-a-coleta-e-uso-dos-meus-dados-conforme-');
-                const campoIdiomas = encontrarCampo('possui-outro-idioma');
-                const campoSemestres = encontrarCampo('qual-semestre-do-curso');
-                const campoAreaAtuacao = encontrarCampo('qual-sua-area-de-atuacao');
-                const campoNivelAtuacao = encontrarCampo('qual-seu-nivel-de-atuacao');
+                const campoOrigem = encontrarCampo('origem');
+                const campoMeio = encontrarCampo('meio');
+                const campoLGPD = encontrarCampo('termo_privacidade');
+                const campoIdiomas = encontrarCampo('idiomas');
+                const campoSemestres = encontrarCampo('semestre_curso');
+                const campoAreaAtuacao = encontrarCampo('area_atuacao');
+                const campoNivelAtuacao = encontrarCampo('nivel_mercado');
 
                 const [emailFormatado, telefoneFormatado] = await Promise.all([
-                    traduzirPalavras(campoEmail?.options ? ordenarOpcoes(campoEmail.options) : []),
-                    traduzirPalavras(campoTelefone?.options ? ordenarOpcoes(campoTelefone.options) : []),
+                    traduzirPalavras(opcoesCampo(campoEmail).length ? ordenarOpcoes(opcoesCampo(campoEmail)) : []),
+                    traduzirPalavras(opcoesCampo(campoTelefone).length ? ordenarOpcoes(opcoesCampo(campoTelefone)) : []),
                 ]);
 
                 const novoTitulo = campoLGPD?.name || tituloTermoPadrao;
-                const novaDescricao = campoLGPD?.description || '';
+                const novaDescricao = campoLGPD?.config?.settings?.description || campoLGPD?.description || '';
                 const novasUniversidades = respostaUniversidades?.data?.universidades || [];
-                const novosEscritorios = (campoEscritorio?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosProdutos = (campoProduto?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novasOrigens = (campoOrigem?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosMeios = (campoMeio?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosIdiomas = (campoIdiomas?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosSemestres = (campoSemestres?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novasAreaAtuacao = (campoAreaAtuacao?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
-                const novosNivelAtuacao = (campoNivelAtuacao?.options || []).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosEscritorios = opcoesCampo(campoEscritorio).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosProdutos = opcoesCampo(campoProduto).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novasOrigens = opcoesCampo(campoOrigem).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosMeios = opcoesCampo(campoMeio).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosIdiomas = opcoesCampo(campoIdiomas).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosSemestres = opcoesCampo(campoSemestres).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novasAreaAtuacao = opcoesCampo(campoAreaAtuacao).map((item: any) => ({ id: item.id, nome: item.text }));
+                const novosNivelAtuacao = opcoesCampo(campoNivelAtuacao).map((item: any) => ({ id: item.id, nome: item.text }));
 
                 cacheGlobal = {
                     listaProdutos: novosProdutos,
@@ -229,7 +230,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
         }
 
         const produto: any = {
-            id_podio: fields.idProduto,
+            id_b2c: fields.idProduto,
             titulo: fields.produtoSelecionado
         };
 
