@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
+    "build:cloudflare": "opennextjs-cloudflare build",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "start": "next start",
-    "production" : "node .next/standalone/server.js",
+    "production": "node .next/standalone/server.js",
     "lint": "eslint",
     "clean": "rm -rf .next node_modules",
     "dev:clean": "rm -rf .next node_modules package-lock.json && npm i && npm run dev"
@@ -19,6 +22,7 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.19.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19.2.18",
@@ -26,9 +30,13 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.154.0"
   },
   "allowScripts": {
-    "unrs-resolver@1.12.2": true
+    "unrs-resolver@1.12.2": true,
+    "esbuild@0.25.4": true,
+    "esbuild@0.28.2": true,
+    "workerd@1.20261023.1": true
   }
 }
