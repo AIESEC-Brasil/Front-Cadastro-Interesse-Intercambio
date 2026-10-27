@@ -17,11 +17,7 @@ interface ProgramasIntercambioProps {
 }
 
 /**
- * Controla o fluxo de duas etapas do cadastro.
- * Se houver parâmetros de query na URL durante o Step 1, renderiza o formulário preparado para parâmetros.
- * 
- * @param {ProgramasIntercambioProps} props Props do componente.
- * @returns {JSX.Element} Componente da página de programas de intercâmbio.
+ * Componente interno com a lógica e os hooks.
  */
 const ProgramasIntercambioContent: React.FC<ProgramasIntercambioProps> = () => {
     const [step, setStep] = useState<number>(1);

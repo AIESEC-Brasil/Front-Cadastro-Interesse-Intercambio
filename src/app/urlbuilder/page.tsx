@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 
 // Auxiliares de formatação e mapeamentos estáticos
 import { slugify } from '@/helpers/formatter';
-import { siglaProduto, escritorios, ItemSigla, ItemEscritorio } from '@/helpers/dicionario';
+import { siglaProduto, escritorios } from '@/helpers/dicionario';
 
 // Componentes de Interface de Usuário (UI)
 import InputTexto from '@/components/ui/input/InputTexto';
