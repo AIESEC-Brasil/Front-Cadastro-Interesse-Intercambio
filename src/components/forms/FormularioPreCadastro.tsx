@@ -122,6 +122,7 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
                         tituloLabel="Email"
                         tipoInput="email"
                         itens={emails}
+                        maxItens={2}
                         opcoesTipo={opcoesEmail}
                         aoAdicionar={handleAdicionarEmail}
                         aoRemover={handleRemoverEmail}
@@ -136,6 +137,7 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
                         tituloLabel="Telefone"
                         tipoInput="tel"
                         itens={telefones}
+                        maxItens={2}
                         opcoesTipo={opcoesTelefone}
                         aoAdicionar={handleAdicionarTelefone}
                         aoRemover={handleRemoverTelefone}

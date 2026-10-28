@@ -107,7 +107,7 @@ export default function GeradorUrlPage() {
 
             // Tratamento da variável de ambiente para evitar barras duplas na montagem da URL base
             const baseUrl: string = (process.env.NEXT_PUBLIC_URL_DIRECIONADA || '').replace(/\/$/, '');
-
+            console.log(process.env.NEXT_PUBLIC_URL_DIRECIONADA)
             // Montagem da URL completa com a rota e os parâmetros UTM devidamente codificados
             const url: string = `${baseUrl}/${rota}/?utm_source=${encodeURIComponent(
                 slugify(canal)

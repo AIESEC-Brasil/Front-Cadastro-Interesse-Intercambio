@@ -26,6 +26,7 @@ const InputDinamico = ({
   itens,
   opcoesTipo,
   erros = [],
+  maxItens,
   aoAdicionar,
   aoRemover,
   aoAtualizarTipo,
@@ -128,13 +129,15 @@ const InputDinamico = ({
       })}
 
       {/* Botão Adicionar Outro */}
-      <div className={styles.botaoAdicionarWrapper}>
-        <ButtonConfirmar
-          texto="Adicionar outro"
-          aoClicar={aoAdicionar}
-          type="button"
-        />
-      </div>
+      {maxItens === undefined || itens.length < maxItens ? (
+        <div className={styles.botaoAdicionarWrapper}>
+          <ButtonConfirmar
+            texto="Adicionar outro"
+            aoClicar={aoAdicionar}
+            type="button"
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

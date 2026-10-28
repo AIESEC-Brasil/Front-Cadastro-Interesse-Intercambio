@@ -38,6 +38,7 @@ let estadoGlobalFormulario: EstadoCamposFormulario = {
     idAreaAtuacao: '' as string | number,
     nivelAtuacao: '',
     idNivelAtuacao: '' as string | number,
+    tag: [] as string[]
 };
 
 let listenersGlobal: Array<() => void> = [];
@@ -117,6 +118,7 @@ export function useCamposFormulario() {
                 idAreaAtuacao: '' as string | number,
                 nivelAtuacao: '',
                 idNivelAtuacao: '' as string | number,
+                tag: [] as string[]
             }
     }
 
@@ -275,6 +277,11 @@ export function useCamposFormulario() {
         idNivelAtuacao: estadoGlobalFormulario.idNivelAtuacao,
         setIdNivelAtuacao: (v: string | number) => {
             estadoGlobalFormulario.idNivelAtuacao = v;
+            notificarListeners();
+        },
+        tag: estadoGlobalFormulario.tag,
+        setTag: (v: string[]) => {
+            estadoGlobalFormulario.tag = v;
             notificarListeners();
         },
         limpar
