@@ -45,3 +45,21 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           NEXT_PUBLIC_URL_DIRECIONADA: ${{ secrets.NEXT_PUBLIC_URL_DIRECIONADA }}
           EXTERNAL_API_URL: ${{ secrets.EXTERNAL_API_URL }}
+
+      - name: Notificar sucesso via Google Apps Script
+        if: success()
+        env:
+          APPSCRIPT_URL: ${{ secrets.APPSCRIPT_WEBAPP_URL }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          STATUS: success
+          DETAIL: Deploy realizado com sucesso e aplicação recarregada.
+        run: python .github/scripts/notificar_deploy.py
+
+      - name: Notificar falha via Google Apps Script
+        if: failure()
+        env:
+          APPSCRIPT_URL: ${{ secrets.APPSCRIPT_WEBAPP_URL }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          STATUS: fail
+          DETAIL: A pipeline de deploy falhou durante o envio dos arquivos ou o reload da aplicação.
+        run: python .github/scripts/notificar_deploy.py

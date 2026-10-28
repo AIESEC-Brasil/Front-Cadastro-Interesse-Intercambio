@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { aplicarMascaraData } from '../helpers/formatter';
 import { contemApenasLetrasEspacos } from '../utils/validates';
-
 import type { ItemContato } from '../types/comum';
 import { EstadoCamposFormulario } from '../types/formulario';
 
