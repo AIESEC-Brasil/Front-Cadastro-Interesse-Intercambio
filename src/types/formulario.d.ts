@@ -32,6 +32,7 @@ export interface EstadoCamposFormulario {
   idAreaAtuacao: IdEntidadeSemDefinir;
   nivelAtuacao: string;
   idNivelAtuacao: IdEntidadeSemDefinir;
+  tag: string[];
 }
 
 /** Mensagens agrupadas pelo nome do campo. */
@@ -91,6 +92,7 @@ export interface DadosPreCadastro {
   universidade?: string;
   comite?: DadosOpcaoSelecionada;
   meio?: DadosOpcaoSelecionada;
+  tag?: string[];
 }
 
 /** Corpo enviado na atualização opcional da qualificação. */

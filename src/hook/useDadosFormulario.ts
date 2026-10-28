@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
+
 import axios from 'axios';
+
 import apiOgxClient from '../service/clients/apiOgxClient';
+
 import { traduzirPalavras } from '../helpers/formatter';
+
 import { removerMascaraData, removerMascaraTelefone } from '../helpers/formatter';
+
 import type {
     OpcaoMetadados,
     OpcaoMetadadosApi,
     OpcaoTraduzida,
 } from '../types/comum';
+
 import type {
     ApiErrorResponse,
     DadosPreCadastro,
@@ -16,8 +22,11 @@ import type {
     RegistroDivisaoMercado,
     UniversidadesResponse,
 } from '../types/formulario';
+
 import type { useCamposFormulario } from './useCamposFormulario';
+
 import type { useModaisFormulario } from './useModaisFormulario';
+
 
 interface CampoMetadadoApi {
     external_id: string;
@@ -34,14 +43,20 @@ interface CampoMetadadoApi {
 interface MetadadosResponse {
     data: {
         fields: CampoMetadadoApi[];
+        categorias_contato: {
+            email: string[];
+            telefone: string[];
+        };
     };
     timestamp: string;
 }
+
 
 interface RespostaQualificacao {
     id: number;
     status: 'qualificação';
 }
+
 
 function formatarErrosDaApi(resposta: ApiErrorResponse): Record<string, string[]> {
     const nomesCampos: Record<string, string> = {
@@ -65,12 +80,14 @@ function formatarErrosDaApi(resposta: ApiErrorResponse): Record<string, string[]
     };
     const erros: Record<string, string[]> = {};
 
+
     for (const detalhe of resposta.error_details ?? []) {
         const partes = detalhe.loc.split(' -> ');
         const campo = partes[0] === 'body' ? partes[1] ?? partes[0] : partes[0];
         const nomeCampo = nomesCampos[campo] ?? campo;
         (erros[nomeCampo] ??= []).push(detalhe.msg);
     }
+
 
     if (Object.keys(erros).length === 0) {
         const mensagem = resposta.message
@@ -79,13 +96,16 @@ function formatarErrosDaApi(resposta: ApiErrorResponse): Record<string, string[]
         erros.Erro = [mensagem];
     }
 
+
     return erros;
 }
+
 
 /**
  * Interface que define a estrutura padrão para os itens de metadados (listas suspensas, opções, etc.).
  */
 const tituloTermoPadrao = 'Eu concordo com a coleta e uso dos meus dados conforme a Política de Privacidade *';
+
 
 // ==========================================
 // CACHE GLOBAL EM MEMÓRIA (SINGLETON DO MÓDULO)
@@ -108,6 +128,7 @@ let cacheGlobal: {
     opcoesTelefone: OpcaoTraduzida[];
     tituloTermoLGPD: string;
     descricaoTermoLGPD: string;
+    tag: string[];
     jaCarregou: boolean;
 } = {
     listaProdutos: [],
@@ -123,8 +144,10 @@ let cacheGlobal: {
     opcoesTelefone: [],
     tituloTermoLGPD: tituloTermoPadrao,
     descricaoTermoLGPD: '',
+    tag: [],
     jaCarregou: false,
 };
+
 
 interface UseDadosFormularioProps {
     modals: ReturnType<typeof useModaisFormulario>;
@@ -132,6 +155,7 @@ interface UseDadosFormularioProps {
     step?: number;
     rota?: string;
 }
+
 
 /**
  * Hook customizado responsável por gerenciar o carregamento de metadados, 
@@ -141,6 +165,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
     // Inicializa com o cache caso já tenha sido carregado antes
     const [carregandoMetadados, setCarregandoMetadados] = useState(!cacheGlobal.jaCarregou);
     const [erroMetadados, setErroMetadados] = useState(false);
+
 
     const [listaProdutos, setListaProdutos] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaProdutos);
     const [listaOrigens, setListaOrigens] = useState<Array<{ id: number | string; nome: string }>>(cacheGlobal.listaOrigens);
@@ -155,8 +180,10 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
     const [opcoesTelefone, setOpcoesTelefone] = useState<OpcaoTraduzida[]>(cacheGlobal.opcoesTelefone);
     const [tituloTermoLGPD, setTituloTermoLGPD] = useState(cacheGlobal.tituloTermoLGPD);
     const [descricaoTermoLGPD, setDescricaoTermoLGPD] = useState(cacheGlobal.descricaoTermoLGPD);
+    const [tag, setTag] = useState<string[]>(cacheGlobal.tag);
     const setTipoErroConexao = modals.setTipoErroConexao;
-    const setModalErroConexaoAberta = modals.setModalErroConexaoAberta;
+    const setModalErroConexaoAberta = modals.setModalErroConexaoAberta; 
+
 
     /**
      * Efeito responsável por buscar os metadados do backend e as universidades na montagem do componente,
@@ -167,7 +194,9 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             return;
         }
 
+
         let componenteMontado = true;
+
 
         const carregarDados = async () => {
             try {
@@ -176,9 +205,12 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                     apiOgxClient.get<UniversidadesResponse>('/divisao-mercado/universidades/metadados'),
                 ]);
 
+
                 const metadados = respostaMetadados.data.data.fields;
 
+
                 if (!componenteMontado) return;
+
 
                 const encontrarCampo = (identificador: string): CampoMetadadoApi | undefined =>
                     metadados.find((item) => item.external_id === identificador);
@@ -187,6 +219,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 const textoOpcao = (opcao: OpcaoMetadadosApi): string =>
                     opcao.text;
 
+
                 const ordenarOpcoes = (opcoes: OpcaoMetadadosApi[]) =>
                     [...opcoes].sort((a, b) =>
                         textoOpcao(a).toLowerCase() === 'other'
@@ -194,8 +227,8 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                             : textoOpcao(b).toLowerCase() === 'other' ? 1 : 0
                     );
 
-                const campoEmail = encontrarCampo('email');
-                const campoTelefone = encontrarCampo('telefone');
+
+                const campoCategoriaContato = encontrarCampo('categoriaContato');
                 const campoEscritorio = encontrarCampo('aiesec_proxima');
                 const campoProduto = encontrarCampo('produto');
                 const campoOrigem = encontrarCampo('origem');
@@ -206,11 +239,34 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 const campoAreaAtuacao = encontrarCampo('area_atuacao');
                 const campoNivelAtuacao = encontrarCampo('nivel_mercado');
 
+
+                const opcoesCategoriaContato = ordenarOpcoes(
+                    opcoesCampo(campoCategoriaContato)
+                        .filter((opcao) => {
+                            const status = opcao.status?.toLowerCase();
+                            return !status || status === 'active' || status === 'activate';
+                        })
+                        .map((opcao) => ({
+                            ...opcao,
+                            text: textoOpcao(opcao).trim().toLowerCase(),
+                        })),
+                );
+                const filtrarCategorias = (permitidas: string[]) =>
+                    opcoesCategoriaContato.filter((opcao) =>
+                        permitidas.includes(textoOpcao(opcao)),
+                    );
                 const [emailFormatado, telefoneFormatado] = await Promise.all([
-                    traduzirPalavras(ordenarOpcoes(opcoesCampo(campoEmail)).map(textoOpcao)),
-                    traduzirPalavras(ordenarOpcoes(opcoesCampo(campoTelefone)).map(textoOpcao)),
+                    traduzirPalavras(
+                        filtrarCategorias(respostaMetadados.data.data.categorias_contato.email)
+                            .map(textoOpcao),
+                    ),
+                    traduzirPalavras(
+                        filtrarCategorias(respostaMetadados.data.data.categorias_contato.telefone)
+                            .map(textoOpcao),
+                    ),
                 ]);
 
+                const novaTag: string[] = [];
                 const novoTitulo = campoLGPD?.name || tituloTermoPadrao;
                 const novaDescricao = campoLGPD?.config?.settings?.description || campoLGPD?.description || '';
                 const novasUniversidades: OpcaoMetadados[] = respostaUniversidades.data.dados.map(
@@ -233,6 +289,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 const novasAreaAtuacao = mapearOpcoes(campoAreaAtuacao);
                 const novosNivelAtuacao = mapearOpcoes(campoNivelAtuacao);
 
+
                 cacheGlobal = {
                     listaProdutos: novosProdutos,
                     listaOrigens: novasOrigens,
@@ -247,8 +304,10 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                     opcoesTelefone: telefoneFormatado,
                     tituloTermoLGPD: novoTitulo,
                     descricaoTermoLGPD: novaDescricao,
+                    tag: novaTag,
                     jaCarregou: true,
                 };
+
 
                 if (componenteMontado) {
                     setTituloTermoLGPD(novoTitulo);
@@ -264,6 +323,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                     setListaSemestres(novosSemestres);
                     setListaAreaAtuacao(novasAreaAtuacao);
                     setListaNivelMercado(novosNivelAtuacao);
+                    setTag(novaTag);
                 }
             } catch {
                 if (componenteMontado) {
@@ -276,12 +336,15 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             }
         };
 
+
         carregarDados();
+
 
         return () => {
             componenteMontado = false;
         };
     }, [setModalErroConexaoAberta, setTipoErroConexao]);
+
 
     /**
      * Função responsável por processar e enviar os dados do formulário para a API,
@@ -306,20 +369,24 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             numero: removerMascaraTelefone(item.valor),
         }));
 
+
         const comite = {
             id: fields.idEscritorio,
             nome: fields.escritorioSelecionado,
         };
+
 
         const origem = {
             id: fields.idOrigem,
             nome: fields.origemSelecionada,
         };
 
+
         const meio = {
             id: fields.idMeio,
             nome: fields.meioSelecionado,
-        }
+        };
+
 
         const produto = {
             id: fields.idProduto,
@@ -331,7 +398,12 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             }[rota ?? ''] ?? 0,
         };
 
+
+        const tag = fields.tag;
+
+
         let resultado = null;
+
 
         if (step === 1) {
             const jsonPreCadastro: DadosPreCadastro = {
@@ -343,8 +415,10 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 telefone,
                 produto,
                 origem,
-                autorizacao: 1
+                autorizacao: 1,
+                tag
             };
+
 
             if (fields.marcarSemUniversidade) {
                 jsonPreCadastro.comite = comite;
@@ -352,9 +426,11 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 jsonPreCadastro.universidade = fields.universidadeSelecionada;
             }
 
+
             if (fields.meioSelecionado){
                 jsonPreCadastro.meio = meio;
             }
+
 
             try {
                 const response = await apiOgxClient.post<LeadPreCadastroResponse>(
@@ -385,14 +461,17 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
             }
             return resultado;
 
+
         } else if (step === 2) {
             const jsonQualificacao: DadosQualificacao = {
                 id: fields.itemId
             };
 
+
             if (fields.curso) {
                 jsonQualificacao.curso = fields.curso;
             }
+
 
             if (fields.anexoPdf) {
                 jsonQualificacao.curriculo = {
@@ -401,12 +480,14 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 };
             }
 
+
             if (fields.idiomasSelecionados?.length > 0) {
                 jsonQualificacao.idiomas = fields.idiomasSelecionados.map((nome: string, index: number) => ({
                     id: fields.idIdiomas[index],
                     nome
                 }));
             }
+
 
             if (fields.semestreSelecionado) {
                 jsonQualificacao.semestreCurso = {
@@ -415,6 +496,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 };
             }
 
+
             if (fields.areaAtuacaoSelecionada) {
                 jsonQualificacao.areaAtuacao = {
                     id: fields.idAreaAtuacao,
@@ -422,12 +504,14 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
                 };
             }
 
+
             if (fields.nivelAtuacaoSelecionado) {
                 jsonQualificacao.nivelAtuacao = {
                     id: fields.idNivelAtuacao,
                     nome: fields.nivelAtuacaoSelecionado
                 };
             }
+
 
             try {
                 const response = await apiOgxClient.put<RespostaQualificacao>(
@@ -460,6 +544,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
         }
     };
 
+
     return {
         carregandoMetadados,
         erroMetadados,
@@ -476,6 +561,7 @@ export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormu
         opcoesTelefone,
         tituloTermoLGPD,
         descricaoTermoLGPD,
+        tag,
         enviarDados
     };
 }

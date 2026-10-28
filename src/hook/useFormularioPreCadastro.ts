@@ -116,6 +116,10 @@ export function useFormularioPreCadastro(
                 }
             }
         }
+
+        if(params?.utm_campaign) {
+            fields.setTag([params.utm_campaign]);
+        }
         
     }, [
         rota, 
@@ -172,7 +176,9 @@ export function useFormularioPreCadastro(
     };
 
     /** Adiciona um novo campo de e-mail ao formulário. */
-    const aoAdicionarEmail = () => fields.setEmails([...fields.emails, { tipo: 'other', valor: '' }]);
+    const aoAdicionarEmail = () => fields.setEmails((emails) =>
+        emails.length >= 2 ? emails : [...emails, { tipo: 'other', valor: '' }],
+    );
 
     /** Remove um campo de e-mail específico pelo índice. */
     const aoRemoverEmail = (indice: number) => fields.setEmails(fields.emails.filter((_, index) => index !== indice));
@@ -188,7 +194,9 @@ export function useFormularioPreCadastro(
     };
 
     /** Adiciona um novo campo de telefone ao formulário. */
-    const aoAdicionarTelefone = () => fields.setTelefones([...fields.telefones, { tipo: 'other', valor: '' }]);
+    const aoAdicionarTelefone = () => fields.setTelefones((telefones) =>
+        telefones.length >= 2 ? telefones : [...telefones, { tipo: 'other', valor: '' }],
+    );
 
     /** Remove um campo de telefone específico pelo índice. */
     const aoRemoverTelefone = (indice: number) => fields.setTelefones(fields.telefones.filter((_, index) => index !== indice));

@@ -116,6 +116,7 @@ export interface DynamicInputProps {
   itens: import('./common').ItemContato[];
   opcoesTipo: OpcaoTraduzida[];
   erros?: string[];
+  maxItens?: number;
   aoAdicionar: () => void;
   aoRemover: (index: number) => void;
   aoAtualizarTipo: (index: number, novoTipo: string) => void;

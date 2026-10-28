@@ -16,6 +16,7 @@ export interface OpcaoMetadados {
 export interface OpcaoMetadadosApi {
   id: IdEntidade;
   text: string;
+  status?: string | null;
 }
 
 /** Opção de contato traduzida para exibição, mantendo o valor original para envio. */
