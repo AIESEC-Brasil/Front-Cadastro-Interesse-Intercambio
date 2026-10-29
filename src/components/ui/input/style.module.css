@@ -44,6 +44,27 @@
     background-color: #fff;
 }
 
+/* No seu arquivo de estilo que gera a classe do olho */
+.eye {
+  position: absolute;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px; /* Garante uma base sólida */
+  min-height: 24px;
+}
+
+/* Solução que zera o erro do relatório: expande a área invisível para mais de 44px */
+.eye::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  bottom: -12px;
+  left: -12px;
+  right: -12px;
+}
+
 .eye.hasError {
     top: 26.5px;
 }
