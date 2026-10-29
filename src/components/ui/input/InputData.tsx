@@ -168,6 +168,7 @@ export default function InputData({
                     name="calendario"
                     onClick={alternarAbertura}
                     className="absolute right-3 text-zinc-500 hover:text-black focus:outline-none flex items-center justify-center p-1"
+                    aria-label="Abrir calendário"
                     tabIndex={-1}
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
