@@ -1,16 +1,13 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { FileText, Upload, X } from 'lucide-react';
 import styles from './style.module.css';
 import type { PdfInputProps } from '../../../types/componentes';
 
 /**
  * Controla a escolha local de um currículo PDF.
- *
- * O arquivo é validado antes do processamento e, quando aceito, é convertido
- * para Base64 para ser incluído no payload. A barra de progresso representa o
- * processamento local da interface, não o progresso de um upload de rede.
+ * O arquivo é validado e convertido para Base64. O progresso é lido via FileReader.onprogress.
  */
 const InputAnexoPdf = ({
     id,
@@ -22,47 +19,61 @@ const InputAnexoPdf = ({
     tamanhoMaximoMb
 }: PdfInputProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
+    const readerRef = useRef<FileReader | null>(null);
+
     const [carregando, setCarregando] = useState<boolean>(false);
     const [progresso, setProgresso] = useState<number>(0);
 
-    const processarArquivo = (novoArquivo: File) => {
+    // Garante o cancelamento do FileReader ao desmontar o componente
+    useEffect(() => {
+        return () => {
+            if (readerRef.current) {
+                readerRef.current.abort();
+            }
+        };
+    }, []);
+
+    const processarArquivo = useCallback((novoArquivo: File) => {
         setCarregando(true);
         setProgresso(0);
 
-        let progressoAtual = 0;
-        const intervalo = setInterval(() => {
-            progressoAtual += 20;
-            setProgresso(progressoAtual);
+        const reader = new FileReader();
+        readerRef.current = reader;
 
-            if (progressoAtual >= 100) {
-                clearInterval(intervalo);
-                
-                // Converte o arquivo para Base64 usando FileReader
-                const reader = new FileReader();
-                reader.readAsDataURL(novoArquivo);
-                reader.onload = () => {
-                    const base64String = reader.result as string;
-                    const base64Puro = base64String.split(',')[1] || base64String;
-                    setCarregando(false);
-                    // Passa o arquivo bruto e o base64 para a função de callback
-                    atualizar(novoArquivo, base64Puro);
-                };
-                reader.onerror = () => {
-                    setCarregando(false);
-                    atualizar(null, null);
-                };
+        // Atualiza a barra com o progresso real de leitura em disco
+        reader.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percentual = Math.round((event.loaded / event.total) * 100);
+                setProgresso(percentual);
             }
-        }, 80);
-    };
+        };
 
-    const selecionarArquivo = (event: React.ChangeEvent<HTMLInputElement>) => {
+        reader.onload = () => {
+            const base64String = reader.result as string;
+            const base64Puro = base64String.split(',')[1] || base64String;
+            
+            setProgresso(100);
+            setCarregando(false);
+            atualizar(novoArquivo, base64Puro);
+            readerRef.current = null;
+        };
+
+        reader.onerror = () => {
+            setCarregando(false);
+            setProgresso(0);
+            atualizar(null, null);
+            readerRef.current = null;
+        };
+
+        reader.readAsDataURL(novoArquivo);
+    }, [atualizar]);
+
+    const selecionarArquivo = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const novoArquivo = event.target.files?.[0] ?? null;
 
-        if (!novoArquivo) {
-            return;
-        }
+        if (!novoArquivo) return;
 
-        // Validações imediatas
+        // Validações de tipo e tamanho
         if (novoArquivo.type !== 'application/pdf' || !novoArquivo.name.toLowerCase().endsWith('.pdf')) {
             atualizar(null, null);
             event.target.value = '';
@@ -76,26 +87,33 @@ const InputAnexoPdf = ({
         }
 
         processarArquivo(novoArquivo);
-    };
+    }, [atualizar, tamanhoMaximoMb, processarArquivo]);
 
-    const removerArquivo = (e: React.MouseEvent) => {
+    const removerArquivo = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
+
+        if (readerRef.current) {
+            readerRef.current.abort();
+            readerRef.current = null;
+        }
+
         atualizar(null, null);
         setCarregando(false);
         setProgresso(0);
+
         if (inputRef.current) {
             inputRef.current.value = '';
         }
-    };
+    }, [atualizar]);
 
-    const handleClickContainer = () => {
+    const handleClickContainer = useCallback(() => {
         if (!desabilitado && !carregando) {
             inputRef.current?.click();
         }
-    };
+    }, [desabilitado, carregando]);
 
     return (
-        <div className={`${styles.inputGroup}`}>
+        <div className={styles.inputGroup}>
             <span className="mb-2 block text-sm font-medium text-gray-700">
                 {legenda} {obrigatorio && <span className="text-red-500">*</span>}
             </span>
@@ -185,6 +203,7 @@ const InputAnexoPdf = ({
                             <Upload size={16} aria-hidden="true" />
                             Anexar PDF
                         </button>
+
                         <span className="text-sm text-gray-500">Nenhum PDF selecionado</span>
                     </div>
                 )}

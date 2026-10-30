@@ -1,7 +1,8 @@
 // src/components/ui/input/InputData.tsx
+
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import type { CalendarDay, CalendarView, DateInputProps } from '../../../types/componentes';
 
 const MESES = [
@@ -22,14 +23,23 @@ export default function InputData({
     const [aberto, setAberto] = useState<boolean>(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const hoje = new Date();
+    const hoje = useMemo(() => new Date(), []);
     const [anoAtualVisual, setAnoAtualVisual] = useState<number>(hoje.getFullYear());
     const [mesAtualVisual, setMesAtualVisual] = useState<number>(hoje.getMonth());
     const [visao, setVisao] = useState<CalendarView | 'meses'>('dias');
     const [anoInicioDecada, setAnoInicioDecada] = useState<number>(Math.floor(hoje.getFullYear() / 12) * 12);
 
-    // Sincroniza a visualização do calendário ao digitar ou ao abrir o popover
+    // 1. Sincronização e parsing otimizado de data digitada
     useEffect(() => {
+        if (!valor) {
+            if (aberto) {
+                const dataHoje = new Date();
+                setAnoAtualVisual(dataHoje.getFullYear());
+                setMesAtualVisual(dataHoje.getMonth());
+            }
+            return;
+        }
+
         const apenasNumeros = valor.replace(/\D/g, "");
         if (apenasNumeros.length === 8) {
             const d = parseInt(apenasNumeros.slice(0, 2), 10);
@@ -38,18 +48,11 @@ export default function InputData({
             if (!isNaN(d) && !isNaN(m) && !isNaN(a) && a >= 1900 && a <= 2100 && m >= 0 && m <= 11) {
                 setAnoAtualVisual(a);
                 setMesAtualVisual(m);
-                return;
             }
-        }
-
-        if (aberto && apenasNumeros.length === 0) {
-            const dataHoje = new Date();
-            setAnoAtualVisual(dataHoje.getFullYear());
-            setMesAtualVisual(dataHoje.getMonth());
         }
     }, [valor, aberto]);
 
-    // Fecha o popover ao clicar fora e reseta a visão interna
+    // 2. Event listener para fechar ao clicar fora
     useEffect(() => {
         const handleClickFora = (event: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -61,20 +64,22 @@ export default function InputData({
         return () => document.removeEventListener('mousedown', handleClickFora);
     }, []);
 
-    const dispararAtualizacao = (novaDataStr: string) => {
+    const dispararAtualizacao = useCallback((novaDataStr: string) => {
         const eventoSimulado = {
             target: { id, value: novaDataStr }
         } as unknown as React.ChangeEvent<HTMLInputElement>;
         atualizar(eventoSimulado);
-    };
+    }, [id, atualizar]);
 
-    const obterDiasDoMes = (): CalendarDay[] => {
+    // 3. Matriz de dias memoizada com uso do Date.prototype otimizado
+    const diasDoMes = useMemo((): CalendarDay[] => {
         const primeiroDiaSemana = new Date(anoAtualVisual, mesAtualVisual, 1).getDay();
         const ultimoDiaData = new Date(anoAtualVisual, mesAtualVisual + 1, 0).getDate();
         const ultimoDiaMesAnterior = new Date(anoAtualVisual, mesAtualVisual, 0).getDate();
 
-        const dias = [];
+        const dias: CalendarDay[] = [];
 
+        // Dias do mês anterior
         for (let i = primeiroDiaSemana - 1; i >= 0; i--) {
             dias.push({
                 dia: ultimoDiaMesAnterior - i,
@@ -84,6 +89,7 @@ export default function InputData({
             });
         }
 
+        // Dias do mês atual
         for (let i = 1; i <= ultimoDiaData; i++) {
             dias.push({
                 dia: i,
@@ -93,6 +99,7 @@ export default function InputData({
             });
         }
 
+        // Dias do mês seguinte
         const totalCelulas = dias.length <= 35 ? 35 : 42;
         const diasRestantes = totalCelulas - dias.length;
         for (let i = 1; i <= diasRestantes; i++) {
@@ -105,42 +112,42 @@ export default function InputData({
         }
 
         return dias;
-    };
+    }, [anoAtualVisual, mesAtualVisual]);
 
-    const selecionarDia = (d: number, m: number, a: number) => {
+    const selecionarDia = useCallback((d: number, m: number, a: number) => {
         const diaFormatado = String(d).padStart(2, '0');
         const mesFormatado = String(m + 1).padStart(2, '0');
-        const anoFormatado = String(a);
-        dispararAtualizacao(`${diaFormatado}/${mesFormatado}/${anoFormatado}`);
+        dispararAtualizacao(`${diaFormatado}/${mesFormatado}/${a}`);
         setAberto(false);
         setVisao('dias');
-    };
+    }, [dispararAtualizacao]);
 
-    const navegarMes = (direcao: number) => {
-        let novoMes = mesAtualVisual + direcao;
-        let novoAno = anoAtualVisual;
-        if (novoMes > 11) {
-            novoMes = 0;
-            novoAno++;
-        } else if (novoMes < 0) {
-            novoMes = 11;
-            novoAno--;
-        }
-        setMesAtualVisual(novoMes);
-        setAnoAtualVisual(novoAno);
-    };
+    const navegarMes = useCallback((direcao: number) => {
+        setMesAtualVisual((prevMes) => {
+            let novoMes = prevMes + direcao;
+            if (novoMes > 11) {
+                setAnoAtualVisual((prevAno) => prevAno + 1);
+                return 0;
+            } else if (novoMes < 0) {
+                setAnoAtualVisual((prevAno) => prevAno - 1);
+                return 11;
+            }
+            return novoMes;
+        });
+    }, []);
 
-    const alternarAbertura = () => {
-        const novoEstadoAberto = !aberto;
-        setAberto(novoEstadoAberto);
-        setVisao('dias');
+    const alternarAbertura = useCallback(() => {
+        setAberto((prev) => {
+            const novo = !prev;
+            if (novo) setVisao('dias');
+            return novo;
+        });
+    }, []);
 
-        if (novoEstadoAberto && !valor) {
-            const dataHoje = new Date();
-            setAnoAtualVisual(dataHoje.getFullYear());
-            setMesAtualVisual(dataHoje.getMonth());
-        }
-    };
+    // 4. Decada memoizada para visão de anos
+    const anosDecada = useMemo(() => {
+        return Array.from({ length: 12 }, (_, i) => anoInicioDecada + i);
+    }, [anoInicioDecada]);
 
     return (
         <div className="flex flex-col gap-1.5 w-full relative" ref={containerRef}>
@@ -179,7 +186,6 @@ export default function InputData({
 
             {aberto && (
                 <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-zinc-200 shadow-xl rounded-2xl p-4 w-full text-black select-none">
-                    
                     {/* Cabeçalho de Navegação */}
                     <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-100">
                         {visao === 'dias' && (
@@ -188,7 +194,6 @@ export default function InputData({
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
                                 </button>
                                 <div className="flex items-center gap-2 font-semibold text-sm">
-                                    {/* Clicar aqui vai para a seleção de MESES */}
                                     <button 
                                         type="button" 
                                         onClick={() => setVisao('meses')} 
@@ -205,10 +210,9 @@ export default function InputData({
 
                         {visao === 'meses' && (
                             <div className="w-full flex items-center justify-between font-semibold text-sm">
-                                <button type="button" onClick={() => setAnoAtualVisual(anoAtualVisual - 1)} className="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-600">
+                                <button type="button" onClick={() => setAnoAtualVisual((prev) => prev - 1)} className="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-600">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
                                 </button>
-                                {/* Clicar no ano estando na tela de MESES vai para a tela de ANOS */}
                                 <button 
                                     type="button" 
                                     onClick={() => {
@@ -219,7 +223,7 @@ export default function InputData({
                                 >
                                     {anoAtualVisual}
                                 </button>
-                                <button type="button" onClick={() => setAnoAtualVisual(anoAtualVisual + 1)} className="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-600">
+                                <button type="button" onClick={() => setAnoAtualVisual((prev) => prev + 1)} className="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-600">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
                                 </button>
                             </div>
@@ -227,11 +231,11 @@ export default function InputData({
 
                         {visao === 'anos' && (
                             <div className="w-full flex items-center justify-between font-semibold text-sm">
-                                <button type="button" onClick={() => setAnoInicioDecada(anoInicioDecada - 12)} className="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-600">
+                                <button type="button" onClick={() => setAnoInicioDecada((prev) => prev - 12)} className="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-600">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
                                 </button>
                                 <span>{anoInicioDecada} - {anoInicioDecada + 11}</span>
-                                <button type="button" onClick={() => setAnoInicioDecada(anoInicioDecada + 12)} className="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-600">
+                                <button type="button" onClick={() => setAnoInicioDecada((prev) => prev + 12)} className="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-600">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
                                 </button>
                             </div>
@@ -247,7 +251,7 @@ export default function InputData({
                                 ))}
                             </div>
                             <div className="grid grid-cols-7 gap-1 text-center text-sm">
-                                {obterDiasDoMes().map((item, idx) => {
+                                {diasDoMes.map((item, idx) => {
                                     const selecionado = valor === `${String(item.dia).padStart(2, '0')}/${String(item.mesRef + 1).padStart(2, '0')}/${item.anoRef}`;
                                     return (
                                         <button
@@ -294,13 +298,13 @@ export default function InputData({
                     {/* Visão 3: Anos */}
                     {visao === 'anos' && (
                         <div className="grid grid-cols-3 gap-2 py-2">
-                            {Array.from({ length: 12 }, (_, i) => anoInicioDecada + i).map((ano) => (
+                            {anosDecada.map((ano) => (
                                 <button
                                     key={ano}
                                     type="button"
                                     onClick={() => {
                                         setAnoAtualVisual(ano);
-                                        setVisao('meses'); // Ao selecionar o ano, volta para a escolha de meses
+                                        setVisao('meses');
                                     }}
                                     className={`py-3 text-xs font-medium rounded-xl transition-colors ${
                                         anoAtualVisual === ano ? 'bg-blue-600 text-white' : 'hover:bg-zinc-100 text-zinc-700'
@@ -311,7 +315,6 @@ export default function InputData({
                             ))}
                         </div>
                     )}
-
                 </div>
             )}
 

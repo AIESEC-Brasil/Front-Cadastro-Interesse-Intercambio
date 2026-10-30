@@ -6,7 +6,7 @@
  * Renderiza os inputs, listas dinâmicas e modais consumindo a lógica do custom hook.
  */
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { ChevronDown } from 'lucide-react';
 import InputTexto from '../ui/input/InputTexto';
 import InputSenha from '../ui/input/InputSenha';
@@ -24,17 +24,8 @@ import LoadSpinner from '../loading/LoadSpinner';
 import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
 
 import { useFormularioPreCadastro } from '../../hook/useFormularioPreCadastro';
-
 import type { FormularioProps } from '../../types/componentes';
 
-/**
- * Primeira etapa do cadastro de interesse.
- *
- * O componente é deliberadamente voltado à renderização: valores, handlers,
- * validação, chamadas de API e estados de modal vêm de `useFormularioPreCadastro`.
- * A universidade e o comitê são alternativas, e o produto só é exibido
- * manualmente para a rota de talento quando não houve pré-seleção automática.
- */
 const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
     const {
         nome, setNome,
@@ -75,7 +66,7 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
 
     return (
         <div className="relative">
-            {/* Esqueleto de carregamento exibido enquanto metadados são buscados */}
+            {/* Esqueleto de carregamento exibido enquanto metadados gerais são buscados */}
             <LoadSkeletonDinamico aberta={carregandoMetadados} layoutLinhas={[2, 1, 1, 2, 2]} />
 
             {!carregandoMetadados && (
@@ -117,35 +108,40 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
                         obrigatorio
                     />
 
-                    <InputDinamico
-                        placeholderInput="E-mail"
-                        tituloLabel="Email"
-                        tipoInput="email"
-                        itens={emails}
-                        maxItens={2}
-                        opcoesTipo={opcoesEmail}
-                        aoAdicionar={handleAdicionarEmail}
-                        aoRemover={handleRemoverEmail}
-                        aoAtualizarTipo={handleAtualizarTipoEmail}
-                        aoAtualizarValor={handleAtualizarValorEmail}
-                        erros={erroEmail}
-                        obrigatorio
-                    />
+                    {/* Inputs dinâmicos com opções assíncronas */}
+                    <Suspense fallback={<div className="h-10 bg-gray-100 animate-pulse rounded-lg" />}>
+                        <InputDinamico
+                            placeholderInput="E-mail"
+                            tituloLabel="Email"
+                            tipoInput="email"
+                            itens={emails}
+                            maxItens={2}
+                            opcoesTipo={opcoesEmail}
+                            aoAdicionar={handleAdicionarEmail}
+                            aoRemover={handleRemoverEmail}
+                            aoAtualizarTipo={handleAtualizarTipoEmail}
+                            aoAtualizarValor={handleAtualizarValorEmail}
+                            erros={erroEmail}
+                            obrigatorio
+                        />
+                    </Suspense>
 
-                    <InputDinamico
-                        placeholderInput="(99) 9 9999-9999"
-                        tituloLabel="Telefone"
-                        tipoInput="tel"
-                        itens={telefones}
-                        maxItens={2}
-                        opcoesTipo={opcoesTelefone}
-                        aoAdicionar={handleAdicionarTelefone}
-                        aoRemover={handleRemoverTelefone}
-                        aoAtualizarTipo={handleAtualizarTipoTelefone}
-                        aoAtualizarValor={handleAtualizarValorTelefone}
-                        erros={erroTelefone}
-                        obrigatorio
-                    />
+                    <Suspense fallback={<div className="h-10 bg-gray-100 animate-pulse rounded-lg" />}>
+                        <InputDinamico
+                            placeholderInput="(99) 9 9999-9999"
+                            tituloLabel="Telefone"
+                            tipoInput="tel"
+                            itens={telefones}
+                            maxItens={2}
+                            opcoesTipo={opcoesTelefone}
+                            aoAdicionar={handleAdicionarTelefone}
+                            aoRemover={handleRemoverTelefone}
+                            aoAtualizarTipo={handleAtualizarTipoTelefone}
+                            aoAtualizarValor={handleAtualizarValorTelefone}
+                            erros={erroTelefone}
+                            obrigatorio
+                        />
+                    </Suspense>
 
                     {/* Seleção de Produto */}
                     {rota === 'talento-global' && (
@@ -156,8 +152,9 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
 
                             <div
                                 onClick={() => setIsOpen(!isOpen)}
-                                className={`w-full p-2.5 border rounded-lg bg-white text-gray-900 cursor-pointer flex justify-between items-center ${erroProduto ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-blue-200'
-                                    }`}
+                                className={`w-full p-2.5 border rounded-lg bg-white text-gray-900 cursor-pointer flex justify-between items-center ${
+                                    erroProduto ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-blue-200'
+                                }`}
                             >
                                 <span>{produtoSelecionado || "Selecione"}</span>
                                 <ChevronDown size={18} className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -189,16 +186,18 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
 
                     {/* Divisão de Mercado: Universidade ou Escritório */}
                     <div className="flex flex-col">
-                        <InputAutoComplete
-                            id="universidade"
-                            legenda="Qual sua Universidade?"
-                            opcoes={listaUniversidades}
-                            valor={universidadeSelecionada}
-                            atualizar={handleSelecionarUniversidade}
-                            error={erroUniversidade}
-                            desabilitado={marcarSemUniversidade}
-                            obrigatorio={!marcarSemUniversidade}
-                        />
+                        <Suspense fallback={<div className="h-10 bg-gray-100 animate-pulse rounded-lg" />}>
+                            <InputAutoComplete
+                                id="universidade"
+                                legenda="Qual sua Universidade?"
+                                opcoes={listaUniversidades}
+                                valor={universidadeSelecionada}
+                                atualizar={handleSelecionarUniversidade}
+                                error={erroUniversidade}
+                                desabilitado={marcarSemUniversidade}
+                                obrigatorio={!marcarSemUniversidade}
+                            />
+                        </Suspense>
 
                         <div className="flex items-center gap-2 mt-2">
                             <input
@@ -208,36 +207,40 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
                                 onChange={(e) => handleAlternarUniversidade(e.target.checked)}
                             />
                             <label htmlFor="semUniversidade" className="text-base cursor-pointer select-none text-blue-900">
-                                Minha universidade não está listada ou não tenho vínculo com nenhum universidade
+                                Minha universidade não está listada ou não tenho vínculo com nenhuma universidade
                             </label>
                         </div>
 
                         {marcarSemUniversidade && (
                             <div className="flex flex-col gap-2 mt-7">
-                                <InputAutoComplete
-                                    id="escritorio"
-                                    legenda="Qual AIESEC mais próxima?"
-                                    opcoes={listaEscritorios}
-                                    valor={escritorioSelecionado}
-                                    atualizar={handleSelecionarEscritorio}
-                                    error={erroEscritorio}
-                                    obrigatorio={marcarSemUniversidade}
-                                />
+                                <Suspense fallback={<div className="h-10 bg-gray-100 animate-pulse rounded-lg" />}>
+                                    <InputAutoComplete
+                                        id="escritorio"
+                                        legenda="Qual AIESEC mais próxima?"
+                                        opcoes={listaEscritorios}
+                                        valor={escritorioSelecionado}
+                                        atualizar={handleSelecionarEscritorio}
+                                        error={erroEscritorio}
+                                        obrigatorio={marcarSemUniversidade}
+                                    />
+                                </Suspense>
                             </div>
                         )}
                     </div>
 
                     {/* Origem */}
                     <div className="flex flex-col">
-                        <InputAutoComplete
-                            id="origem"
-                            legenda="Como conheceu a AIESEC?"
-                            opcoes={listaOrigens}
-                            valor={origemSelecionada}
-                            atualizar={handleSelecionarOrigem}
-                            error={erroOrigem}
-                            obrigatorio
-                        />
+                        <Suspense fallback={<div className="h-10 bg-gray-100 animate-pulse rounded-lg" />}>
+                            <InputAutoComplete
+                                id="origem"
+                                legenda="Como conheceu a AIESEC?"
+                                opcoes={listaOrigens}
+                                valor={origemSelecionada}
+                                atualizar={handleSelecionarOrigem}
+                                error={erroOrigem}
+                                obrigatorio
+                            />
+                        </Suspense>
                     </div>
 
                     {/* Termo LGPD */}
