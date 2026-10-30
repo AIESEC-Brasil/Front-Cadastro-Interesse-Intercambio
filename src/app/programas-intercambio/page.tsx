@@ -5,10 +5,24 @@
  * @description Página de fluxo de cadastro para Programas de Intercâmbio.
  */
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useState, Suspense } from 'react';
-import FormularioPreCadastro from "@components/forms/FormularioPreCadastro";
-import FormularioPreCadastroParams from "@components/forms/FormularioPreCadastroParams";
-import FormularioQualificao from "@components/forms/FormularioQualificao";
+import React, { useState, Suspense, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+
+// Força o carregamento estritamente no Client-side, sem preloading no HTML inicial
+const FormularioPreCadastro = dynamic(() => import("@components/forms/FormularioPreCadastro"), {
+    ssr: false,
+    loading: () => <div className="p-8 text-center text-gray-500 font-medium">Carregando formulário...</div>,
+});
+
+const FormularioPreCadastroParams = dynamic(() => import("@components/forms/FormularioPreCadastroParams"), {
+    ssr: false,
+    loading: () => <div className="p-8 text-center text-gray-500 font-medium">Carregando formulário...</div>,
+});
+
+const FormularioQualificao = dynamic(() => import("@components/forms/FormularioQualificao"), {
+    ssr: false,
+    loading: () => <div className="p-8 text-center text-gray-500 font-medium">Carregando próxima etapa...</div>,
+});
 
 interface ProgramasIntercambioProps {
     req?: { 
@@ -25,19 +39,22 @@ const ProgramasIntercambioContent: React.FC<ProgramasIntercambioProps> = () => {
     const searchParams = useSearchParams();
     const totalSteps = 2;
 
-    // Converte os parâmetros da URL diretamente para o tipo esperado
-    const paramsObjeto = Object.fromEntries(searchParams.entries()) as {
-        utm_source: string;
-        utm_medium: string;
-        utm_campaign: string;
-        utm_term: string;
-        utm_content: string;
-    };
+    // Processa parâmetros sem disparar polyfill de Object.fromEntries
+    const paramsObjeto = useMemo(() => {
+        if (!searchParams) return { utm_source: '', utm_medium: '', utm_campaign: '', utm_term: '', utm_content: '' };
+        return {
+            utm_source: searchParams.get('utm_source') || '',
+            utm_medium: searchParams.get('utm_medium') || '',
+            utm_campaign: searchParams.get('utm_campaign') || '',
+            utm_term: searchParams.get('utm_term') || '',
+            utm_content: searchParams.get('utm_content') || '',
+        };
+    }, [searchParams]);
 
     // Normaliza o caminho removendo a barra inicial
-    const rotaFormatada = pathname?.replace(/^\//, '') || '';
+    const rotaFormatada = useMemo(() => pathname?.replace(/^\//, '') || '', [pathname]);
 
-    // Verifica se existem parâmetros de query na URL (ex: ?utm_source=xyz)
+    // Verifica se existem parâmetros na URL
     const temParametrosUrl = searchParams ? searchParams.toString().length > 0 : false;
     
     return (
@@ -77,7 +94,7 @@ const ProgramasIntercambioContent: React.FC<ProgramasIntercambioProps> = () => {
                     })}
                 </div>
 
-                {/* STEP 1: Renderização condicional baseada na presença de parâmetros na URL */}
+                {/* STEP 1: Renderização condicional diferida */}
                 {step === 1 && (
                     temParametrosUrl ? (
                         <FormularioPreCadastroParams 
@@ -95,7 +112,7 @@ const ProgramasIntercambioContent: React.FC<ProgramasIntercambioProps> = () => {
                     )
                 )}
                 
-                {/* STEP 2: Continua inalterado */}
+                {/* STEP 2: Carregado sob demanda */}
                 {step === 2 && (
                     <FormularioQualificao
                         rota={rotaFormatada} 
