@@ -48,6 +48,7 @@ const FormularioPreCadastroB2c = () => {
         modalSucessoAberta, setModalSucessoAberta,
         modalSucessoCadastroAberta,
         tipoErroConexao, errosJson, dadosResumo,
+        dataConflito,
         tagCampanha,
 
         erroNome, erroSobrenome, erroDataNascimento,
@@ -253,6 +254,7 @@ const FormularioPreCadastroB2c = () => {
             <ModalConflito
                 aberta={modalConflitoAberta}
                 tipo="b2c"
+                dadosErro={dataConflito}
                 aoFechar={() => setModalConflitoAberta(false)}
             />
         </div>
