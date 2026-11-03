@@ -63,7 +63,7 @@ export interface DadosEnvioTelefone {
 }
 
 /** Referência de uma opção selecionada enviada para a API. */
-export interface DadosOpcaoSelecionada extends OpcaoMetadados {}
+export type DadosOpcaoSelecionada = OpcaoMetadados;
 
 /** Produto com os identificadores usados pelo sistema externo. */
 export interface DadosProduto {
@@ -95,6 +95,9 @@ export interface DadosPreCadastro {
   tag?: string[];
 }
 
+/** Corpo enviado pelo formulário B2C, sem criação de senha para o EXPA. */
+export type DadosPreCadastroB2C = Omit<DadosPreCadastro, 'senha' | 'meio'>;
+
 /** Corpo enviado na atualização opcional da qualificação. */
 export interface DadosQualificacao {
   id: number;
@@ -110,6 +113,24 @@ export interface DadosQualificacao {
 export interface LeadPreCadastroResponse {
   id: number;
   status: 'pré-cadastro';
+}
+
+/** Confirmação devolvida pela rota de pré-cadastro B2C. */
+export interface LeadPreCadastroB2CResponse {
+  status: 'pré-cadastro b2c';
+  id_produto: number;
+  id_status: number;
+  id_escritorio: number;
+  id_origem: number;
+  nome: string;
+  sobrenome: string;
+  telefone: Array<{ tipo: number; numero: string }>;
+  email: Array<{ tipo: number; email: string }>;
+  autorizacao: 1 | 2;
+  universidade: string | null;
+  dataNascimento: string;
+  criado_em: string;
+  tag: string[] | null;
 }
 
 /** Formato padronizado de erro de validação retornado pelo backend. */

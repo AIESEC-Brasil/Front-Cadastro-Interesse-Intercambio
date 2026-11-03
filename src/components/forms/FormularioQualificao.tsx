@@ -13,10 +13,9 @@ import InputAutoComplete from '../ui/input/InputAutoComplete';
 import InputAnexoPdf from '../ui/input/InputAnexoPdf';
 import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
 
+import ModalConfirmacao from '../modal/ModalConfirmacao';
 import ModalSucesso from '../modal/ModalSucesso';
-import ModalSucessoQualificacao from '../modal/ModalSucessoQualificacao';
 import ModalErro from '../modal/ModalErro';
-import ModalErroConexao from '../modal/ModalErroConexao';
 
 import LoadSpinner from '../loading/LoadSpinner';
 import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
@@ -48,6 +47,7 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioProps) => {
         handleAtualizarNivelAtuacao,
         validarEProcessar,
         setModalErroAberta,
+        setModalErroConexaoAberta,
         setModalSucessoAberta,
         modalSucessoQualificaco,
         modalErroAberta,
@@ -141,7 +141,7 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioProps) => {
             {/* Loaders */}
             <LoadSpinner aberta={carregandoEnvio} />
 
-            <ModalSucesso 
+            <ModalConfirmacao
                 aberta={modalSucessoAberta} 
                 titulo="Confirme" 
                 resumoDados={dadosResumo} 
@@ -149,20 +149,22 @@ const FormularioQualificacao = ({ rota, state,step }: FormularioProps) => {
                 aoEditar={() => setModalSucessoAberta(false)} 
             />
 
-            <ModalErroConexao 
-                aberta={modalErroConexaoAberta} 
-                tipo={tipoErroConexao}
-                aoTentarNovamente={() => window.parent.location.reload()} 
+            <ModalErro
+                aberta={modalErroAberta || modalErroConexaoAberta}
+                tipo={modalErroConexaoAberta ? tipoErroConexao : 'validacao'}
+                erros={errosJson}
+                aoFechar={() => {
+                    setModalErroAberta(false);
+                    setModalErroConexaoAberta(false);
+                }}
+                aoTentarNovamente={() => window.parent.location.reload()}
             />
 
-             <ModalErro 
-                aberta={modalErroAberta} 
-                titulo="Dados incorretos." 
-                erros={errosJson} 
-                aoFechar={() => setModalErroAberta(false)} 
+            <ModalSucesso
+                aberta={modalSucessoQualificaco}
+                tipo="qualificacao"
+                aoFechar={fecharModalSucessoQualificacao}
             />
-
-            <ModalSucessoQualificacao isOpen={modalSucessoQualificaco} onClose ={fecharModalSucessoQualificacao} />
         </div>
     );
 };

@@ -12,6 +12,24 @@ const MESES = [
 
 const DIAS_DA_SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];
 
+function dataCompletaValida(valor: string): boolean {
+    const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor);
+    if (!partes) return false;
+
+    const dia = Number(partes[1]);
+    const mes = Number(partes[2]);
+    const ano = Number(partes[3]);
+    const data = new Date(ano, mes - 1, dia);
+
+    return (
+        ano >= 1900 &&
+        ano <= 2100 &&
+        data.getFullYear() === ano &&
+        data.getMonth() === mes - 1 &&
+        data.getDate() === dia
+    );
+}
+
 export default function InputData({
     id,
     legenda,
@@ -167,6 +185,13 @@ export default function InputData({
                     placeholder="DD/MM/AAAA"
                     value={valor}
                     onChange={atualizar}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter' && aberto && dataCompletaValida(valor)) {
+                            event.preventDefault();
+                            setAberto(false);
+                            setVisao('dias');
+                        }
+                    }}
                     className="w-full bg-white px-4 py-3 text-sm text-black placeholder:text-zinc-400 placeholder:uppercase focus:outline-none rounded-xl pr-10"
                 />
 

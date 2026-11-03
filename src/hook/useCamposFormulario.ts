@@ -120,6 +120,7 @@ export function useCamposFormulario() {
                 idNivelAtuacao: '' as string | number,
                 tag: [] as string[]
             }
+            notificarListeners();
     }
 
     return {

@@ -14,14 +14,27 @@ import type { ConflictModalProps } from '../../types/componentes';
  */
 const ModalConflito = ({ 
     aberta, 
-    titulo = "Conflito de Dados Detectado", 
-    dadosErro, 
+    tipo = 'cadastro',
+    dadosErro = '',
     aoFechar 
 }: ConflictModalProps) => {
     if (!aberta) return null;
 
+    const configuracoes = {
+        cadastro: {
+            titulo: "Conflito de Dados Detectado",
+            mensagem: undefined,
+            botaoTexto: "Entendido",
+        },
+        b2c: {
+            titulo: "Lead já existente",
+            mensagem: "Este lead já existe.",
+            botaoTexto: "Entendido",
+        },
+    } as const;
+    const config = configuracoes[tipo];
     const isMensagemSimples = typeof dadosErro === 'string';
-    const mensagem = isMensagemSimples
+    const mensagemResposta = isMensagemSimples
         ? dadosErro
         : dadosErro.message
             ?? (typeof dadosErro.error === 'string' ? dadosErro.error : undefined)
@@ -63,7 +76,7 @@ const ModalConflito = ({
                 
                 {/* Cabeçalho */}
                 <div className="flex justify-between items-center px-6 py-4 border-b border-amber-100 bg-amber-50/50">
-                    <h3 className="text-xl font-bold text-amber-700">{titulo}</h3>
+                    <h3 className="text-xl font-bold text-amber-700">{config.titulo}</h3>
                     <button 
                         onClick={aoFechar}
                         className="text-gray-400 hover:text-gray-600 transition text-2xl font-bold leading-none cursor-pointer"
@@ -75,9 +88,9 @@ const ModalConflito = ({
 
                 {/* Corpo do Modal */}
                 <div className="p-6 max-h-80 overflow-y-auto">
-                    {mensagem && (
+                    {(config.mensagem || mensagemResposta) && (
                         <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 text-amber-800 text-sm">
-                            {mensagem}
+                            {config.mensagem ?? mensagemResposta}
                         </div>
                     )}
 
@@ -117,7 +130,7 @@ const ModalConflito = ({
                         </ul>
                     )}
 
-                    {!mensagem && entradasConflito.length === 0 && detalhesErro.length === 0 && (
+                    {!config.mensagem && !mensagemResposta && entradasConflito.length === 0 && detalhesErro.length === 0 && (
                         <p className="text-gray-700">A solicitação conflita com um cadastro existente.</p>
                     )}
                 </div>
@@ -125,7 +138,7 @@ const ModalConflito = ({
                 {/* Rodapé */}
                 <div className="flex justify-end px-6 py-4 bg-gray-50 border-t border-gray-100">
                     <ButtonEditar 
-                        texto="Entendido" 
+                        texto={config.botaoTexto}
                         aoClicar={aoFechar} 
                     />
                 </div>

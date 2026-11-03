@@ -17,7 +17,7 @@ import InputAutoComplete from '@/components/ui/input/InputAutoComplete';
 
 // Feedback visual e tratamento de erros
 import LoadSkeletonDinamico from '@/components/loading/LoadSkeletonDinamico';
-import ModalErroGenerico from '@/components/modal/ModalErroGenerico';
+import ModalErro from '@/components/modal/ModalErro';
 
 // Hooks customizados para gerenciamento de estado da aplicação
 import { useDadosFormulario } from '@/hook/useDadosFormulario';
@@ -284,9 +284,12 @@ export default function GeradorUrlPage() {
             </main>
 
             {/* Modal para tratamento global de erros de conexão */}
-            <ModalErroGenerico
+            <ModalErro
                 aberta={modals.modalErroConexaoAberta}
                 tipo={modals.tipoErroConexao}
+                aoFechar={() => modals.setModalErroConexaoAberta(false)}
+                tema="escuro"
+                mostrarContato={false}
                 aoTentarNovamente={() => window.parent.location.reload()}
             />
         </div>

@@ -4,6 +4,11 @@ import { params } from '@/types/componentes';
 import type { useCamposFormulario } from './useCamposFormulario';
 import type { ErrosCampos } from '../types/formulario';
 
+interface OpcoesValidacaoFormulario {
+    exigirSenha?: boolean;
+    exigirAutorizacao?: boolean;
+}
+
 /**
  * Centraliza as mensagens de validação das duas etapas.
  *
@@ -15,9 +20,12 @@ import type { ErrosCampos } from '../types/formulario';
  */
 export function useValidacaoFormulario(
     fields: ReturnType<typeof useCamposFormulario>,
-    step: number,
-    params?: params
+    step?: number,
+    params?: params,
+    opcoes: OpcoesValidacaoFormulario = {}
 ) {
+    const exigirSenha = opcoes.exigirSenha ?? true;
+    const exigirAutorizacao = opcoes.exigirAutorizacao ?? true;
     const [erroNome, setErroNome] = useState<string>('');
     const [erroSobrenome, setErroSobrenome] = useState<string>('');
     const [erroSenha, setErroSenha] = useState<string[]>([]);
@@ -83,7 +91,7 @@ export function useValidacaoFormulario(
                 }
             }
 
-            if (senha) {
+            if (exigirSenha && senha) {
                 const eSenha = validarSenha(senha);
                 if (!eSenha || eSenha.length === 0) {
                     setErroSenha([]);
@@ -181,6 +189,7 @@ export function useValidacaoFormulario(
 
     }, [
         step,
+        exigirSenha,
         nome,
         sobrenome,
         curso,
@@ -214,7 +223,7 @@ export function useValidacaoFormulario(
         const eNome = step === 1 ? validarTexto(fields.nome, "nome") : [''];
         const eSobrenome = step === 1 ? validarTexto(fields.sobrenome, "sobrenome") : [''];
         const eCurso = step === 2 ? validarCurso(fields.curso) : [''];
-        const eSenha = step === 1 ? validarSenha(fields.senha) : [];
+        const eSenha = step === 1 && exigirSenha ? validarSenha(fields.senha) : [];
         const eData = step === 1 ? validarData(fields.dataNascimento) : [''];
         const errsE = step === 1 ? validarEmail(fields.emails.map((item) => item.valor)) : [];
         const errsT = step === 1 ? validarTelefone(fields.telefones.map((item) => item.valor)) : [];
@@ -222,7 +231,7 @@ export function useValidacaoFormulario(
         const errOrigem = step === 1 && !fields.idOrigem ? 'Campo obrigatório.' : '';
         const errUni = step === 1 && !params?.utm_term && !fields.marcarSemUniversidade && !fields.idUniversidade ? 'Campo obrigatório.' : '';
         const errEsc = step === 1 && !params?.utm_term && fields.marcarSemUniversidade && !fields.idEscritorio ? 'Campo obrigatório.' : '';
-        const errLGPD = step === 1 && !fields.termoLGPD ? 'Campo obrigatório.' : '';
+        const errLGPD = step === 1 && exigirAutorizacao && !fields.termoLGPD ? 'Campo obrigatório.' : '';
        
         // Step 2 Opcional: Só valida se tem algo preenchido/selecionado mas falta o ID correspondente
         const temAlgoSemestre = fields.semestreSelecionado !== undefined && fields.semestreSelecionado !== null && fields.semestreSelecionado !== '' && fields.semestreSelecionado.length > 0;
