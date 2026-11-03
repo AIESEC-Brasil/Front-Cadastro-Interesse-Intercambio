@@ -45,10 +45,11 @@ async function handleProxy(
   const headers: Record<string, string> = {};
   req.headers.forEach((value, key) => {
     const lowerKey = key.toLowerCase();
-    if (!["host", "connection", "content-length", "transfer-encoding"].includes(lowerKey)) {
+    if (!["host", "x-forwarded-host", "connection", "content-length", "transfer-encoding"].includes(lowerKey)) {
       headers[key] = value;
     }
   });
+  headers["X-Forwarded-Host"] = req.nextUrl.host;
   headers["Accept"] = "application/json";
 
   try {
