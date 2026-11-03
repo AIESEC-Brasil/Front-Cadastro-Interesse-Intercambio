@@ -16,9 +16,8 @@ import InputAutoComplete from '../ui/input/InputAutoComplete';
 import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
 
 import ModalErro from '../modal/ModalErro';
+import ModalConfirmacao from '../modal/ModalConfirmacao';
 import ModalSucesso from '../modal/ModalSucesso';
-import ModalErroConexao from '../modal/ModalErroConexao';
-import ModalSucessoCadastro from '../modal/ModalSucessoCadastro';
 import ModalConflito from '../modal/ModalConflito';
 import LoadSpinner from '../loading/LoadSpinner';
 import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
@@ -47,7 +46,7 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
 
         carregandoMetadados, carregandoEnvio,
         modalErroAberta, setModalErroAberta,
-        modalErroConexaoAberta, modalConflitoAberta, setModalConflitoAberta,
+        modalErroConexaoAberta, setModalErroConexaoAberta, modalConflitoAberta, setModalConflitoAberta,
         modalSucessoAberta, setModalSucessoAberta,
         modalSucessoCadastroAberta,
         tipoErroConexao, errosJson, dadosResumo, dataConflito,
@@ -145,42 +144,18 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
 
                     {/* Seleção de Produto */}
                     {rota === 'talento-global' && (
-                        <div className="flex flex-col gap-1 relative">
-                            <label className="text-sm font-medium text-gray-700">
-                                Produto <span className="text-red-500">*</span>
-                            </label>
-
-                            <div
-                                onClick={() => setIsOpen(!isOpen)}
-                                className={`w-full p-2.5 border rounded-lg bg-white text-gray-900 cursor-pointer flex justify-between items-center ${
-                                    erroProduto ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-blue-200'
-                                }`}
-                            >
-                                <span>{produtoSelecionado || "Selecione"}</span>
-                                <ChevronDown size={18} className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                            </div>
-
-                            {isOpen && (
-                                <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden py-2 px-1 space-y-1 max-h-60 overflow-y-auto">
-                                    <div
-                                        className="px-3 py-2.5 hover:bg-gray-100 rounded-xl cursor-pointer text-gray-700 text-sm"
-                                        onClick={handleLimparProduto}
-                                    >
-                                        Selecione
-                                    </div>
-                                    {listaProdutos.filter(p => p.nome.toLowerCase().includes("talento global")).map((prod) => (
-                                        <div
-                                            key={prod.id}
-                                            className="px-3 py-2.5 hover:bg-gray-100 rounded-xl cursor-pointer text-gray-900 text-sm"
-                                            onClick={() => handleSelecionarProduto(prod.nome, prod.id)}
-                                        >
-                                            {prod.nome}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {erroProduto && <span className="min-h-4 text-xs text-red-500 mt-0.5">{erroProduto}</span>}
+                        <div className="flex flex-col">
+                            <Suspense fallback={<div className="h-10 bg-gray-100 animate-pulse rounded-lg" />}>
+                                <InputAutoComplete
+                                    id="produto"
+                                    legenda="Qual Produto de interesse?"
+                                    opcoes={listaProdutos.filter(p => p.nome.toLowerCase().includes("talento global"))}
+                                    valor={produtoSelecionado}
+                                    atualizar={handleSelecionarProduto}
+                                    error={erroProduto}
+                                    obrigatorio
+                                />
+                            </Suspense>
                         </div>
                     )}
 
@@ -279,13 +254,17 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
             <LoadSpinner aberta={carregandoEnvio} />
 
             <ModalErro
-                aberta={modalErroAberta}
-                titulo="Dados incorretos."
+                aberta={modalErroAberta || modalErroConexaoAberta}
+                tipo={modalErroConexaoAberta ? tipoErroConexao : 'validacao'}
                 erros={errosJson}
-                aoFechar={() => setModalErroAberta(false)}
+                aoFechar={() => {
+                    setModalErroAberta(false);
+                    setModalErroConexaoAberta(false);
+                }}
+                aoTentarNovamente={() => window.parent.location.reload()}
             />
 
-            <ModalSucesso
+            <ModalConfirmacao
                 aberta={modalSucessoAberta}
                 titulo="Confirme"
                 resumoDados={dadosResumo}
@@ -293,17 +272,12 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
                 aoEditar={() => setModalSucessoAberta(false)}
             />
 
-            <ModalSucessoCadastro
+            <ModalSucesso
                 aberta={modalSucessoCadastroAberta}
+                tipo="cadastro"
                 senha={senha}
                 emailReferencia={emails[0]?.valor || ''}
-                aoConcluir={fecharModalSucessoCadastro}
-            />
-
-            <ModalErroConexao
-                aberta={modalErroConexaoAberta}
-                tipo={tipoErroConexao}
-                aoTentarNovamente={() => window.parent.location.reload()}
+                aoFechar={fecharModalSucessoCadastro}
             />
 
             <ModalConflito aberta={modalConflitoAberta} dadosErro={dataConflito} aoFechar={() => { setModalConflitoAberta(false) }} />

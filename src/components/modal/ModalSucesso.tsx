@@ -1,92 +1,100 @@
-/**
- * @file ModalSucesso.tsx
- * @description Modal de sucesso dinâmica com botão de fechar (×) e dois botões no rodapé (Editar dados e Confirmar), totalmente em português.
- */
-import ButtonEditar from '../ui/buttons/ButtonEditar';
-import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
-import type { SummaryModalProps } from '../../types/componentes';
+import React from 'react';
+import type { FinalSuccessModalProps } from '../../types/componentes';
 
-/**
- * Confirmação intermediária antes do envio.
- *
- * Fechar ou editar chama `aoEditar`; confirmar chama `aoConfirmar`. O modal não
- * conhece a API: ele apenas apresenta o resumo recebido e delega a decisão ao
- * hook que controla o formulário.
- */
-const ModalSucesso = ({
-    aberta,
-    titulo = "Confirme seus dados",
-    mensagem,
-    resumoDados,
-    aoEditar,
-    aoConfirmar
-}: SummaryModalProps) => {
-    if (!aberta) return null;
+const configuracoes = {
+  cadastro: {
+    titulo: 'Cadastro Realizado com Sucesso!',
+    mensagem: 'Em breve entraremos em contato com você, fique atento ao e-mail ou ao telefone que você informou.',
+    botao: 'Entendido',
+    tema: 'verde',
+    mostrarDetalhes: true,
+    mostrarFechar: false,
+  },
+  preCadastroB2c: {
+    titulo: 'Pré-cadastro feito com sucesso!',
+    mensagem: '',
+    botao: 'Entendido',
+    tema: 'verde',
+    mostrarDetalhes: false,
+    mostrarFechar: false,
+  },
+  qualificacao: {
+    titulo: 'Dados enviados com sucesso!',
+    mensagem: 'Valeu pelas informações adicionais! 💙',
+    botao: 'Ok',
+    tema: 'azul',
+    mostrarDetalhes: false,
+    mostrarFechar: true,
+  },
+} as const;
 
-    return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden relative">
-                
-                {/* Cabeçalho com o botão X para fechar */}
-                <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
-                    <h3 className="text-xl font-bold text-blue-900 truncate pr-2">{titulo}</h3>
-                    <button 
-                        onClick={aoEditar}
-                        className="text-gray-400 hover:text-gray-600 transition text-2xl font-bold leading-none cursor-pointer shrink-0"
-                        aria-label="Fechar"
-                    >
-                        &times;
-                    </button>
-                </div>
+/** Apresenta a confirmação final de acordo com o fluxo concluído. */
+export default function ModalSucesso({
+  aberta,
+  tipo,
+  emailReferencia,
+  senha,
+  aoFechar,
+}: FinalSuccessModalProps) {
+  if (!aberta) return null;
 
-                {/* Corpo da Modal com limitação de altura responsiva */}
-                <div className="p-6 max-h-[60vh] overflow-y-auto">
-                    {mensagem && <p className="text-gray-700 mb-4 whitespace-pre-line">{mensagem}</p>}
+  const config = configuracoes[tipo];
+  const cores = config.tema === 'azul'
+    ? { titulo: 'text-blue-900', botao: 'bg-blue-600 hover:bg-blue-700' }
+    : { titulo: 'text-green-600', botao: 'bg-green-600 hover:bg-green-700' };
 
-                    {/* Exibe o resumo estruturado */}
-                    {resumoDados && (
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 space-y-3 max-w-full">
-                            {Object.entries(resumoDados).map(([chave, valor], index) => (
-                                <div key={index} className="text-sm border-b border-gray-200/60 pb-2 last:border-0 last:pb-0 min-w-0">
-                                    <strong className="text-gray-700 block mb-0.5">{chave}:</strong>
-                                    
-                                    {/* Se o valor for um array */}
-                                    {Array.isArray(valor) ? (
-                                        <ul className="list-disc list-inside pl-2 space-y-0.5 text-gray-600">
-                                            {valor.map((item, idx) => (
-                                                <li key={idx} className="truncate" title={String(item)}>
-                                                    {String(item)}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <span 
-                                            className="text-gray-600 block pl-2 truncate" 
-                                            title={String(valor)}
-                                        >
-                                            {String(valor)}
-                                        </span>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* Rodapé */}
-                <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-gray-100">
-                    <ButtonEditar 
-                        texto="Editar dados" 
-                        aoClicar={aoEditar} 
-                    />
-                    <ButtonConfirmar 
-                        texto="Confirmar" 
-                        aoClicar={aoConfirmar} 
-                    />
-                </div>
-            </div>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div
+        className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-2xl max-w-md w-full"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-sucesso-titulo"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <h2 id="modal-sucesso-titulo" className={`text-xl font-bold mb-3 ${cores.titulo}`}>
+            {config.titulo}
+          </h2>
+          {config.mostrarFechar && (
+            <button
+              type="button"
+              onClick={aoFechar}
+              className="text-gray-400 hover:text-gray-600 transition text-2xl font-bold leading-none cursor-pointer"
+              aria-label="Fechar"
+            >
+              &times;
+            </button>
+          )}
         </div>
-    );
-};
 
-export default ModalSucesso;
+        {config.mensagem && (
+          <p className="text-zinc-600 dark:text-zinc-400 mb-4">{config.mensagem}</p>
+        )}
+
+        {config.mostrarDetalhes && (
+          <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded-lg mb-6 space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+            {emailReferencia && (
+              <p>
+                <strong className="text-zinc-900 dark:text-zinc-100">E-mail referência:</strong>{' '}
+                {emailReferencia}
+              </p>
+            )}
+            {senha && (
+              <p>
+                <strong className="text-zinc-900 dark:text-zinc-100">Senha cadastrada:</strong>{' '}
+                {senha}
+              </p>
+            )}
+          </div>
+        )}
+
+        <button
+          onClick={aoFechar}
+          className={`w-full py-2 px-4 text-white rounded-lg transition-colors font-medium cursor-pointer ${cores.botao}`}
+        >
+          {config.botao}
+        </button>
+      </div>
+    </div>
+  );
+}

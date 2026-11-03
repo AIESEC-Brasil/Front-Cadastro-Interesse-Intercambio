@@ -32,19 +32,20 @@ export interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
 }
 
+export type ConnectionErrorType = 'conexao' | 'bug';
+export type ErrorModalType = 'validacao' | ConnectionErrorType;
+
 export interface ErrorModalProps {
   aberta: boolean;
-  titulo?: string;
-  erros: ErrosCampos;
+  tipo: ErrorModalType;
+  erros?: ErrosCampos;
   aoFechar: () => void;
-}
-
-export type ConnectionErrorType = 'conexao' | 'bug';
-
-export interface ConnectionErrorModalProps {
-  aberta: boolean;
-  aoTentarNovamente: () => void;
-  tipo: ConnectionErrorType;
+  aoTentarNovamente?: () => void;
+  titulo?: string;
+  mensagem?: string;
+  botaoTexto?: string;
+  mostrarContato?: boolean;
+  tema?: 'claro' | 'escuro';
 }
 
 export interface ConflictData {
@@ -58,8 +59,8 @@ export interface ConflictData {
 
 export interface ConflictModalProps {
   aberta: boolean;
-  titulo?: string;
-  dadosErro: ConflictData | string;
+  tipo?: 'cadastro' | 'b2c';
+  dadosErro?: ConflictData | string;
   aoFechar: () => void;
 }
 
@@ -72,16 +73,12 @@ export interface SummaryModalProps {
   aoConfirmar: () => void;
 }
 
-export interface CadastroSuccessModalProps {
+export interface FinalSuccessModalProps {
   aberta: boolean;
-  senha: string;
-  emailReferencia: string;
-  aoConcluir: () => void;
-}
-
-export interface QualificationSuccessModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  tipo: 'cadastro' | 'preCadastroB2c' | 'qualificacao';
+  emailReferencia?: string;
+  senha?: string;
+  aoFechar: () => void;
 }
 
 export interface TextInputProps {

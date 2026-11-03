@@ -14,9 +14,8 @@ import InputDinamico from '../ui/input/InputDinamico';
 import ButtonConfirmar from '../ui/buttons/ButtonConfirmar';
 
 import ModalErro from '../modal/ModalErro';
+import ModalConfirmacao from '../modal/ModalConfirmacao';
 import ModalSucesso from '../modal/ModalSucesso';
-import ModalErroConexao from '../modal/ModalErroConexao';
-import ModalSucessoCadastro from '../modal/ModalSucessoCadastro';
 import ModalConflito from '../modal/ModalConflito';
 import LoadSpinner from '../loading/LoadSpinner';
 import LoadSkeletonDinamico from '../loading/LoadSkeletonDinamico';
@@ -42,7 +41,7 @@ const FormularioPreCadastroParams = ({ rota, state, step, params }: FormularioPr
 
         carregandoMetadados, carregandoEnvio,
         modalErroAberta, setModalErroAberta,
-        modalErroConexaoAberta, modalConflitoAberta, setModalConflitoAberta,
+        modalErroConexaoAberta, setModalErroConexaoAberta, modalConflitoAberta, setModalConflitoAberta,
         modalSucessoAberta, setModalSucessoAberta,
         modalSucessoCadastroAberta,
         tipoErroConexao, errosJson, dadosResumo, dataConflito,
@@ -167,13 +166,17 @@ const FormularioPreCadastroParams = ({ rota, state, step, params }: FormularioPr
             <LoadSpinner aberta={carregandoEnvio} />
 
             <ModalErro
-                aberta={modalErroAberta}
-                titulo="Dados incorretos."
+                aberta={modalErroAberta || modalErroConexaoAberta}
+                tipo={modalErroConexaoAberta ? tipoErroConexao : 'validacao'}
                 erros={errosJson}
-                aoFechar={() => setModalErroAberta(false)}
+                aoFechar={() => {
+                    setModalErroAberta(false);
+                    setModalErroConexaoAberta(false);
+                }}
+                aoTentarNovamente={() => window.parent.location.reload()}
             />
 
-            <ModalSucesso
+            <ModalConfirmacao
                 aberta={modalSucessoAberta}
                 titulo="Confirme"
                 resumoDados={dadosResumo}
@@ -181,17 +184,12 @@ const FormularioPreCadastroParams = ({ rota, state, step, params }: FormularioPr
                 aoEditar={() => setModalSucessoAberta(false)}
             />
 
-            <ModalSucessoCadastro
+            <ModalSucesso
                 aberta={modalSucessoCadastroAberta}
+                tipo="cadastro"
                 senha={senha}
                 emailReferencia={emails[0]?.valor || ''}
-                aoConcluir={fecharModalSucessoCadastro}
-            />
-
-            <ModalErroConexao
-                aberta={modalErroConexaoAberta}
-                tipo={tipoErroConexao}
-                aoTentarNovamente={() => window.parent.location.reload()}
+                aoFechar={fecharModalSucessoCadastro}
             />
 
             <ModalConflito aberta={modalConflitoAberta} dadosErro={dataConflito} aoFechar={() => { setModalConflitoAberta(false) }} />
