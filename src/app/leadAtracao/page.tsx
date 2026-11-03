@@ -7,6 +7,11 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 
+const pathname = usePathname();
+
+// Normaliza o caminho removendo a barra inicial
+const rotaFormatada = useMemo(() => pathname?.replace(/^\//, '') || '', [pathname]);
+
 // Carregamento dinâmico no Client-side sem bloquear o HTML inicial
 const FormularioPreCadastroB2c = dynamic(
     () => import("@components/forms/FormularioPreCadastroB2c"),
