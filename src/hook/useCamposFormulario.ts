@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { aplicarMascaraData } from '../helpers/formatter';
+import { aplicarMascaraData, formatarNome } from '../helpers/formatter';
 import { contemApenasLetrasEspacos } from '../utils/validates';
 import type { ItemContato } from '../types/comum';
 import { EstadoCamposFormulario } from '../types/formulario';
@@ -71,20 +71,6 @@ export function useCamposFormulario() {
             listenersGlobal = listenersGlobal.filter((l) => l !== atualizar);
         };
     }, []);
-
-    const formatarNome = (val: string) => {
-        const conectivos = ['da', 'de', 'di', 'do', 'du', 'a', 'e', 'i', 'o', 'u'];
-        return val
-            .split(' ')
-            .map((p, index) => {
-                const palavraLower = p.toLowerCase();
-                if (index > 0 && conectivos.includes(palavraLower)) {
-                    return palavraLower;
-                }
-                return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();
-            })
-            .join(' ');
-    };
 
     const limpar = () => {
             estadoGlobalFormulario = {

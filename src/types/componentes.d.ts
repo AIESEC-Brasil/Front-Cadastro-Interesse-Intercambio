@@ -30,6 +30,7 @@ export interface ButtonProps {
   texto: string;
   aoClicar: () => void;
   type?: 'button' | 'submit' | 'reset';
+  desabilitado?: boolean;
 }
 
 export type ConnectionErrorType = 'conexao' | 'bug';

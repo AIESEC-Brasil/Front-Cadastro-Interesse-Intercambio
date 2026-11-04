@@ -20,24 +20,30 @@ const InputAnexoPdf = ({
 }: PdfInputProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const readerRef = useRef<FileReader | null>(null);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [carregando, setCarregando] = useState<boolean>(false);
     const [progresso, setProgresso] = useState<number>(0);
+    const [erroArquivo, setErroArquivo] = useState<string | null>(null);
 
     // Garante o cancelamento do FileReader ao desmontar o componente
     useEffect(() => {
         return () => {
-            if (readerRef.current) {
-                readerRef.current.abort();
-            }
+            readerRef.current?.abort();
+            if (timerRef.current) clearTimeout(timerRef.current);
         };
     }, []);
 
     const processarArquivo = useCallback((novoArquivo: File) => {
+        readerRef.current?.abort();
+        if (timerRef.current) clearTimeout(timerRef.current);
+
         setCarregando(true);
         setProgresso(0);
+        setErroArquivo(null);
 
         const reader = new FileReader();
+        const inicioLeitura = Date.now();
         readerRef.current = reader;
 
         // Atualiza a barra com o progresso real de leitura em disco
@@ -49,20 +55,36 @@ const InputAnexoPdf = ({
         };
 
         reader.onload = () => {
-            const base64String = reader.result as string;
+            if (typeof reader.result !== 'string') {
+                setErroArquivo('Não foi possível ler o arquivo selecionado.');
+                setCarregando(false);
+                setProgresso(0);
+                atualizar(null, null);
+                readerRef.current = null;
+                return;
+            }
+
+            const base64String = reader.result;
             const base64Puro = base64String.split(',')[1] || base64String;
-            
+
             setProgresso(100);
-            setCarregando(false);
-            atualizar(novoArquivo, base64Puro);
-            readerRef.current = null;
+            const tempoRestante = Math.max(0, 300 - (Date.now() - inicioLeitura));
+            timerRef.current = setTimeout(() => {
+                if (readerRef.current !== reader) return;
+                setCarregando(false);
+                atualizar(novoArquivo, base64Puro);
+                readerRef.current = null;
+                timerRef.current = null;
+            }, tempoRestante);
         };
 
         reader.onerror = () => {
+            setErroArquivo('Não foi possível ler o arquivo selecionado.');
             setCarregando(false);
             setProgresso(0);
             atualizar(null, null);
             readerRef.current = null;
+            timerRef.current = null;
         };
 
         reader.readAsDataURL(novoArquivo);
@@ -73,19 +95,31 @@ const InputAnexoPdf = ({
 
         if (!novoArquivo) return;
 
-        // Validações de tipo e tamanho
-        if (novoArquivo.type !== 'application/pdf' || !novoArquivo.name.toLowerCase().endsWith('.pdf')) {
+        event.target.value = '';
+        readerRef.current?.abort();
+        readerRef.current = null;
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
+        setCarregando(false);
+        setProgresso(0);
+
+        // Aceita arquivos PDF cujo navegador não informe o MIME type.
+        if (!novoArquivo.name.toLowerCase().endsWith('.pdf') ||
+            (novoArquivo.type && novoArquivo.type !== 'application/pdf')) {
+            setErroArquivo('Selecione um arquivo PDF.');
             atualizar(null, null);
-            event.target.value = '';
             return;
         }
 
         if (tamanhoMaximoMb && novoArquivo.size > tamanhoMaximoMb * 1024 * 1024) {
+            setErroArquivo(`O arquivo deve ter no máximo ${tamanhoMaximoMb} MB.`);
             atualizar(null, null);
-            event.target.value = '';
             return;
         }
 
+        setErroArquivo(null);
         processarArquivo(novoArquivo);
     }, [atualizar, tamanhoMaximoMb, processarArquivo]);
 
@@ -96,10 +130,15 @@ const InputAnexoPdf = ({
             readerRef.current.abort();
             readerRef.current = null;
         }
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
 
         atualizar(null, null);
         setCarregando(false);
         setProgresso(0);
+        setErroArquivo(null);
 
         if (inputRef.current) {
             inputRef.current.value = '';
@@ -208,6 +247,11 @@ const InputAnexoPdf = ({
                     </div>
                 )}
             </div>
+            {erroArquivo && (
+                <span className="mt-1 block text-xs text-red-500" role="alert">
+                    {erroArquivo}
+                </span>
+            )}
         </div>
     );
 };
