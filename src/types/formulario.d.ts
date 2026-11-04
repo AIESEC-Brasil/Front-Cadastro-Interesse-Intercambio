@@ -98,6 +98,19 @@ export interface DadosPreCadastro {
 /** Corpo enviado pelo formulário B2C, sem criação de senha para o EXPA. */
 export type DadosPreCadastroB2C = Omit<DadosPreCadastro, 'senha' | 'meio'>;
 
+/** Linha importada do modelo de pré-cadastro B2C em planilha. */
+export interface DadosPlanilhaB2C {
+  nome: string;
+  sobrenome: string;
+  email: string;
+  telefone: string;
+  nascimento: string;
+  produto: string;
+  comite: string;
+  como_conheceu: string;
+  tag: string;
+}
+
 /** Corpo enviado na atualização opcional da qualificação. */
 export interface DadosQualificacao {
   id: number;

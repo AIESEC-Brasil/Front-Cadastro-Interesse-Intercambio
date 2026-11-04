@@ -97,10 +97,25 @@ const slugify = (texto:string) => {
             .replace(/^[-/]+|[-/]+$/g, "");      // remove hífens ou barras no início/fim
     }
 
+const formatarNome = (valor: string): string => {
+    const conectivos = ['da', 'de', 'di', 'do', 'du', 'a', 'e', 'i', 'o', 'u'];
+    return valor
+        .split(' ')
+        .map((palavra, indice) => {
+            const minuscula = palavra.toLowerCase();
+            if (indice > 0 && conectivos.includes(minuscula)) {
+                return minuscula;
+            }
+            return palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase();
+        })
+        .join(' ');
+};
+
 export {
     aplicarMascaraTelefone,
     removerMascaraTelefone,
     aplicarMascaraData,
     removerMascaraData,
-    slugify
+    slugify,
+    formatarNome
 };
