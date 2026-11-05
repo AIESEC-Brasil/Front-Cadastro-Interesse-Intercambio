@@ -27,18 +27,23 @@ const ModalConflito = ({
             botaoTexto: "Entendido",
         },
         b2c: {
-            titulo: "Lead já existente",
-            mensagem: "Este lead já existe.",
+            titulo: "Conflito no pré-cadastro",
+            mensagem: "Não foi possível concluir o pré-cadastro.",
             botaoTexto: "Entendido",
         },
     } as const;
     const config = configuracoes[tipo];
     const isMensagemSimples = typeof dadosErro === 'string';
+    const detalheB2c = !isMensagemSimples && tipo === 'b2c'
+        ? dadosErro.error_details?.find((detalhe) => detalhe.loc === 'B2C')?.msg
+        : undefined;
     const mensagemResposta = isMensagemSimples
         ? dadosErro
-        : dadosErro.message
+        : detalheB2c
+            ?? dadosErro.message
             ?? (typeof dadosErro.error === 'string' ? dadosErro.error : undefined)
             ?? dadosErro.erro;
+    const mensagemExibida = mensagemResposta || config.mensagem;
     const entradasConflito = !isMensagemSimples && dadosErro
         ? Object.entries(dadosErro).filter(
             ([campo, itens]) =>
@@ -48,7 +53,9 @@ const ModalConflito = ({
         )
         : [];
     const detalhesErro = !isMensagemSimples && dadosErro?.error_details
-        ? dadosErro.error_details
+        ? dadosErro.error_details.filter(
+            (detalhe) => tipo !== 'b2c' || detalhe.loc !== 'B2C'
+        )
         : [];
 
     // Função para traduzir/formatar o nome do campo para exibição amigável
@@ -88,9 +95,9 @@ const ModalConflito = ({
 
                 {/* Corpo do Modal */}
                 <div className="p-6 max-h-80 overflow-y-auto">
-                    {(config.mensagem || mensagemResposta) && (
+                    {mensagemExibida && (
                         <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 text-amber-800 text-sm">
-                            {config.mensagem ?? mensagemResposta}
+                            {mensagemExibida}
                         </div>
                     )}
 
@@ -130,7 +137,7 @@ const ModalConflito = ({
                         </ul>
                     )}
 
-                    {!config.mensagem && !mensagemResposta && entradasConflito.length === 0 && detalhesErro.length === 0 && (
+                    {!mensagemExibida && entradasConflito.length === 0 && detalhesErro.length === 0 && (
                         <p className="text-gray-700">A solicitação conflita com um cadastro existente.</p>
                     )}
                 </div>
