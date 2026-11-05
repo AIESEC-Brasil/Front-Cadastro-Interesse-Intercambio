@@ -104,7 +104,7 @@ const InputAutoComplete: React.FC<AutoCompleteProps> = ({
 
     return (
         <div
-            className={`${styles.inputGroup} ${error ? styles.hasError : ''} relative w-full`}
+            className={`${styles.inputGroup} ${styles.autoComplete} ${error ? styles.hasError : ''} relative w-full`}
             ref={containerRef}
         >
             <div className={`relative flex items-center w-full rounded-xl border bg-white transition-all ${
