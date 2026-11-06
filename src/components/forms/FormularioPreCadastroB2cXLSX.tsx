@@ -164,6 +164,8 @@ const FormularioPreCadastroB2cXLSX = () => {
         enviarLeadPlanilha,
     } = useFormularioPreCadastroB2c();
     const [arquivoPlanilha, setArquivoPlanilha] = useState<File | null>(null);
+    const [nomeArquivoPlanilha, setNomeArquivoPlanilha] = useState<string | null>(null);
+    const [inputPlanilhaKey, setInputPlanilhaKey] = useState(0);
     const [processando, setProcessando] = useState(false);
     const [erroArquivo, setErroArquivo] = useState<string | null>(null);
     const [resultados, setResultados] = useState<ResultadoLinha[]>([]);
@@ -276,6 +278,8 @@ const FormularioPreCadastroB2cXLSX = () => {
             );
         } finally {
             setProcessando(false);
+            setArquivoPlanilha(null);
+            setInputPlanilhaKey((key) => key + 1);
         }
     };
 
@@ -323,12 +327,14 @@ const FormularioPreCadastroB2cXLSX = () => {
                 </a>
             </div>
 
-            {carregandoMetadados && <LoadSkeletonDinamico aberta layoutLinhas={[2, 1]} />}
-
             <InputXlsx
+                key={inputPlanilhaKey}
                 id="planilha-leads"
                 legenda="Planilha de leads"
-                atualizar={setArquivoPlanilha}
+                atualizar={(arquivo) => {
+                    setArquivoPlanilha(arquivo);
+                    setNomeArquivoPlanilha(arquivo?.name ?? null);
+                }}
                 obrigatorio
                 desabilitado={processando || carregandoMetadados}
             />
@@ -413,10 +419,10 @@ const FormularioPreCadastroB2cXLSX = () => {
                                     </p>
                                 )}
                                 <div className="mt-5 flex flex-wrap justify-end gap-3">
-                                    {planilhaComErros && arquivoPlanilha && (
+                                    {planilhaComErros && nomeArquivoPlanilha && (
                                         <ButtonConfirmar
                                             texto="Baixar planilha com erros"
-                                            aoClicar={() => fazerDownloadErros(planilhaComErros, arquivoPlanilha.name)}
+                                            aoClicar={() => fazerDownloadErros(planilhaComErros, nomeArquivoPlanilha)}
                                         />
                                     )}
                                     <ButtonConfirmar
