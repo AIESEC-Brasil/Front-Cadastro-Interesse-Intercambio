@@ -15,6 +15,7 @@ import apiOgxClient from "@/service/clients/apiOgxClient";
 import { aplicarMascaraData } from "@/helpers/formatter";
 import {
   validarCurso,
+  validarConfirmacaoSenha,
   validarData,
   validarEmail,
   validarSenha,
@@ -127,6 +128,8 @@ function CompletarCadastroContent() {
   );
   const [senha, setSenha] = useState("");
   const [senhaFoiAlterada, setSenhaFoiAlterada] = useState(false);
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [confirmacaoSenhaFoiAlterada, setConfirmacaoSenhaFoiAlterada] = useState(false);
   const [curso, setCurso] = useState("");
   const [idiomas, setIdiomas] = useState<OpcaoMetadados[]>([]);
   const [areaAtuacao, setAreaAtuacao] = useState("");
@@ -247,6 +250,7 @@ function CompletarCadastroContent() {
   };
 
   const validarFormulario = () => {
+    setConfirmacaoSenhaFoiAlterada(true);
     if (!lead) return "Link de conclusão inválido.";
     const erros = [
       ...validarTexto(lead.nome, "nome").filter(Boolean),
@@ -255,6 +259,7 @@ function CompletarCadastroContent() {
       ...validarTelefone([lead.telefone]).filter(Boolean),
       ...validarData(dataNascimento).filter(Boolean),
       ...validarSenha(senha).filter(Boolean),
+      ...validarConfirmacaoSenha(senha, confirmarSenha).filter(Boolean),
     ];
 
     if (!produto) erros.push("O produto informado no link não está disponível.");
@@ -388,7 +393,7 @@ function CompletarCadastroContent() {
           {erroMetadados && <p role="alert" className="mb-4 text-red-600">{erroMetadados}</p>}
           <div className="flex flex-col gap-5">
             {linkValidado && (
-              <p className="mb-6 text-gray-600">Olá, {lead.nome} {lead.sobrenome}!</p>
+              <h3 className="mb-6 text-gray-600">Olá, {lead.nome} {lead.sobrenome}!</h3>
             )}
             <InputData
               id="dataNascimento"
@@ -406,6 +411,12 @@ function CompletarCadastroContent() {
                 setSenhaFoiAlterada(true);
               }}
               error={senhaFoiAlterada ? validarSenha(senha) : [""]}
+              confirmarValor={confirmarSenha}
+              atualizarConfirmacao={(evento) => {
+                setConfirmarSenha(evento.target.value);
+                setConfirmacaoSenhaFoiAlterada(true);
+              }}
+              erroConfirmacao={confirmacaoSenhaFoiAlterada ? validarConfirmacaoSenha(senha, confirmarSenha) : [""]}
               obrigatorio
             />
 

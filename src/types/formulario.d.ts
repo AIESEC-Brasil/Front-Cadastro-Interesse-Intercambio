@@ -5,6 +5,7 @@ export interface EstadoCamposFormulario {
   nome: string;
   sobrenome: string;
   senha: string;
+  confirmarSenha: string;
   dataNascimento: string;
   itemId: number;
   emails: ItemContato[];

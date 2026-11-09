@@ -91,7 +91,11 @@ export interface TextInputProps {
   obrigatorio?: boolean;
 }
 
-export interface PasswordInputProps extends TextInputProps {}
+export interface PasswordInputProps extends TextInputProps {
+  confirmarValor: string;
+  atualizarConfirmacao: ManipuladorMudancaEntradaTexto;
+  erroConfirmacao?: string | string[];
+}
 
 export interface DateInputProps extends TextInputProps {}
 

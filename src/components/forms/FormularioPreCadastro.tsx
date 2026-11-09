@@ -29,7 +29,7 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
     const {
         nome, setNome,
         sobrenome, setSobrenome,
-        senha, setSenha,
+        senha, setSenha, confirmarSenha, setConfirmarSenha,
         dataNascimento, setDataNascimento,
         emails,
         telefones,
@@ -51,7 +51,7 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
         modalSucessoCadastroAberta,
         tipoErroConexao, errosJson, dadosResumo, dataConflito,
 
-        erroNome, erroSobrenome, erroSenha, erroDataNascimento,
+        erroNome, erroSobrenome, erroSenha, erroConfirmacaoSenha, erroDataNascimento,
         erroEmail, erroTelefone, erroProduto, erroOrigem,
         erroUniversidade, erroEscritorio, erroTermoLGPD,
 
@@ -95,6 +95,9 @@ const FormularioPreCadastro = ({ rota, state, step }: FormularioProps) => {
                         valor={senha}
                         atualizar={(e: React.ChangeEvent<HTMLInputElement>) => setSenha(e.target.value)}
                         error={erroSenha}
+                        confirmarValor={confirmarSenha}
+                        atualizarConfirmacao={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmarSenha(e.target.value)}
+                        erroConfirmacao={erroConfirmacaoSenha}
                         obrigatorio
                     />
 
