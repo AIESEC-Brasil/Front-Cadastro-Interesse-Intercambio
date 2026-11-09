@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { validarTexto, validarSenha, validarEmail, validarTelefone, validarData, validarCurso } from '../utils/validates';
+import { validarTexto, validarSenha, validarConfirmacaoSenha, validarEmail, validarTelefone, validarData, validarCurso } from '../utils/validates';
 import { params } from '@/types/componentes';
 import type { useCamposFormulario } from './useCamposFormulario';
 import type { ErrosCampos } from '../types/formulario';
@@ -29,6 +29,7 @@ export function useValidacaoFormulario(
     const [erroNome, setErroNome] = useState<string>('');
     const [erroSobrenome, setErroSobrenome] = useState<string>('');
     const [erroSenha, setErroSenha] = useState<string[]>([]);
+    const [confirmacaoTentada, setConfirmacaoTentada] = useState(false);
     const [erroDataNascimento, setErroDataNascimento] = useState<string>('');
     const [erroEmail, setErroEmail] = useState<string[]>([]);
     const [erroTelefone, setErroTelefone] = useState<string[]>([]);
@@ -49,6 +50,7 @@ export function useValidacaoFormulario(
     const sobrenome = fields.sobrenome;
     const curso = fields.curso;
     const senha = fields.senha;
+    const confirmarSenha = fields.confirmarSenha;
     const dataNascimento = fields.dataNascimento;
     const emails = fields.emails;
     const telefones = fields.telefones;
@@ -194,6 +196,7 @@ export function useValidacaoFormulario(
         sobrenome,
         curso,
         senha,
+        confirmarSenha,
         dataNascimento,
         emails.length,
         JSON.stringify(emails),
@@ -224,6 +227,10 @@ export function useValidacaoFormulario(
         const eSobrenome = step === 1 ? validarTexto(fields.sobrenome, "sobrenome") : [''];
         const eCurso = step === 2 ? validarCurso(fields.curso) : [''];
         const eSenha = step === 1 && exigirSenha ? validarSenha(fields.senha) : [];
+        if (step === 1 && exigirSenha) setConfirmacaoTentada(true);
+        const eConfirmacaoSenha = step === 1 && exigirSenha
+            ? validarConfirmacaoSenha(fields.senha, fields.confirmarSenha)
+            : [];
         const eData = step === 1 ? validarData(fields.dataNascimento) : [''];
         const errsE = step === 1 ? validarEmail(fields.emails.map((item) => item.valor)) : [];
         const errsT = step === 1 ? validarTelefone(fields.telefones.map((item) => item.valor)) : [];
@@ -252,6 +259,9 @@ export function useValidacaoFormulario(
             if (eNome?.[0]) { setErroNome(eNome[0]); errosJson["Nome"] = eNome; }
             if (eSobrenome?.[0]) { setErroSobrenome(eSobrenome[0]); errosJson["Sobrenome"] = eSobrenome; }
             if (eSenha?.[0]) { setErroSenha(eSenha); errosJson["Senha"] = eSenha; }
+            if (eConfirmacaoSenha?.[0]) {
+                errosJson["Confirmação da senha"] = eConfirmacaoSenha;
+            }
             if (eData?.[0]) { setErroDataNascimento(eData[0]); errosJson["Data de Nascimento"] = eData; }
             if (errsE.some((e: string) => e !== '')) { setErroEmail(errsE); errosJson["E-mail"] = errsE.filter((e: string) => e !== ''); }
             if (errsT.some((e: string) => e !== '')) { setErroTelefone(errsT); errosJson["Telefone"] = errsT.filter((e: string) => e !== ''); }
@@ -274,9 +284,13 @@ export function useValidacaoFormulario(
         };
     };
 
+    const erroConfirmacaoSenha = exigirSenha && (confirmarSenha || confirmacaoTentada)
+        ? validarConfirmacaoSenha(senha, confirmarSenha)
+        : [];
+
     return {
         erros: {
-            erroNome, erroSobrenome, erroSenha, erroDataNascimento, erroCurso,
+            erroNome, erroSobrenome, erroSenha, erroConfirmacaoSenha, erroDataNascimento, erroCurso,
             erroEmail, erroTelefone, erroProduto, erroOrigem,
             erroUniversidade, erroEscritorio, erroTermoLGPD, erroSemestre, erroIdiomas,
             erroAreaAtuacao, erroNivelAtuacao

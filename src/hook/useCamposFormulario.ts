@@ -11,6 +11,7 @@ let estadoGlobalFormulario: EstadoCamposFormulario = {
     nome: '',
     sobrenome: '',
     senha: '',
+    confirmarSenha: '',
     dataNascimento: '',
     itemId: 0,
     emails: [{ tipo: 'other', valor: '' }] as ItemContato[],
@@ -77,6 +78,7 @@ export function useCamposFormulario() {
                 nome: '',
                 sobrenome: '',
                 senha: '',
+                confirmarSenha: '',
                 dataNascimento: '',
                 itemId: 0,
                 emails: [{ tipo: 'other', valor: '' }] as ItemContato[],
@@ -127,6 +129,11 @@ export function useCamposFormulario() {
         senha: estadoGlobalFormulario.senha, 
         setSenha: (v: string) => {
             estadoGlobalFormulario.senha = v;
+            notificarListeners();
+        },
+        confirmarSenha: estadoGlobalFormulario.confirmarSenha,
+        setConfirmarSenha: (v: string) => {
+            estadoGlobalFormulario.confirmarSenha = v;
             notificarListeners();
         },
         curso: estadoGlobalFormulario.curso,

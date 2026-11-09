@@ -68,6 +68,19 @@ const validarSenha = (senha: string): string[] => {
     return erros;
 };
 
+const validarConfirmacaoSenha = (senha: string, confirmarSenha: string): string[] => {
+    const erros = validarSenha(confirmarSenha).filter(Boolean);
+    if (erros.includes("O campo senha é obrigatório.")) {
+        return ["Confirme sua senha."];
+    }
+
+    if (senha && senha !== confirmarSenha) {
+        erros.push("As senhas não coincidem.");
+    }
+
+    return erros.length > 0 ? erros : [''];
+};
+
 const validarEmail = (emails: string[]): string[] => {
     // O índice da mensagem corresponde à posição da linha no InputDinamico.
     const erros: string[] = [];
@@ -190,6 +203,7 @@ const validarData = (data: string): string[] => {
 export { 
     validarTexto, 
     validarSenha, 
+    validarConfirmacaoSenha,
     contemApenasLetrasEspacos, 
     validarEmail, 
     validarTelefone,
