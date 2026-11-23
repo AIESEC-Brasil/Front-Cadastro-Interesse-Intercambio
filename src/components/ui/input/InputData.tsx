@@ -1,4 +1,4 @@
-// src/components/ui/input/InputData.tsx
+/** Campo de data com calendário acessível e entrada no formato DD/MM/AAAA. */
 
 "use client";
 
@@ -12,6 +12,7 @@ const MESES = [
 
 const DIAS_DA_SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];
 
+/** Verifica a forma e a validade real de uma data digitada. */
 function dataCompletaValida(valor: string): boolean {
     const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor);
     if (!partes) return false;
@@ -30,6 +31,7 @@ function dataCompletaValida(valor: string): boolean {
     );
 }
 
+/** Campo controlado de data com calendário para navegação por dias e anos. */
 export default function InputData({
     id,
     legenda,

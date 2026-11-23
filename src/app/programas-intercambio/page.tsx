@@ -128,6 +128,7 @@ const ProgramasIntercambioContent: React.FC<ProgramasIntercambioProps> = () => {
 /**
  * Componente principal exportado que protege o useSearchParams com o Suspense.
  */
+/** Seleciona a etapa do formulário de intercâmbio a partir da rota e da URL. */
 export default function ProgramasIntercambio(props: ProgramasIntercambioProps) {
     return (
         <Suspense fallback={

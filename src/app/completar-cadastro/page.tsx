@@ -69,6 +69,7 @@ const programasExpa: Record<number, string> = {
   9: "Professor Global",
 };
 
+/** Mantém apenas opções ativas de um campo recebido nos metadados da API. */
 const opcoesAtivas = (campo?: CampoApi): OpcaoMetadados[] =>
   (campo?.config?.settings?.options ?? [])
     .filter((opcao) => {
@@ -77,6 +78,7 @@ const opcoesAtivas = (campo?: CampoApi): OpcaoMetadados[] =>
     })
     .map((opcao) => ({ id: opcao.id, nome: opcao.text }));
 
+/** Converte a data da resposta da API para o formato exibido no formulário. */
 const formatarDataInicial = (valor: string | null) => {
   if (!valor || valor === "null") return "";
   const [ano, mes, dia] = valor.slice(0, 10).split("-");
@@ -84,11 +86,13 @@ const formatarDataInicial = (valor: string | null) => {
   return `${dia}/${mes}/${ano}`;
 };
 
+/** Converte a data digitada para o formato ISO esperado pelo backend. */
 const converterDataParaApi = (valor: string) => {
   const [dia, mes, ano] = valor.split("/");
   return `${ano}-${mes}-${dia}T00:00:00`;
 };
 
+/** Busca o pré-cadastro pelo ID da URL e controla sua conclusão. */
 function CompletarCadastroContent() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -508,6 +512,7 @@ function CompletarCadastroContent() {
   );
 }
 
+/** Envolve o conteúdo dependente de query string no limite de Suspense do Next. */
 export default function CompletarCadastroPage() {
   return (
     <Suspense fallback={<p className="p-8 text-center text-gray-500">Carregando cadastro...</p>}>

@@ -2,6 +2,7 @@ import { useCamposFormulario } from './useCamposFormulario';
 import { useValidacaoFormulario } from './useValidacaoFormulario';
 import { useModaisFormulario } from './useModaisFormulario';
 import { useDadosFormulario } from './useDadosFormulario';
+import type { ResumoFormulario } from '../types/formulario';
 
 /**
  * Orquestra a segunda etapa, chamada de qualificação.
@@ -65,7 +66,7 @@ export function useFormularioQualificacao(rota: string, state: (step: number) =>
             modals.setErrosJson(errosJson);
             modals.setModalErroAberta(true);
         } else {
-            const jsonResumo: any = {};
+            const jsonResumo: ResumoFormulario = {};
             const campoOpicionalPreenchido = fields.idiomasSelecionados.length > 0 
             || fields.curso || 
             fields.semestreSelecionado || 

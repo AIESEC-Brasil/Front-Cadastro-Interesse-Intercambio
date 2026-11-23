@@ -1,23 +1,23 @@
-// Estruturas de produto com sigla e nome por extenso para facilitar matching.
-//Formato dos itens: { sigla: 'gv', nome: 'Voluntário Globa' }
+/** Par de sigla e rótulo usado para associar parâmetros de campanha a produtos. */
 export interface ItemSigla {
     sigla: string;
     nome: string;
 }
 
+/** Par de sigla e nome de um escritório local da AIESEC. */
 export interface ItemEscritorio {
     sigla: string;
     nome: string;
 }
 
+/** Rótulos oficiais usados para interpretar `utm_content` no gerador de URLs. */
 const siglaProduto: ItemSigla[] = [
     { sigla: 'gv', nome: 'Voluntário Global' },
     { sigla: 'gtast', nome: 'Talento Global Short Term' },
     { sigla: 'gtalt', nome: 'Talento Global Mid e Long Term' },
     { sigla: 'gte', nome: 'Professor Global' }
 ];
-// Estruturas de escritórios (CLs) com sigla e nome por extenso para facilitar matching.
-//Formato dos itens: { sigla: 'AB', nome: 'ABC' } 
+/** Escritórios locais e siglas aceitas pelo gerador de URLs de campanha. */
 const escritorios: ItemEscritorio[] = [
     { sigla: "AB", nome: "ABC" },
     { sigla: "AJ", nome: "ARACAJU" },

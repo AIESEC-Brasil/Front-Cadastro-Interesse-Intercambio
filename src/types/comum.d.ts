@@ -1,3 +1,4 @@
+/** Tipos básicos compartilhados entre os contratos de formulário e interface. */
 import type { ChangeEvent } from 'react';
 
 /** Identificador aceito pelo backend para uma opção cadastrada. */

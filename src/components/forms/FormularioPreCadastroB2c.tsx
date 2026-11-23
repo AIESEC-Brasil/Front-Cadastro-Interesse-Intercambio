@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * @file FormularioPreCadastro.tsx
- * @description Componente de formulário para pré-cadastro de leads AIESEC.
- * Renderiza os inputs, listas dinâmicas e modais consumindo a lógica do custom hook.
+ * @file FormularioPreCadastroB2c.tsx
+ * @description Formulário de pré-cadastro B2C, sem etapa de senha/EXPA.
+ * Renderiza os campos e modais usando o hook específico do fluxo B2C.
  */
 
 import React, { Suspense } from 'react';

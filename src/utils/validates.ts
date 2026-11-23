@@ -3,6 +3,7 @@
  * @description Funções utilitárias para validação de campos de formulário e formatação de máscaras.
  */
 
+/** Valida obrigatoriedade, caracteres permitidos e tamanho de um nome textual. */
 const validarTexto = (Texto: string, campo: string): string[] => {
     // Retorna uma lista porque um campo pode acumular mais de uma mensagem;
     // a camada visual decide como apresentar o primeiro ou todos os erros.
@@ -18,6 +19,7 @@ const validarTexto = (Texto: string, campo: string): string[] => {
     return [''];
 };
 
+/** Permite letras e espaços; a string vazia é aceita durante a digitação. */
 const contemApenasLetrasEspacos = (valor: string): boolean => {
     if (valor === "") {
         return true;
@@ -25,6 +27,7 @@ const contemApenasLetrasEspacos = (valor: string): boolean => {
     return /^[A-Za-zÀ-ÿ\s]+$/.test(valor);
 };
 
+/** Retorna os requisitos de senha ainda não atendidos pelo valor informado. */
 const validarSenha = (senha: string): string[] => {
     // As regras são verificadas separadamente para que o usuário saiba
     // exatamente quais requisitos ainda faltam cumprir.
@@ -68,6 +71,7 @@ const validarSenha = (senha: string): string[] => {
     return erros;
 };
 
+/** Valida a confirmação e a igualdade com a senha original. */
 const validarConfirmacaoSenha = (senha: string, confirmarSenha: string): string[] => {
     const erros = validarSenha(confirmarSenha).filter(Boolean);
     if (erros.includes("O campo senha é obrigatório.")) {
@@ -81,6 +85,7 @@ const validarConfirmacaoSenha = (senha: string, confirmarSenha: string): string[
     return erros.length > 0 ? erros : [''];
 };
 
+/** Valida uma lista de e-mails e mantém cada erro alinhado à sua linha. */
 const validarEmail = (emails: string[]): string[] => {
     // O índice da mensagem corresponde à posição da linha no InputDinamico.
     const erros: string[] = [];
@@ -109,6 +114,7 @@ const validarEmail = (emails: string[]): string[] => {
     return erros;
 };
 
+/** Valida celulares brasileiros com DDD após remover a máscara visual. */
 const validarTelefone = (telefones: string[]): string[] => {
     const erros: string[] = [];
     const regexTelefone = /^[1-9]{2}9\d{8}$/;
@@ -136,6 +142,7 @@ const validarTelefone = (telefones: string[]): string[] => {
     return erros;
 };
 
+/** Valida o nome opcional do curso e seu limite de caracteres. */
 const validarCurso = (curso: string): string[] => {
     const valor = curso.trim();
     if (!valor) return [''];

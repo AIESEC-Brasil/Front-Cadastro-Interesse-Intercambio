@@ -24,7 +24,7 @@ import { useDadosFormulario } from '@/hook/useDadosFormulario';
 import { useModaisFormulario } from '@/hook/useModaisFormulario';
 
 /**
- * Componente principal da tela do Gerador de URL.
+ * Tela que monta links de campanha com rota do programa e parâmetros UTM.
  * 
  * @returns {JSX.Element} Elemento React representando o formulário e resultado da URL.
  */
@@ -97,12 +97,12 @@ export default function GeradorUrlPage() {
 
             // Busca a sigla do escritório no dicionário
             const siglaEscritorio: string = escritorios.filter(
-                (e: any) => e.nome === nomeEscritorioLimpo
+                (e) => e.nome === nomeEscritorioLimpo
             )[0]?.sigla || '';
 
             // Busca a sigla do produto/programa no dicionário
             const siglaProdutoEncontrada: string = siglaProduto.filter(
-                (e: any) => e.nome === programa
+                (e) => e.nome === programa
             )[0]?.sigla || '';
 
             // Tratamento da variável de ambiente para evitar barras duplas na montagem da URL base

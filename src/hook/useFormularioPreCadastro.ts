@@ -64,10 +64,10 @@ export function useFormularioPreCadastro(
                 fields.setIdProduto(encontrado.id); 
             }
         } else if (rota === 'talento-global' && (params?.utm_content === 'gtast' || params?.utm_content === 'gtalt')) {
-            const produto = siglaProduto?.filter((e: any) => e?.sigla.toLowerCase() === params?.utm_content)[0]?.nome;
+            const produto = siglaProduto?.filter((e) => e?.sigla.toLowerCase() === params?.utm_content)[0]?.nome;
             if (produto) {
                 const encontrado = dadosFormulario.listaProdutos.find(
-                    (p:any) => p.nome.toLowerCase() === produto.toLowerCase()
+                    (p) => p.nome.toLowerCase() === produto.toLowerCase()
                 );
                 if (encontrado) { 
                     fields.setProdutoSelecionado(encontrado.nome); 
@@ -79,7 +79,7 @@ export function useFormularioPreCadastro(
         // 2. Preenchimento automático da Origem (Como conheceu a AIESEC) via utm_source
         if (params?.utm_source) {
             const origem = dadosFormulario.listaOrigens.find(
-                (o:any) => slugify(o.nome.toLowerCase()) === params?.utm_source?.toLowerCase()
+                (o) => slugify(o.nome.toLowerCase()) === params?.utm_source?.toLowerCase()
             );
             if (origem) { 
                 fields.setOrigemSelecionada(origem.nome); 
@@ -91,7 +91,7 @@ export function useFormularioPreCadastro(
         // 3. Preenchimento automático do Meio de divulgação via utm_medium
         if (params?.utm_medium) {
             const meio = dadosFormulario.listaMeio.find(
-                (o:any) => slugify(o.nome.toLowerCase()) === params?.utm_medium?.toLowerCase()
+                (o) => slugify(o.nome.toLowerCase()) === params?.utm_medium?.toLowerCase()
             );
             if (meio) { 
                 fields.setMeioSelecionado(meio.nome); 
@@ -102,7 +102,7 @@ export function useFormularioPreCadastro(
         // 4. Seleção automática do Escritório Local (CL) via utm_term e desativação de universidade
         if (params?.utm_term) {
             fields.setMarcarSemUniversidade(true);
-            const cl = escritorios?.filter((e: any) => e?.sigla.toLowerCase() === params?.utm_term)[0]?.nome;
+            const cl = escritorios?.filter((e) => e?.sigla.toLowerCase() === params?.utm_term)[0]?.nome;
             if (cl) {
                 const escritorio = dadosFormulario.listaEscritorios.filter(
                     o => o.nome

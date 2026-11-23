@@ -20,6 +20,7 @@ import type { useModaisFormulario } from './useModaisFormulario';
 import { useDadosFormulario } from './useDadosFormulario';
 import { validarData, validarEmail, validarTelefone, validarTexto } from '../utils/validates';
 
+/** Adapta os erros da API aos rótulos dos campos do formulário B2C. */
 function formatarErrosDaApi(resposta: ApiErrorResponse): Record<string, string[]> {
     const nomesCampos: Record<string, string> = {
         nome: 'Nome',
@@ -59,12 +60,22 @@ interface ResultadoEnvioB2c {
     erro?: string;
 }
 
-const normalizarTexto = (valor: string) =>
+/** Normaliza nomes para comparações sem diferenças de acento ou caixa. */
+const normalizarTexto = (valor: string): string =>
     valor.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
 
-const buscarOpcao = (opcoes: OpcaoMetadados[], valor: string) =>
+/** Encontra uma opção de metadado pelo nome normalizado. */
+const buscarOpcao = (opcoes: OpcaoMetadados[], valor: string): OpcaoMetadados | undefined =>
     opcoes.find((opcao) => normalizarTexto(opcao.nome) === normalizarTexto(valor));
 
+/**
+ * Fornece operações do fluxo B2C sobre os metadados e campos compartilhados.
+ * Envia pré-cadastros individuais ou linhas importadas e encaminha conflitos
+ * e erros para os modais.
+ *
+ * @param options Estado dos modais e dos campos do formulário.
+ * @returns Ações de envio e dados necessários ao fluxo B2C.
+ */
 export function useDadosFormularioB2c({ modals, fields }: UseDadosFormularioB2cProps) {
     const dadosMetadados = useDadosFormulario({ modals });
     const searchParams = useSearchParams();

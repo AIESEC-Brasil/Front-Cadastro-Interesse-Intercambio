@@ -1,3 +1,4 @@
+/** Modelos de estado, payload e resposta usados pelos fluxos de cadastro. */
 import type { ItemContato, IdEntidade, OpcaoMetadados, IdEntidadeSemDefinir } from './comum';
 
 /** Estado completo compartilhado entre pré-cadastro e qualificação. */

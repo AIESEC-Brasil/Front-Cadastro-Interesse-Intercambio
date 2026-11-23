@@ -44,7 +44,8 @@ let estadoGlobalFormulario: EstadoCamposFormulario = {
 
 let listenersGlobal: Array<() => void> = [];
 
-const notificarListeners = () => {
+/** Notifica os hooks inscritos após uma atualização no estado compartilhado. */
+const notificarListeners = (): void => {
     listenersGlobal.forEach((listener) => listener());
 };
 
@@ -60,6 +61,12 @@ const notificarListeners = () => {
  * Cada setter altera o campo correspondente e chama `notificarListeners`. A
  * notificação força os componentes que usam este hook a renderizarem de novo,
  * simulando um pequeno store compartilhado sem adicionar uma biblioteca.
+ */
+/**
+ * Expõe os campos do formulário e setters que mantêm o estado compartilhado.
+ * O store permanece em memória entre as etapas enquanto a página estiver aberta.
+ *
+ * @returns Valores atuais, atualizadores por campo e a ação para limpar o formulário.
  */
 export function useCamposFormulario() {
     const [, setForcarRender] = useState({});

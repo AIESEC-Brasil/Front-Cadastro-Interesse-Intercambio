@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 const MODO_CADASTRO_KEY = 'leadAtracao:modoCadastro';
 const MODO_CADASTRO_EVENT = 'leadAtracao:modoCadastro-change';
 
+/** Observa alterações locais e entre abas na escolha do modo de cadastro. */
 const assinarModoCadastro = (notificar: () => void) => {
     window.addEventListener('storage', notificar);
     window.addEventListener(MODO_CADASTRO_EVENT, notificar);
@@ -16,11 +17,14 @@ const assinarModoCadastro = (notificar: () => void) => {
     };
 };
 
+/** Lê o modo persistido no navegador, usando o modo individual como padrão. */
 const obterModoCadastro = () =>
     window.localStorage.getItem(MODO_CADASTRO_KEY) === '2' ? '2' : '1';
 
+/** Valor inicial usado durante a renderização no servidor. */
 const obterModoCadastroNoServidor = () => '1';
 
+/** Carrega o formulário individual apenas no cliente. */
 const FormularioPreCadastroB2c = dynamic(
     () => import("@components/forms/FormularioPreCadastroB2c"),
     {
@@ -29,6 +33,7 @@ const FormularioPreCadastroB2c = dynamic(
     }
 );
 
+/** Carrega o formulário de planilha apenas no cliente. */
 const FormularioPreCadastroB2cXLSX = dynamic(
     () => import("@components/forms/FormularioPreCadastroB2cXLSX"),
     {

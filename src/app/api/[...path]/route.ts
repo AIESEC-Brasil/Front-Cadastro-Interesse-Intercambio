@@ -7,10 +7,18 @@ import { NextRequest, NextResponse } from "next/server";
 import apiExterna from "@/service/api/apiExterna";
 import axios from "axios";
 
+/**
+ * Encaminha uma chamada `/api/<path>` ao backend configurado no servidor.
+ * Preserva método, query string, corpo, status e payload de erro da origem.
+ *
+ * @param req Requisição recebida pelo App Router.
+ * @param context Parâmetros dinâmicos da rota catch-all.
+ * @returns Resposta HTTP que o navegador receberá.
+ */
 async function handleProxy(
   req: NextRequest,
   context: { params: Promise<{ path?: string[] }> }
-) {
+): Promise<NextResponse> {
   // Remove o prefixo público `/api` e encaminha para a rota real do backend.
   const { path } = await context.params;
 
@@ -25,7 +33,7 @@ async function handleProxy(
   const restQuery = Object.fromEntries(req.nextUrl.searchParams.entries());
 
   // Tratamento seguro do body apenas se realmente houver payload
-  let body: any = undefined;
+  let body: unknown = undefined;
   const method = req.method.toUpperCase();
   
   if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
@@ -62,7 +70,7 @@ async function handleProxy(
     });
 
     return NextResponse.json(response.data, { status: response.status });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status || 500;
       const errorData = error.response?.data || { message: error.message };
@@ -70,7 +78,10 @@ async function handleProxy(
     }
 
     return NextResponse.json(
-      { message: "Erro interno no proxy", error: error.message },
+      {
+        message: "Erro interno no proxy",
+        error: (error as { message?: string }).message,
+      },
       { status: 500 }
     );
   }

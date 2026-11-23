@@ -8,6 +8,7 @@ const lato = Lato({
   weight: ["400", "700"],
 });
 
+/** Metadados HTML padrão herdados pelas rotas da aplicação. */
 export const metadata: Metadata = {
   title: {
     default: "Cadastro de Interesse | AIESEC no Brasil",
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     "Conheça oportunidades de intercâmbio e cadastre seu interesse nos programas da AIESEC no Brasil.",
 };
 
-/** Envolve cada página com a estrutura HTML comum da aplicação. */
+/** Envolve cada rota com a estrutura HTML, fonte e estilos globais. */
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html

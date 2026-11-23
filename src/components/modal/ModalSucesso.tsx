@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FinalSuccessModalProps } from '../../types/componentes';
 
+/** Textos e aparência por etapa exibidos pelo modal de sucesso. */
 const configuracoes = {
   cadastro: {
     titulo: 'Cadastro Realizado com Sucesso!',
@@ -29,6 +30,7 @@ const configuracoes = {
 } as const;
 
 /** Apresenta a confirmação final de acordo com o fluxo concluído. */
+/** Confirma ao usuário o resultado da etapa de cadastro atual. */
 export default function ModalSucesso({
   aberta,
   tipo,
