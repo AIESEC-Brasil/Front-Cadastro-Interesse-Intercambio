@@ -13,6 +13,7 @@ import axios from "axios";
  */
 const apiOgxClient = axios.create({
   baseURL: "/api",
+  timeout: 300000,
   headers: {
     "Content-Type": "application/json"
   }
