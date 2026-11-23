@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FileSpreadsheet, Upload, X } from 'lucide-react';
 import styles from './style.module.css';
 
+/** Contrato do seletor de arquivos de planilha. */
 interface InputXlsxProps {
   id: string;
   legenda: string;
@@ -12,6 +13,7 @@ interface InputXlsxProps {
   desabilitado?: boolean;
 }
 
+/** Seleciona um arquivo Excel local e encaminha a seleção ao formulário pai. */
 const InputXlsx = ({
   id,
   legenda,

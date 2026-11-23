@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend
 
-## Getting Started
+Aplicação web para cadastro e qualificação de pessoas interessadas nos programas de intercâmbio da AIESEC Brasil. O frontend apresenta os formulários e encaminha as chamadas à API pelo servidor Next.js.
 
-First, run the development server:
+## Visão geral
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+O projeto usa Next.js App Router. As páginas e componentes ficam em `src/app/` e `src/components/`; hooks concentram o estado e as validações dos formulários, e os clientes HTTP ficam em `src/service/`.
+
+## Tecnologias
+
+- Next.js 16 e React 19
+- TypeScript
+- Axios
+- Tailwind CSS
+- OpenNext e Wrangler para o runtime Cloudflare Workers
+
+## Funcionalidades
+
+- Formulário de pré-cadastro B2C.
+- Fluxo para completar e qualificar cadastro.
+- Formulário de atração e geração de links para programas de intercâmbio.
+- Importação de cadastros por planilha XLSX.
+- Campos e opções preenchidos com metadados retornados pela API.
+
+## Estrutura do projeto
+
+```text
+.
+├── src/
+│   ├── app/                 # páginas, layouts e proxy /api/[...path]
+│   ├── components/          # formulários, campos e elementos de interface
+│   ├── hook/                # estado, envio e validação dos formulários
+│   ├── helpers/             # formatação e dicionários
+│   ├── service/             # clientes HTTP do navegador e do servidor
+│   ├── types/               # tipos compartilhados
+│   └── utils/               # utilitários de validação
+├── public/                  # arquivos estáticos
+├── .github/workflows/       # deploy para Cloudflare Workers
+├── Dockerfile               # imagem para teste local
+├── package.json
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Requisitos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Node.js e npm nas versões definidas no workflow de deploy.
+- Acesso à API Flask para carregar metadados e enviar cadastros.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Instalação e execução local
 
-## Learn More
+```bash
+npm ci
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Abra `http://localhost:3000` no navegador.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Configuração do ambiente
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Defina `EXTERNAL_API_URL` no ambiente do processo Next.js com a URL base da API Flask. A rota `src/app/api/[...path]/route.ts` usa essa variável no servidor para encaminhar as requisições recebidas em `/api/<rota>`; portanto, o navegador não acessa diretamente a URL do backend.
 
-## Deploy on Vercel
+`NEXT_PUBLIC_URL_DIRECIONADA` é usada pelo gerador de links e não configura o destino da API. Para a imagem Docker local, essa variável é recebida como argumento de build. Não coloque credenciais nos valores `NEXT_PUBLIC_*`, pois eles podem ser incorporados ao bundle do navegador.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts disponíveis
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run dev                 # servidor Next.js para desenvolvimento
+npm run lint                # análise estática com ESLint
+npm run build               # build padrão do Next.js
+npm run build:cloudflare    # build OpenNext para Cloudflare Workers
+npm run preview             # executa a build no runtime local de Workers
+npm run deploy              # compila e publica o Worker
+```
+
+## API
+
+Os formulários consultam endpoints de metadados e enviam operações de cadastro pela API Flask. O contrato dos endpoints, os formatos de resposta e a configuração do serviço estão documentados no [README do backend](../backend/README.md). O portal OpenAPI da API é servido em `/api/docs` quando habilitado e autorizado.
+
+## Deploy
+
+O workflow `.github/workflows/deploy.yaml` deste diretório prepara a aplicação com OpenNext e publica um Cloudflare Worker. Ele requer `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `EXTERNAL_API_URL` como secrets, além de `NEXT_PUBLIC_URL_DIRECIONADA` para os links gerados. O Dockerfile serve para o ambiente local de teste; não define o runtime de produção.

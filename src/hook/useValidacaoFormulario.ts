@@ -17,6 +17,12 @@ interface OpcoesValidacaoFormulario {
  * o botão de avanço é acionado. Na etapa 2, os campos são opcionais: só há erro
  * quando alguém começou a preenchê-los, mas ainda não escolheu uma opção válida
  * com ID correspondente.
+ *
+ * @param fields Store dos campos atuais do formulário.
+ * @param step Etapa ativa; define quais grupos de campos são validados.
+ * @param params Valores UTM usados para reconhecer um produto pré-selecionado.
+ * @param opcoes Permite dispensar validações de senha e autorização no fluxo B2C.
+ * @returns Mensagens por campo e ações para validar ou limpar erros.
  */
 export function useValidacaoFormulario(
     fields: ReturnType<typeof useCamposFormulario>,

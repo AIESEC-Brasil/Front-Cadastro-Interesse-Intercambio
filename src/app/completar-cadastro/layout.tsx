@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+/** Metadados da etapa de conclusão de um pré-cadastro B2C. */
 export const metadata: Metadata = {
   title: "Complete seu cadastro",
   description:
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
   }, 
 };
 
+/** Repassa a página de conclusão para o layout global da aplicação. */
 export default function CompletarCadastroLayout({
   children,
 }: {

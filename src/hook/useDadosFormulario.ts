@@ -42,6 +42,7 @@ interface RespostaQualificacao {
     status: 'qualificação';
 }
 
+/** Converte detalhes de erro da API para rótulos compreensíveis pela interface. */
 function formatarErrosDaApi(resposta: ApiErrorResponse): Record<string, string[]> {
     const nomesCampos: Record<string, string> = {
         nome: 'Nome',
@@ -114,6 +115,14 @@ interface UseDadosFormularioProps {
     rota?: string;
 }
 
+/**
+ * Carrega os metadados compartilhados e executa operações de cadastro.
+ * Normaliza os valores escolhidos para o contrato da API e encaminha falhas
+ * aos estados dos modais.
+ *
+ * @param options Modais, campos e contexto opcional da etapa/rota atual.
+ * @returns Listas de metadados, estados de carregamento e ações de envio.
+ */
 export function useDadosFormulario({ modals, fields, step, rota }: UseDadosFormularioProps) {
     const [carregandoMetadados, setCarregandoMetadados] = useState(!cacheGlobal.jaCarregou);
     const [erroMetadados, setErroMetadados] = useState(false);

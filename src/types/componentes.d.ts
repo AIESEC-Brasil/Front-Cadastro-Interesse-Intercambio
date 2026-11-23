@@ -1,6 +1,8 @@
+/** Contratos de props compartilhados pelos componentes visuais da aplicação. */
 import type { ManipuladorMudancaArquivo, OpcaoMetadados, ManipuladorSelecaoMetadados, ManipuladorMudancaEtapa, ManipuladorMudancaEntradaTexto, OpcaoTraduzida } from './comum';
 import type { ErrosCampos, ResumoFormulario } from './formulario';
 
+/** Parâmetros de campanha lidos da URL e usados para pré-preencher formulários. */
 export interface params {
   utm_source: string;
   utm_medium: string;
@@ -9,6 +11,7 @@ export interface params {
   utm_content: string;
 }
 
+/** Propriedades comuns aos formulários de pré-cadastro e qualificação. */
 export interface FormularioProps {
   rota: string;
   state: ManipuladorMudancaEtapa;
@@ -16,16 +19,19 @@ export interface FormularioProps {
   params?: params
 }
 
+/** Controla a visibilidade e o número de colunas do esqueleto de carregamento. */
 export interface LoadSkeletonProps {
   aberta: boolean;
   layoutLinhas?: number[];
 }
 
+/** Estado e mensagem do indicador que bloqueia a interface durante uma operação. */
 export interface LoadSpinnerProps {
   aberta: boolean;
   message?: string;
 }
 
+/** Contrato de um botão de ação reutilizável. */
 export interface ButtonProps {
   texto: string;
   aoClicar: () => void;
@@ -33,9 +39,12 @@ export interface ButtonProps {
   desabilitado?: boolean;
 }
 
+/** Origem da falha exibida no modal de erro. */
 export type ConnectionErrorType = 'conexao' | 'bug';
+/** Tipos de conteúdo que o modal de erro consegue apresentar. */
 export type ErrorModalType = 'validacao' | ConnectionErrorType;
 
+/** Dados de estado, mensagens e callbacks do modal de erro. */
 export interface ErrorModalProps {
   aberta: boolean;
   tipo: ErrorModalType;
@@ -49,6 +58,7 @@ export interface ErrorModalProps {
   tema?: 'claro' | 'escuro';
 }
 
+/** Campos de conflito devolvidos pela API, como e-mails ou telefones duplicados. */
 export interface ConflictData {
   erro?: string;
   error?: boolean | string;
@@ -58,6 +68,7 @@ export interface ConflictData {
   error_details?: Array<{ loc: string; msg: string }>;
 }
 
+/** Propriedades do modal que detalha um conflito HTTP 409. */
 export interface ConflictModalProps {
   aberta: boolean;
   tipo?: 'cadastro' | 'b2c';
@@ -65,6 +76,7 @@ export interface ConflictModalProps {
   aoFechar: () => void;
 }
 
+/** Dados e ações do resumo que pede confirmação antes do envio. */
 export interface SummaryModalProps {
   aberta: boolean;
   titulo?: string;
@@ -74,6 +86,7 @@ export interface SummaryModalProps {
   aoConfirmar: () => void;
 }
 
+/** Propriedades dos modais que confirmam a conclusão de uma etapa. */
 export interface FinalSuccessModalProps {
   aberta: boolean;
   tipo: 'cadastro' | 'preCadastroB2c' | 'qualificacao';
@@ -82,6 +95,7 @@ export interface FinalSuccessModalProps {
   aoFechar: () => void;
 }
 
+/** Contrato compartilhado pelos campos de texto controlados. */
 export interface TextInputProps {
   id: string;
   legenda: string;
@@ -91,14 +105,17 @@ export interface TextInputProps {
   obrigatorio?: boolean;
 }
 
+/** Propriedades adicionais necessárias para validar a confirmação da senha. */
 export interface PasswordInputProps extends TextInputProps {
   confirmarValor: string;
   atualizarConfirmacao: ManipuladorMudancaEntradaTexto;
   erroConfirmacao?: string | string[];
 }
 
+/** O campo de data reutiliza o contrato dos campos de texto. */
 export interface DateInputProps extends TextInputProps {}
 
+/** Dados, opções e callbacks de um campo com busca/autocomplete. */
 export interface AutoCompleteProps {
   id: string;
   legenda: string;
@@ -111,6 +128,7 @@ export interface AutoCompleteProps {
   desabilitado?: boolean;
 }
 
+/** Configuração do controle para listas editáveis, como e-mails e telefones. */
 export interface DynamicInputProps {
   tituloLabel: string;
   placeholderInput: string;
@@ -126,6 +144,7 @@ export interface DynamicInputProps {
   obrigatorio?: boolean;
 }
 
+/** Estado e opções do seletor múltiplo de idiomas. */
 export interface LanguageMultiSelectProps {
   id: string;
   legenda: string;
@@ -138,6 +157,7 @@ export interface LanguageMultiSelectProps {
   desabilitado?: boolean;
 }
 
+/** Arquivo local e callback de atualização do campo de currículo PDF. */
 export interface PdfInputProps {
   id: string;
   legenda: string;
@@ -148,6 +168,7 @@ export interface PdfInputProps {
   tamanhoMaximoMb?: number;
 }
 
+/** Dia renderizado pelo calendário, incluindo a origem no mês visível. */
 export interface CalendarDay {
   dia: number;
   outroMes: boolean;
@@ -155,4 +176,5 @@ export interface CalendarDay {
   anoRef: number;
 }
 
+/** Modos disponíveis no seletor de calendário. */
 export type CalendarView = 'dias' | 'anos';

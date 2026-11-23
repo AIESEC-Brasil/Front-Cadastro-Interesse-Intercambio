@@ -3,9 +3,16 @@
  * @description Funções auxiliares para tradução de metadados e formatação de máscaras (telefone e data).
  */
 
-export async function traduzirPalavras(palavras: string[]) {
-    /** O backend envia valores técnicos; esta tabela traduz apenas rótulos
-     * conhecidos e preserva o texto original quando não há tradução segura. */
+/**
+ * Converte rótulos técnicos de metadados em textos de interface em português.
+ * Valores não reconhecidos são preservados para não esconder informação.
+ *
+ * @param palavras Rótulos recebidos da API, como tipos de telefone e e-mail.
+ * @returns Cada rótulo original acompanhado do texto mostrado ao usuário.
+ */
+export async function traduzirPalavras(
+    palavras: string[]
+): Promise<Array<{ original: string; traduzido: string }>> {
     const dicionarioBase: Record<string, string> = {
         home: "Casa",
         main: "Principal",
@@ -32,6 +39,7 @@ export async function traduzirPalavras(palavras: string[]) {
 /**
  * Aplica a máscara de telefone brasileiro no formato (DD) 9XXXXXXXX.
  */
+/** Aplica a máscara visual brasileira `(DD) 99999-9999`, limitada a 11 dígitos. */
 const aplicarMascaraTelefone = (valor: string): string => {
     // A máscara é visual: antes do envio, removerMascaraTelefone extrai apenas
     // os dígitos para atender ao formato esperado pelo backend.
@@ -49,6 +57,7 @@ const aplicarMascaraTelefone = (valor: string): string => {
 /**
  * Remove a máscara de telefone, retornando apenas os dígitos numéricos.
  */
+/** Remove a máscara de telefone e devolve somente os dígitos para a API. */
 const removerMascaraTelefone = (valor: string): string => {
     return valor.replace(/\D/g, "");
 };
@@ -56,6 +65,7 @@ const removerMascaraTelefone = (valor: string): string => {
 /**
  * Aplica a máscara de data no formato DD/MM/YYYY.
  */
+/** Insere separadores de data progressivamente no formato `DD/MM/AAAA`. */
 const aplicarMascaraData = (valor: string): string => {
     const apenasNumeros = valor.replace(/\D/g, "").slice(0, 8);
     
@@ -71,6 +81,7 @@ const aplicarMascaraData = (valor: string): string => {
 /**
  * Remove a máscara de data, retornando no formato ano-m-d (YYYY-MM-DD).
  */
+/** Converte uma data completa `DD/MM/AAAA` para `AAAA-MM-DD`. */
 const removerMascaraData = (valor: string): string => {
     const apenasNumeros = valor.replace(/\D/g, "").slice(0, 8);
     
@@ -85,7 +96,8 @@ const removerMascaraData = (valor: string): string => {
     return `${ano}-${mes}-${dia}`;
 };
 
-const slugify = (texto:string) => {
+/** Normaliza um texto para uso em caminhos e identificadores de campanha. */
+const slugify = (texto: string): string => {
         return texto
             .toLowerCase()                       // tudo minúsculo
             .normalize("NFD")                    // separa letras dos acentos
@@ -97,6 +109,7 @@ const slugify = (texto:string) => {
             .replace(/^[-/]+|[-/]+$/g, "");      // remove hífens ou barras no início/fim
     }
 
+/** Capitaliza nomes e mantém conectivos comuns em minúsculas. */
 const formatarNome = (valor: string): string => {
     const conectivos = ['da', 'de', 'di', 'do', 'du', 'a', 'e', 'i', 'o', 'u'];
     return valor

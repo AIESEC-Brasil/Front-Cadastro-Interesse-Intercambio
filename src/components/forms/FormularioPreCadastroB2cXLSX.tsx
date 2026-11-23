@@ -1,5 +1,7 @@
 'use client';
 
+/** Importa leads B2C de uma planilha, valida cada linha e acompanha os envios. */
+
 import { useState, type FormEvent } from 'react';
 import { CheckCircle2, Circle, CircleX, LoaderCircle, X } from 'lucide-react';
 import * as XLSX from '@e965/xlsx';
@@ -51,6 +53,7 @@ const cabecalhosObrigatorios = [
 
 const LIMITE_ENVIO_CONCORRENTE = 3;
 
+/** Remove acentos e pontuação para comparar cabeçalhos equivalentes. */
 const normalizarCabecalho = (valor: ValorCelula) =>
     String(valor)
         .trim()
@@ -59,6 +62,7 @@ const normalizarCabecalho = (valor: ValorCelula) =>
         .toLowerCase()
         .replace(/[\s-]+/g, '_');
 
+/** Converte valores de data da planilha para o formato consumido pelo formulário. */
 const formatarData = (valor: ValorCelula): string => {
     if (valor instanceof Date && !Number.isNaN(valor.getTime())) {
         return [
@@ -82,6 +86,7 @@ const formatarData = (valor: ValorCelula): string => {
     return String(valor ?? '').trim();
 };
 
+/** Lê a primeira aba e associa os valores às colunas do modelo B2C. */
 const lerPlanilha = async (arquivo: File): Promise<PlanilhaLida> => {
     const workbook = XLSX.read(await arquivo.arrayBuffer(), {
         type: 'array',
@@ -139,6 +144,7 @@ const lerPlanilha = async (arquivo: File): Promise<PlanilhaLida> => {
     return { cabecalhos, leads };
 };
 
+/** Gera uma planilha de retorno com os erros de validação encontrados por linha. */
 const baixarPlanilhaComErros = (
     dados: DadosPlanilhaComErros,
     nomeArquivo: string
@@ -155,6 +161,7 @@ const baixarPlanilhaComErros = (
     );
 };
 
+/** Interface de seleção, validação e envio em lote de uma planilha B2C. */
 const FormularioPreCadastroB2cXLSX = () => {
     const {
         carregandoMetadados,
