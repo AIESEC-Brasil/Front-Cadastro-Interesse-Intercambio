@@ -10,7 +10,7 @@ const apiExterna = axios.create({
   // Usa fetch, disponível no runtime Workers; agentes http/https do Node não
   // controlam as conexões de saída nesse ambiente.
   adapter: "fetch",
-  timeout: 60000, // Timeout de segurança de 60 segundos
+  timeout: 300000, // Timeout de segurança de 300 segundos
   headers: {
     "Content-Type": "application/json", //indica o formato esperado
     "Cache-Control": "no-cache",
